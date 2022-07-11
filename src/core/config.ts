@@ -12,3 +12,7 @@ export const LOCALSTORAGE_KEY_MAP = {
 };
 
 export const PAGE_SIZE = 20;
+
+export const WS_PROTOCOL = 'ws';
+// export const HostURL = 'https://pro.web3mq.com:23333';
+export const HostURL = '192.168.3.28';

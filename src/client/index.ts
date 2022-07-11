@@ -10,6 +10,7 @@ import { Message } from '../message';
 import { Channel } from '../channel';
 import { User } from '../user';
 import { Contact } from '../contact';
+import Livep2p from '../libp2p';
 
 export class Web3MQ {
   private static _instance: Web3MQ | null;
@@ -20,6 +21,7 @@ export class Web3MQ {
   messages: Message;
   user: User;
   contact: Contact;
+  livep2p: any | undefined;
 
   constructor(props: LoginParams | string) {
     if (typeof props === 'object') {
@@ -39,6 +41,7 @@ export class Web3MQ {
     this.user = new User(this);
     this.contact = new Contact(this);
     this.subscribe();
+    this.livep2p = new Livep2p();
   }
 
   public static getInstance = (props: LoginParams | string) => {
