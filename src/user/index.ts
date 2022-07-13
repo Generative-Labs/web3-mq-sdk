@@ -23,7 +23,7 @@ export class User {
 
   constructor(client: Web3MQ) {
     this._client = client;
-    this.userInfo = getUserInfoFromToken(client.token as string);
+    this.userInfo = getUserInfoFromToken();
   }
 
   /**

@@ -34,6 +34,7 @@ export const getLoginRandomSecret = (params: LoginRandomSecretParams): Promise<a
  * @param format
  */
 export function dateFormat(time: number, format?: string) {
+  console.log('===============dateFormat');
   const t = new Date(time);
   format = format || 'Y-m-d h:i:s';
   let year = t.getFullYear();
@@ -76,12 +77,15 @@ export const setToken = (token: string) => {
 };
 
 export const parseJwt = (str: string) => {
+  console.log('==============333333333=parseJwt');
   return JSON.parse(
     decodeURIComponent(escape(window.atob(str.replace(/-/g, '+').replace(/_/g, '/')))) || '{}',
   );
 };
 
-export const getUserInfoFromToken = (token: string) => {
+export const getUserInfoFromToken = () => {
+  const token = localStorage.getItem('ACCESS_TOKEN') || '';
+  console.log('==============tokeeeeeeen', token);
   const tokenArr = token.substring(7).split('.');
   const userInfo = parseJwt(tokenArr[1]);
   userInfo.avatar = getUserAvatar(userInfo).avatar;
@@ -95,7 +99,7 @@ export const isExpired = () => {
   if (token === '') {
     return false;
   }
-  const accessExpiredAt = getUserInfoFromToken(token).access_expired_at || 0;
+  const accessExpiredAt = getUserInfoFromToken().access_expired_at || 0;
   const timestamp = Math.floor(Date.now() / 1000);
   return timestamp >= accessExpiredAt;
 };
@@ -151,4 +155,22 @@ export const sigToPubkey = (params: SignToPubKeyParams): Promise<any> => {
 
 export const getNextIdSignPayload = (params: getNextIdSignPayloadParams) => {
   return request.post(`${NEXT_ID_HOST}/v1/proof/payload`, params);
+};
+
+export const formatTime = (t = new Date()) => {
+  let fillZero = (n: number) => {
+    let result = n.toString().length === 1 ? '0' + n : n;
+    return result;
+  };
+  let d = new Date(t);
+  let year = d.getFullYear();
+  let month = d.getMonth() + 1;
+  let date = d.getDate();
+  let hours = d.getHours();
+  let minutes = d.getMinutes();
+  let seconds = d.getSeconds();
+  let result = `${year}/${fillZero(month)}/${fillZero(date)} ${fillZero(hours)}:${fillZero(
+    minutes,
+  )}:${fillZero(seconds)}`;
+  return result;
 };

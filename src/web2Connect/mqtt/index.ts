@@ -1,22 +1,22 @@
 import mqtt, { MqttClient, PacketCallback } from 'mqtt';
-import { BASE_MQTT_URL } from './config';
-import request from './request';
-import { getUserInfoFromToken, hasNotifyPermission, isCurrentWindow, notifyMessage } from './utils';
-import type { SendMessageData, GetRoomsParams } from '../types';
+import { BASE_MQTT_URL } from '../core/config';
+import request from '../core/request';
+import {
+  getUserInfoFromToken,
+  hasNotifyPermission,
+  isCurrentWindow,
+  notifyMessage,
+  getToken,
+} from '../core/utils';
+import type { SendMessageData, GetRoomsParams } from '../../types';
 
-export class Web2Connect {
-  token: string;
-  isNotify: boolean;
+export default class Mqtt {
   hasNotifyPermission: boolean;
-  mqtt: MqttClient | null;
+  mqtt: MqttClient | undefined;
 
-  constructor(token: string, isNotify: boolean) {
-    this.token = token;
+  constructor() {
     this.hasNotifyPermission = false;
-    this.mqtt = null;
-    this.isNotify = isNotify;
     this.init();
-    this.subscribe();
   }
 
   init() {
@@ -24,9 +24,9 @@ export class Web2Connect {
       throw new Error('Browser not supported WebSocket');
     }
 
-    if (!this.token) {
-      throw new Error('The Token is required!');
-    }
+    // if (!this.token) {
+    //   throw new Error('The Token is required!');
+    // }
 
     hasNotifyPermission().then((res: boolean) => {
       this.hasNotifyPermission = res;
@@ -35,7 +35,7 @@ export class Web2Connect {
     this.mqtt = mqtt.connect(BASE_MQTT_URL, {
       username: getUserInfoFromToken().user_id,
       clientId: getUserInfoFromToken().user_id,
-      password: this.token,
+      password: getToken(),
       reconnectPeriod: 3000,
     });
 
@@ -73,9 +73,9 @@ export class Web2Connect {
   receive(message: any) {}
 
   /**
-   * 
-   * @param params 
-   * @returns 
+   *
+   * @param params
+   * @returns
    */
   getMyRooms = (params?: GetRoomsParams): Promise<{ data: string[] }> => {
     return request.get('/my_rooms', params as any);

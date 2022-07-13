@@ -1,21 +1,13 @@
-import request from '../core/request';
 import { Web3MQ } from '../client';
 import {
-  // DelMemberFromRoomParams,
-  // GetMessageParams,
-  // GetRoomInfoParams,
-  AddMemberToRoomParams,
   PageParams,
   ChannelResponse,
   MessageResponse,
   MembersItem,
   ActiveMemberItem,
   GetRoomInfoByTargetUserIdParams,
-  RoomResponse,
-} from '../types';
+} from '../../types';
 import { getUserAvatar } from '../core/utils';
-
-// import {dateFormat} from '../core/utils';
 
 export class Channel {
   private readonly _client: Web3MQ;
@@ -87,11 +79,12 @@ export class Channel {
    * 查询所有channel数据
    */
   queryChannels = async (option: PageParams) => {
+    const { api } = this._client;
     // const { token } = this._client;
     // if (!token) {
     //   throw new Error('The Token is required!');
     // }
-    const { data = [] } = await this.getChatsByUserId({
+    const { data = [] } = await api.getChatsByUserId({
       ...option,
     });
     const cacheObj: MembersItem = {};
@@ -116,13 +109,14 @@ export class Channel {
    * @param params
    */
   createRoom = async (params: GetRoomInfoByTargetUserIdParams) => {
-    const { data: roomId } = await this.getRoomInfoByTargetUserIdApi(params);
+    const { api } = this._client;
+    const { data: roomId } = await api.getRoomInfoByTargetUserIdApi(params);
     if (!roomId) {
       throw new Error('Get room info error!');
     }
     let existRoomInfo = this.channelList?.find((item) => item.room_id === roomId);
     if (!existRoomInfo) {
-      const { data } = await this.getRoomInfoByRoomIdApi(roomId);
+      const { data } = await api.getRoomInfoByRoomIdApi(roomId);
       data.members.map((item) => {
         item.avatar = getUserAvatar(item).avatar;
         item.user_name = getUserAvatar(item).userName;
@@ -145,15 +139,16 @@ export class Channel {
   };
 
   addMembers = async (targetUserIds: string[]) => {
+    const { api } = this._client;
     if (this.activeChannel === null) {
       return;
     }
     const { room_id } = this.activeChannel;
-    const { data: roomId } = await this.addMemberToRoom({
+    const { data: roomId } = await api.addMemberToRoom({
       room_id,
       target_user_ids: targetUserIds,
     });
-    const { data } = await this.getRoomInfoByRoomIdApi(roomId);
+    const { data } = await api.getRoomInfoByRoomIdApi(roomId);
     data.members.map((item) => {
       item.avatar = getUserAvatar(item).avatar;
       item.user_name = getUserAvatar(item).userName;
@@ -163,24 +158,4 @@ export class Channel {
       data: data,
     });
   };
-
-  getChatsByUserId = (params: PageParams): Promise<{ data: ChannelResponse[] }> => {
-    return request.post('/my_chats', params);
-  };
-
-  getRoomInfoByRoomIdApi = (roomId: string): Promise<{ data: ChannelResponse }> => {
-    return request.get(`/rooms/${roomId}`);
-  };
-
-  getRoomInfoByTargetUserIdApi = (params: GetRoomInfoByTargetUserIdParams): Promise<any> => {
-    return request.post<string>('/rooms', params);
-  };
-
-  addMemberToRoom = (params: AddMemberToRoomParams): Promise<any> => {
-    return request.post<RoomResponse>(`/rooms/${params.room_id}/members`, params);
-  };
-
-  // delMemberFromRoom = (params: DelMemberFromRoomParams): Promise<any> => {
-  //   return request.delete(`/rooms/${params.room_id}/members/${params.member_id}`);
-  // };
 }

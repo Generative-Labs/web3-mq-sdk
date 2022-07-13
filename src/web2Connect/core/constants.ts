@@ -1,0 +1,6 @@
+export const LOCALSTORAGE_KEY_MAP = {
+  ACCESS_TOKEN: 'ACCESS_TOKEN',
+  USER_INFO: 'USER_INFO',
+};
+
+export const PAGE_SIZE = 20;
