@@ -29,7 +29,7 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   (response: AxiosResponse<ServiceResponse>) => {
     const { data } = response;
-    if (data.code !== 0) {
+    if (data.code !== 200) {
       throw new Error(data.msg);
     }
     return data;

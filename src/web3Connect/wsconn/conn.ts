@@ -3,31 +3,7 @@ import { PBTYPES } from '../core/constants';
 import { WS_PROTOCOL, HostURL } from '../../core/config';
 import { ConnectCommand } from './ctor/connect';
 import { Web3MQRequestMessage } from './ctor/message';
-import { byteArrayToHexString } from '../core/utils';
-import { LOCALSTORAGE_KEY_MAP } from '../core/constants';
-import { sign } from '../core/noble';
-
-async function getDataSignature(msg: string) {
-  //   let signature = localStorage.getItem(LOCALSTORAGE_KEY_MAP.SIGNATIRE);
-  //   if (!signature) {
-  //     const privateKey = localStorage.getItem(LOCALSTORAGE_KEY_MAP.PRIVATEKEY) || '';
-
-  //     //   let signature = await ed.sign(new TextEncoder().encode(msg), PrivateKey);
-  //     let bytes = await sign(new TextEncoder().encode(msg), privateKey);
-
-  //     signature = byteArrayToHexString(bytes);
-
-  //     localStorage.setItem(LOCALSTORAGE_KEY_MAP.SIGNATIRE, signature);
-  //   }
-  const privateKey = localStorage.getItem(LOCALSTORAGE_KEY_MAP.PRIVATEKEY) || '';
-
-  //   let signature = await ed.sign(new TextEncoder().encode(msg), PrivateKey);
-  const bytes = await sign(new TextEncoder().encode(msg), privateKey);
-
-  const signature = byteArrayToHexString(bytes);
-
-  return signature;
-}
+import { getDataSignature, getUserId } from '../core/utils';
 
 function GetContactBytes(command: any, bytes: Uint8Array) {
   const concatArray = new Uint8Array(bytes.length + 1);
@@ -59,7 +35,7 @@ export const getWSConn = () => {
 export const sendConnectReq = async () => {
   const timestamp = Date.now();
 
-  const userId = localStorage.getItem(LOCALSTORAGE_KEY_MAP.USERID);
+  const userId = getUserId();
   if (userId == null) {
     alert('GenreateAndSaveKeyPair first');
     return;
@@ -69,7 +45,6 @@ export const sendConnectReq = async () => {
   let ts = BigInt(timestamp);
   let prestr = nodeId + userId + ts.toString();
   let signature = (await getDataSignature(prestr)) || '';
-  console.log('======sendConnectReq', signature);
 
   let reqCmd: ConnectCommand = {
     nodeId: nodeId,
@@ -78,12 +53,9 @@ export const sendConnectReq = async () => {
     msgSign: signature,
   };
 
-  console.log('ConnectCommand', ConnectCommand);
-
   let bytes = ConnectCommand.toBinary(reqCmd);
 
   const concatArray = GetContactBytes(PBTYPES.PbTypeConnectReqCommand, bytes);
-  console.log(concatArray);
 
   return concatArray;
 };
@@ -91,7 +63,7 @@ export const sendConnectReq = async () => {
 export const sendMsg = async (topic: string, msg: string) => {
   const timestamp = BigInt(Date.now());
 
-  const userId = localStorage.getItem(LOCALSTORAGE_KEY_MAP.USERID) || '';
+  const userId = getUserId();
 
   var byteData = new TextEncoder().encode(msg);
 
@@ -99,7 +71,6 @@ export const sendMsg = async (topic: string, msg: string) => {
 
   const prestr = userId + topic + msgid + timestamp.toString();
   const fromSign = await getDataSignature(prestr);
-  console.log('======sendMsg', fromSign);
 
   var needStore = true;
   let msgReq: Web3MQRequestMessage = {
@@ -114,7 +85,6 @@ export const sendMsg = async (topic: string, msg: string) => {
     timestamp: BigInt(timestamp),
     messageId: msgid,
   };
-  console.log('SendMsg: ', msgReq);
 
   let bytes = Web3MQRequestMessage.toBinary(msgReq);
 

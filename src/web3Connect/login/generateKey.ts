@@ -20,8 +20,7 @@ const generateEd25519 = async () => {
   let privateKey = randomPrivateKey();
 
   let publicKey = await getPublicKey(privateKey);
-  console.log('privateKey', privateKey);
-  console.log('publicKey', publicKey);
+
   return {
     privateKey: byteArrayToHexString(privateKey),
     publicKey: byteArrayToHexString(publicKey),

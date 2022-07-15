@@ -1,21 +1,13 @@
 /* eslint-disable indent */
 import { LOCALSTORAGE_KEY_MAP } from './constants';
 import { PLATFORM_ENUM, MemberUserInfo, MessageResponse, MsgTypeEnum } from '../../types';
+import { sign } from '../core/noble';
+
 export function byteArrayToHexString(byteArray: Uint8Array) {
   return Array.from(byteArray, function (byte) {
     return ('0' + (byte & 0xff).toString(16)).slice(-2);
   }).join('');
 }
-
-export const isExpired = () => {
-  const token = localStorage.getItem(LOCALSTORAGE_KEY_MAP.ACCESS_TOKEN) || '';
-  if (token === '') {
-    return false;
-  }
-  const accessExpiredAt = getUserInfoFromToken().access_expired_at || 0;
-  const timestamp = Math.floor(Date.now() / 1000);
-  return timestamp >= accessExpiredAt;
-};
 
 export const parseJwt = (str: string) => {
   return JSON.parse(
@@ -110,3 +102,24 @@ export const notifyMessage = (message: MessageResponse) => {
       return '';
   }
 };
+
+export async function getDataSignature(msg: string) {
+  const privateKey = localStorage.getItem(LOCALSTORAGE_KEY_MAP.PRIVATEKEY) || '';
+  //   let signature = await ed.sign(new TextEncoder().encode(msg), PrivateKey);
+  const bytes = await sign(new TextEncoder().encode(msg), privateKey);
+  const signature = byteArrayToHexString(bytes);
+  return signature;
+}
+
+export const getUserId = () => {
+  return localStorage.getItem(LOCALSTORAGE_KEY_MAP.USERID) || '';
+};
+
+export async function getSignature() {
+  let signature = localStorage.getItem(LOCALSTORAGE_KEY_MAP.SIGNATIRE);
+  if (!signature) {
+    signature = await getDataSignature('content_need_to_signing');
+    localStorage.setItem(LOCALSTORAGE_KEY_MAP.SIGNATIRE, signature);
+  }
+  return signature;
+}

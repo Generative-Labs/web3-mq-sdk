@@ -13,6 +13,7 @@ import {
   GetMessageByIdParams,
   ServiceResponse,
   GetThreadsParams,
+  GetFuzzySearchParams_web2,
 } from '../../types';
 
 import { PAGE_SIZE } from '../core/constants';
@@ -56,7 +57,7 @@ export class Api {
     return request.get(`/threads/${params.room_id}/${params.page}/${params.size}`);
   };
 
-  searchUsersByName = (params: { keyword: string }): Promise<any> => {
+  searchUsersByName = (params: GetFuzzySearchParams_web2): Promise<any> => {
     return request.post('/search', params);
   };
 }

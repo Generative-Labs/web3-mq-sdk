@@ -4,7 +4,7 @@ export interface SavePublicKeyParams {
   rsa_pubkey: string;
   signature: string;
   sign_content: string;
-  timestamp: bigint;
+  timestamp: number;
   wallet_address: string;
   wallet_type: string;
 }

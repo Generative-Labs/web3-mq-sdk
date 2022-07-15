@@ -1,4 +1,4 @@
-// import request3 from '../core/request';
+import request3 from '../core/request';
 import request2 from '../../web2Connect/core/request';
 import {
   AddMemberToRoomParams,
@@ -11,6 +11,7 @@ import {
   GetMessageByIdParams,
   ServiceResponse,
   GetThreadsParams,
+  GetFuzzySearchParams_web3,
 } from '../../types';
 
 import { PAGE_SIZE } from '../core/constants';
@@ -54,7 +55,7 @@ export class Api {
     return request2.get(`/threads/${params.room_id}/${params.page}/${params.size}`);
   };
 
-  searchUsersByName = (params: { keyword: string }): Promise<any> => {
-    return request2.post('/search', params);
+  getSearchByWalletAddress = (params: GetFuzzySearchParams_web3): Promise<any> => {
+    return request3.get('/api/users/search/', { params });
   };
 }

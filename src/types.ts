@@ -318,3 +318,28 @@ export type CreateNextIdUserParams = {
   uuid: string;
   created_at: string;
 };
+
+export type GetFuzzySearchParams_web2 = {
+  keyword: string;
+};
+
+export type GetFuzzySearchParams_web3 = {
+  userid: string;
+  keyword: string;
+  timestamp: number;
+  signature: string;
+};
+
+export type UserInfo_web3 = {
+  avatar_url?: string;
+  nickname?: string;
+  userid: string;
+  wallet_address: string;
+  wallet_type?: string;
+  avatar?: string;
+  userName?: string;
+  userId?: string;
+  user_name?: string;
+  user_id?: string;
+  eth_wallet_address?: string;
+};

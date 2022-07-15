@@ -1,6 +1,6 @@
 import { Web3MQ } from '../client';
 import { UserInfo } from '../../types';
-import { getUserAvatar, getUserInfoFromToken } from '../core/utils';
+import { getUserAvatar, getUserInfoFromToken, getSignature, getUserId } from '../core/utils';
 
 export class User {
   _client: Web3MQ;
@@ -16,11 +16,38 @@ export class User {
    * @param userName
    */
 
-  async queryUsers(userName: string) {
-    const { data: users } = await this._client.api.searchUsersByName({
-      keyword: userName,
+  async queryUsers(walletAddress: string) {
+    const signature = await getSignature();
+    console.log('walletAddress', walletAddress);
+    const {
+      data: { result },
+    } = await this._client.api.getSearchByWalletAddress({
+      keyword: walletAddress,
+      userid: getUserId(),
+      timestamp: Date.now(),
+      signature,
     });
-    return users.map((user: UserInfo) => {
+
+    return result.map((user: UserInfo) => {
+      return {
+        ...user,
+        ...getUserAvatar(user),
+        userId: user.user_id,
+      };
+    });
+  }
+  async queryUsersByWalletAddress(walletAddress: string) {
+    const signature = await getSignature();
+    const {
+      data: { result },
+    } = await this._client.api.getSearchByWalletAddress({
+      keyword: walletAddress,
+      userid: getUserId(),
+      timestamp: Date.now(),
+      signature,
+    });
+
+    return result.map((user: UserInfo) => {
       return {
         ...user,
         ...getUserAvatar(user),

@@ -3,7 +3,7 @@ import sha3 from 'js-sha3';
 import { formatTime } from '../../core/utils';
 import { savePublicKey } from '../core/api';
 import { generateEd25519KeyPair, generateRsaKeyPair } from './generateKey';
-import { LOCALSTORAGE_KEY_MAP } from '../core/constants';
+import { getUserId } from '../core/utils';
 
 const getEthAccount = async () => {
   let res = {
@@ -59,7 +59,7 @@ const getMetaMaskSign = async (
   ed25519_pubkey: string,
   rsa_pubkey: string,
   walletAddress: string,
-  timestamp: bigint,
+  timestamp: number,
 ) => {
   let wallet_type = 'eth';
 
@@ -96,7 +96,7 @@ export async function saveToRegister() {
 
   let wallet_address = await getWalletAddress();
 
-  const userId = localStorage.getItem(LOCALSTORAGE_KEY_MAP.USERID) || '';
+  const userId = getUserId();
 
   if (!pubkey) {
     throw new Error('pubkey empty');
@@ -106,7 +106,7 @@ export async function saveToRegister() {
     return;
   }
 
-  let timestamp = BigInt(Date.now());
+  let timestamp = Date.now();
 
   //Signing data with MetaMask
   const { signContent, signature } = await getMetaMaskSign(
