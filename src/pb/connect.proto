@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+// msgSign = RSA(nodeId + userId + timestamp)
+
+message ConnectCommand {
+    string nodeId = 1;
+    string userId = 2;
+    uint64 timestamp = 3;
+    string msgSign = 4;
+}
+
+
+message DisconnectCommand {
+    string nodeId = 1;
+    string userId = 2;
+    uint64 timestamp = 3;
+    string msgSign = 4;
+}

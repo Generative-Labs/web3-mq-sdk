@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package pb;
+
+message Web3MQRequestMessage {
+    bytes payload = 1;
+    string contentTopic = 2;
+    uint32 version = 3;
+    string comeFrom = 4;
+    string fromSign = 5;
+    string payloadType = 6;
+    string cipherSuite = 7;
+    bool needStore = 8;
+    uint64 timestamp = 9;
+    string messageId = 10;
+    optional string messageType = 11;
+    string nodeId = 12;
+}
+
+message Web3MQMessageStatusResp {
+    string messageId = 1;
+    string contentTopic = 2;
+    string messageStatus = 3; // received delivered read
+    string version = 4;
+    string comeFrom = 5;
+    string fromSign = 6;
+    uint64 timestamp = 7;
+}
+
+message Web3MQChangeMessageStatus {
+    string messageId = 1;
+    string contentTopic = 2;
+    string messageStatus = 3; // received delivered read
+    string version = 4;
+    string comeFrom = 5;
+    string fromSign = 6;
+    uint64 timestamp = 7;
+}
+
+message MessageItem {
+    string messageId = 1;
+    uint32 version = 2;
+    bytes payload = 3;
+    string payloadType = 4;
+    string comeFrom = 5;
+    string fromSign = 6;
+    string contentTopic = 7;
+    string cipherSuite = 8;
+    uint64 timestamp = 9;
+    bool read = 10;
+    uint64 readTimestamp = 11;
+}
+
+message Web3MQMessageListResponse {
+    repeated MessageItem data = 1;
+}
+
+message GetHistoryMessagesRequest {
+    string comeFrom = 1;
+    string fromSign = 2;
+    uint32 version = 3;
+    uint64 timestamp = 4;
+}
