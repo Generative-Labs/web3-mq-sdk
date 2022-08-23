@@ -8,8 +8,8 @@ import {
 } from '../types';
 import { sendMessageCommand, getParams, renderMessagesList } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
-import { PbTypeNotificationListResp } from '../core/pbType';
-import { Web3MQMessageListResponse } from '../pb/message';
+import { PbTypeNotificationListResp, PbTypeMessageStatusResp } from '../core/pbType';
+import { Web3MQMessageListResponse, Web3MQMessageStatusResp } from '../pb/message';
 
 export class Message {
   private readonly _client: Client;
@@ -76,7 +76,10 @@ export class Message {
       console.log('Receive notification----------', notificationList);
       this._client.notify.receiveNotify(notificationList as unknown as NotifyResponse);
     }
-    console.log(pbType, bytes);
-    // this._client.emit('message.new', { type: 'message.new' });
+    if (pbType === PbTypeMessageStatusResp) {
+      const resp = Web3MQMessageStatusResp.fromBinary(bytes);
+      console.log('msgStatus:', resp);
+      this._client.emit('message.new', { type: 'message.new' });
+    }
   }
 }

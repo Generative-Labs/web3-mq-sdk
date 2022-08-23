@@ -1,10 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosInstance, AxiosResponse } from 'axios';
 
-import { BASE_URL } from './config';
+import { selectUrl } from '../utils';
 import { ServiceResponse } from '../types';
 
 const request: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: selectUrl(),
   headers: {
     'Content-Type': 'application/json;charset=UTF-8',
   },

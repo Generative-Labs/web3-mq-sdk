@@ -3,7 +3,6 @@ import { sha3_224 } from 'js-sha3';
 import { ClientKeyPaires } from './types';
 import { ConnectCommand, Web3MQRequestMessage } from './pb';
 import { PbTypeConnectReqCommand, PbTypeMessage } from './core/pbType';
-import { BASE_URL, BASE_WS } from './core/config';
 
 const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {
   return Array.from(byteArray, (byte: any) => ('0' + (byte & 0xff).toString(16)).slice(-2)).join(
@@ -195,7 +194,14 @@ export const renderMessagesList = async (msglist: any) => {
   });
 };
 
-export const selectUrl = (type: string = 'ws') => {
+export const selectUrl = (type: string = 'http', url?: string) => {
+  let Domain: string = url || 'us-west-2.web3mq.com';
+
+  // Domain = 'ap-singapore-1.web3mq.com';
+
+  const BASE_URL = `https://${Domain}`;
+  const BASE_WS = `ws://${Domain}/messages`;
+
   if (type === 'ws') {
     return BASE_WS;
   }
