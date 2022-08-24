@@ -1,4 +1,4 @@
-import request from '../core/request';
+import { request } from '../core/request';
 
 import {
   SavePublicKeyParams,

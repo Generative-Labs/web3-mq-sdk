@@ -4,11 +4,11 @@ import { Message } from '../message';
 import { User } from '../user';
 import { Contact } from '../contact';
 import { Notify } from '../notify';
+import { Request } from '../core/request';
 
 import event from '../core/eventEmitter';
 import { selectUrl } from '../utils';
 import { KeyPairsType, ClientKeyPaires, EventTypes } from '../types';
-
 export class Client {
   private static _instance: Client | null;
   keys: ClientKeyPaires;
@@ -21,9 +21,9 @@ export class Client {
   contact: Contact;
   notify: Notify;
 
-  constructor(keys: KeyPairsType, wsUrl?: string) {
+  constructor(keys: KeyPairsType, baseUrl?: string) {
     this.keys = { ...keys, userid: `user:${keys.PublicKey}` };
-    this.wsUrl = wsUrl || selectUrl();
+    this.wsUrl = selectUrl('ws', baseUrl);
     this.listeners = new event();
     this.channel = new Channel(this);
     this.connect = new Connect(this);
@@ -31,14 +31,15 @@ export class Client {
     this.user = new User(this);
     this.contact = new Contact(this);
     this.notify = new Notify(this);
+    new Request(selectUrl('http', baseUrl));
   }
 
-  public static getInstance = (keys: KeyPairsType, wsUrl?: string) => {
+  public static getInstance = (keys: KeyPairsType, baseUrl?: string) => {
     if (!keys) {
       throw new Error('The PrivateKey and PublicKey is required!');
     }
     if (!Client._instance) {
-      Client._instance = new Client(keys, wsUrl);
+      Client._instance = new Client(keys, baseUrl);
     }
     return Client._instance as Client;
   };

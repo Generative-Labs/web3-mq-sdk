@@ -194,9 +194,8 @@ export const renderMessagesList = async (msglist: any) => {
   });
 };
 
-export const selectUrl = (type: string = 'http', url?: string) => {
-  let Domain: string = url || 'us-west-2.web3mq.com';
-
+export const selectUrl = (type: string = 'http', url: string = 'us-west-2.web3mq.com') => {
+  let Domain: string = url;
   // Domain = 'ap-singapore-1.web3mq.com';
 
   const BASE_URL = `https://${Domain}`;
