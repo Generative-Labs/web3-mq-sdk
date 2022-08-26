@@ -1,1 +1,1 @@
-export * from './MetaMask';
+export * from './Register';

@@ -53,23 +53,12 @@ export const DownloadKeyPair = (text: string, filename: string = 'KeyPairs') => 
   aTag.click();
 };
 
-export const getDataSignature = async (PrivateKey: string, msg: string) => {
+export const getDataSignature = async (PrivateKey: string, signContent: string) => {
   if (!PrivateKey) {
     throw new Error('Ed25519PrivateKey not found');
   }
-  const signature = await ed.sign(new TextEncoder().encode(msg), PrivateKey);
+  const signature = await ed.sign(new TextEncoder().encode(signContent), PrivateKey);
   return Uint8ToBase64String(signature);
-};
-
-export const getParams = async (keys: ClientKeyPaires) => {
-  const { userid, PrivateKey } = keys;
-  const timestamp = Date.now();
-  const signature = await getDataSignature(PrivateKey, userid + timestamp);
-  return {
-    userid,
-    signature,
-    timestamp,
-  };
 };
 
 export const getCurrentDate = () => {
@@ -114,17 +103,17 @@ export const sendMessageCommand = async (
   keys: ClientKeyPaires,
   topic: string,
   msg: string,
+  nodeId: string,
 ): Promise<Uint8Array> => {
   const { userid, PrivateKey } = keys;
   const timestamp = Date.now();
   const cipherSuite = 'NONE';
-  const NodeId = '';
   var byteData = new TextEncoder().encode(msg);
 
   const msgid = await GenerateMessageID(userid, topic, timestamp, byteData);
 
-  const prestr = msgid + userid + topic + NodeId + timestamp.toString();
-  const fromSign = await getDataSignature(PrivateKey, prestr);
+  const signContent = msgid + userid + topic + nodeId + timestamp.toString();
+  const fromSign = await getDataSignature(PrivateKey, signContent);
 
   const needStore = true;
 
@@ -133,13 +122,13 @@ export const sendMessageCommand = async (
     contentTopic: topic,
     version: 1,
     comeFrom: userid,
-    fromSign: fromSign,
+    fromSign,
     payloadType: 'text/plain; charset=utf-8',
     cipherSuite: cipherSuite,
     needStore: needStore,
     timestamp: BigInt(timestamp),
     messageId: msgid,
-    nodeId: NodeId,
+    nodeId,
   };
 
   const bytes = Web3MQRequestMessage.toBinary(msgReq);

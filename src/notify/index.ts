@@ -1,7 +1,7 @@
 import { Client } from '../client';
 import { ClientKeyPaires, MessageStatus, NotifyResponse } from '../types';
 import { changeNotificationStatusRequest } from '../api';
-import { getParams } from '../utils';
+import { getDataSignature } from '../utils';
 
 export class Notify {
   private readonly _client: Client;
@@ -14,8 +14,18 @@ export class Notify {
   }
 
   async changeNotificationStatus(messages: string[], status: MessageStatus = 'delivered') {
-    const params = await getParams(this._keys);
-    const data = await changeNotificationStatusRequest({ ...params, messages, status });
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + status + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+
+    const data = await changeNotificationStatusRequest({
+      web3mq_signature,
+      userid,
+      timestamp,
+      messages,
+      status,
+    });
     return data;
   }
 

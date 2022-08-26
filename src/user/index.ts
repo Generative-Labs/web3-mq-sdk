@@ -1,7 +1,7 @@
 import { Client } from '../client';
 import { ClientKeyPaires, SearchUsersResponse, UpdateMyProfileResponse } from '../types';
 import { searchUsersRequest, getMyProfileRequest, updateMyProfileRequest } from '../api';
-import { getParams } from '../utils';
+import { getDataSignature } from '../utils';
 
 export class User {
   private readonly _client: Client;
@@ -12,20 +12,43 @@ export class User {
   }
 
   async searchUsers(walletAddress: string): Promise<SearchUsersResponse> {
-    const params = await getParams(this._keys);
-    const data = await searchUsersRequest({ ...params, keyword: walletAddress });
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + walletAddress + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+
+    const data = await searchUsersRequest({
+      web3mq_signature,
+      userid,
+      timestamp,
+      keyword: walletAddress,
+    });
     return data;
   }
 
   async getMyProfile(): Promise<SearchUsersResponse> {
-    const params = await getParams(this._keys);
-    const data = await getMyProfileRequest(params);
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+
+    const data = await getMyProfileRequest({ web3mq_signature, userid, timestamp });
     return data;
   }
 
   async updateMyProfile(nickname: string, avatar_url: string): Promise<UpdateMyProfileResponse> {
-    const params = await getParams(this._keys);
-    const data = await updateMyProfileRequest({ ...params, nickname, avatar_url });
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+
+    const data = await updateMyProfileRequest({
+      web3mq_signature,
+      userid,
+      timestamp,
+      nickname,
+      avatar_url,
+    });
     return data;
   }
 }

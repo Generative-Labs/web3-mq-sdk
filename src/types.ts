@@ -31,7 +31,7 @@ export interface ClientKeyPaires extends KeyPairsType {
 export type SavePublicKeyParams = {
   userid: string;
   pubkey: string;
-  signature: string;
+  metamask_signature: string;
   sign_content: string;
   wallet_address: string;
   wallet_type: 'eth';
@@ -40,15 +40,11 @@ export type SavePublicKeyParams = {
 
 export type BaseParams = {
   userid: string;
-  signature: string;
+  web3mq_signature: string;
   timestamp: number;
 };
 
-export interface createRoomParams extends PageParams {
-  userid: string;
-  signature: string;
-  timestamp: number;
-}
+export interface createRoomParams extends PageParams, BaseParams {}
 
 export type ActiveChannelType = {
   topic: string;

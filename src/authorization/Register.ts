@@ -1,9 +1,10 @@
 import { sha3_224 } from 'js-sha3';
-import { GenerateEd25519KeyPair, getCurrentDate } from '../utils';
+import { Request } from '../core/request';
+import { GenerateEd25519KeyPair, getCurrentDate, selectUrl } from '../utils';
 import { savePublicKeyRequest } from '../api';
 import { SavePublicKeyParams, EthAccountType } from '../types';
 
-export class MetaMask {
+export class Register {
   static getEthAccount = async () => {
     let res: EthAccountType = {
       address: '',
@@ -50,8 +51,10 @@ export class MetaMask {
     return res;
   };
 
-  static signMetaMask = async (domainUrl: string) => {
-    const { address } = await MetaMask.getEthAccount();
+  static signMetaMask = async (domainUrl: string, connectUrl?: string) => {
+    new Request(selectUrl('http', connectUrl));
+
+    const { address } = await Register.getEthAccount();
     const { PrivateKey, PublicKey } = await GenerateEd25519KeyPair();
     const userid = `user:${PublicKey}`;
     const timestamp = Date.now();
@@ -77,12 +80,13 @@ export class MetaMask {
     let payload: SavePublicKeyParams = {
       userid: userid,
       pubkey: PublicKey,
-      signature: signature,
+      metamask_signature: signature,
       sign_content: signContent,
       wallet_address: address,
       wallet_type: 'eth',
       timestamp: timestamp,
     };
+
     await savePublicKeyRequest(payload);
 
     return { PrivateKey, PublicKey };

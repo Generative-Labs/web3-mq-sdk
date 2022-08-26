@@ -1,14 +1,17 @@
 import { Client } from '../client';
 import { sendConnectCommand } from '../utils';
 import { PbTypeConnectRespCommand } from '../core/pbType';
+import { ConnectCommand } from '../pb';
 
 export class Connect {
   private _client: Client;
   ws: WebSocket | null;
+  nodeId: string;
 
   constructor(client: Client) {
     this._client = client;
     this.ws = null;
+    this.nodeId = '';
     this.init();
   }
   init() {
@@ -31,7 +34,10 @@ export class Connect {
       var respData = new Uint8Array(event.data);
       const PbType = respData[0];
       const bytes = respData.slice(1, respData.length);
-      if (PbType !== PbTypeConnectRespCommand) {
+      if (PbType === PbTypeConnectRespCommand) {
+        const { nodeId } = ConnectCommand.fromBinary(bytes);
+        this.nodeId = nodeId;
+      } else {
         this.receive(PbType, bytes);
       }
     };

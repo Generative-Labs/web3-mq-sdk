@@ -6,7 +6,7 @@ import {
   MessageListItem,
   NotifyResponse,
 } from '../types';
-import { sendMessageCommand, getParams, renderMessagesList } from '../utils';
+import { sendMessageCommand, getDataSignature, renderMessagesList } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
 import { PbTypeNotificationListResp, PbTypeMessageStatusResp } from '../core/pbType';
 import { Web3MQMessageListResponse, Web3MQMessageStatusResp } from '../pb/message';
@@ -24,12 +24,15 @@ export class Message {
   }
 
   async getMessageList(option: PageParams) {
-    const params = await getParams(this._keys);
     const topic = this._client.channel.activeChannel?.topic;
     if (topic) {
+      const { userid, PrivateKey } = this._keys;
+      const timestamp = Date.now();
+      const msg = userid + topic + timestamp;
+      const web3mq_signature = await getDataSignature(PrivateKey, msg);
       const {
         data: { result = [] },
-      } = await getMessageListRequest({ ...params, topic, ...option });
+      } = await getMessageListRequest({ userid, timestamp, web3mq_signature, topic, ...option });
       const data = await renderMessagesList(result);
       this.messageList = data.reverse() ?? [];
       this._client.emit('message.getList', { type: 'message.getList' });
@@ -42,17 +45,30 @@ export class Message {
    * if message from one chat: topic = userid
    */
   async changeMessageStatus(messages: string[], status: MessageStatus = 'delivered') {
-    const params = await getParams(this._keys);
-    const topic = this._client.channel.activeChannel?.topic || '';
-    const data = await changeMessageStatusRequest({ topic, ...params, messages, status });
-    return data;
+    const topic = this._client.channel.activeChannel?.topic;
+    if (topic) {
+      const { userid, PrivateKey } = this._keys;
+      const timestamp = Date.now();
+      const signContent = userid + status + timestamp;
+      const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+
+      const data = await changeMessageStatusRequest({
+        topic,
+        web3mq_signature,
+        timestamp,
+        userid,
+        messages,
+        status,
+      });
+      return data;
+    }
   }
 
   async sendMessage(msg: string) {
     const { keys, connect, channel } = this._client;
     if (channel.activeChannel) {
       const { topic } = channel.activeChannel;
-      const concatArray = await sendMessageCommand(keys, topic, msg);
+      const concatArray = await sendMessageCommand(keys, topic, msg, connect.nodeId);
       connect.send(concatArray);
     }
   }
