@@ -16,7 +16,7 @@ module.exports = {
   ignorePatterns: ['.eslintrc.js', 'rollup.config.js'],
   // plugins: ['prettier'],
   rules: {
-    indent: ['error', 2],
+    indent: ['error', 2, {SwitchCase: 1}],
     'no-unused-vars': 'error',
     'no-console': 'off',
     // 单引号

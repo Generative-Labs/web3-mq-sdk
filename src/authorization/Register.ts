@@ -2,7 +2,7 @@ import { sha3_224 } from 'js-sha3';
 import { Request } from '../core/request';
 import { GenerateEd25519KeyPair, getCurrentDate, selectUrl } from '../utils';
 import { savePublicKeyRequest } from '../api';
-import { SavePublicKeyParams, EthAccountType } from '../types';
+import { SavePublicKeyParams, EthAccountType, RegisterOptions } from '../types';
 
 export class Register {
   static getEthAccount = async () => {
@@ -17,7 +17,7 @@ export class Register {
     };
     // @ts-ignore
     const requestPermissionsRes = await window.ethereum.request(reqParams).catch((e: any) => {
-      console.log(e, 'e');
+      console.log(e, 'err');
     });
 
     if (!requestPermissionsRes) {
@@ -51,7 +51,8 @@ export class Register {
     return res;
   };
 
-  static signMetaMask = async (domainUrl: string, connectUrl?: string) => {
+  static signMetaMask = async (domainUrl: string, options: RegisterOptions = {}) => {
+    const { connectUrl, app_key } = options;
     new Request(selectUrl('http', connectUrl));
 
     const { address } = await Register.getEthAccount();
@@ -85,6 +86,7 @@ export class Register {
       wallet_address: address,
       wallet_type: 'eth',
       timestamp: timestamp,
+      app_key,
     };
 
     await savePublicKeyRequest(payload);

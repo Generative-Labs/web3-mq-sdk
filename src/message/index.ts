@@ -8,8 +8,16 @@ import {
 } from '../types';
 import { sendMessageCommand, getDataSignature, renderMessagesList } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
-import { PbTypeNotificationListResp, PbTypeMessageStatusResp } from '../core/pbType';
-import { Web3MQMessageListResponse, Web3MQMessageStatusResp } from '../pb/message';
+import {
+  PbTypeNotificationListResp,
+  PbTypeMessageStatusResp,
+  PbTypeMessageChangeStatus,
+} from '../core/pbType';
+import {
+  Web3MQChangeMessageStatus,
+  Web3MQMessageListResponse,
+  Web3MQMessageStatusResp,
+} from '../pb/message';
 
 export class Message {
   private readonly _client: Client;
@@ -73,19 +81,6 @@ export class Message {
     }
   }
   receive(pbType: number, bytes: Uint8Array) {
-    // if (pbType === PbTypeMessage) {
-    //   const resp = Web3MQRequestMessage.fromBinary(bytes);
-    //   const content = new TextDecoder().decode(resp.payload);
-    //   let message = {
-    //     id: this.messageList.length + 1,
-    //     sender_id: resp.from,
-    //     content,
-    //     timestamp: new Date(),
-    //   };
-    //   console.log(message);
-    //   this.messageList.push(message);
-    //   this._client.emit('message.new', { type: 'message.new', data: message });
-    // }
     if (pbType === PbTypeNotificationListResp) {
       console.log('Receive notification');
       const notificationList = Web3MQMessageListResponse.fromBinary(bytes);
@@ -95,7 +90,11 @@ export class Message {
     if (pbType === PbTypeMessageStatusResp) {
       const resp = Web3MQMessageStatusResp.fromBinary(bytes);
       console.log('msgStatus:', resp);
-      this._client.emit('message.new', { type: 'message.new' });
+      this._client.emit('message.delivered', { type: 'message.delivered', data: resp });
+    }
+    if (pbType === PbTypeMessageChangeStatus) {
+      const resp = Web3MQChangeMessageStatus.fromBinary(bytes);
+      console.log('changeMsgStatus:', resp);
     }
   }
 }

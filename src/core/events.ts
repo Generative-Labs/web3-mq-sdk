@@ -16,8 +16,10 @@ export const EVENT_MAP = {
   'contact.reviceList': true,
   //更新contactlist
   'contact.updateList': true,
-  // 接收到新消息
-  'message.new': true,
+  // 消息送达
+  'message.delivered': true,
+  // 消息已读
+  'message.read': true,
   // 发送更新消息
   'message.updated': true,
   // 获取message list

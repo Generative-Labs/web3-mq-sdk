@@ -1,10 +1,11 @@
 import { Client } from '../client';
-import { sendConnectCommand } from '../utils';
-import { PbTypeConnectRespCommand } from '../core/pbType';
-import { ConnectCommand } from '../pb';
-
+import { sendConnectCommand, GetContactBytes } from '../utils';
+import { PbTypeConnectRespCommand, PbTypePingCommand, PbTypePongCommand } from '../core/pbType';
+import { ConnectCommand, WebsocketPingCommand } from '../pb';
 export class Connect {
   private _client: Client;
+  private timeout: number;
+  private timeoutObj: null | NodeJS.Timeout;
   ws: WebSocket | null;
   nodeId: string;
 
@@ -12,6 +13,8 @@ export class Connect {
     this._client = client;
     this.ws = null;
     this.nodeId = '';
+    this.timeout = 55000;
+    this.timeoutObj = null;
     this.init();
   }
   init() {
@@ -26,22 +29,61 @@ export class Connect {
 
     wsconn.onopen = async () => {
       console.log('connection is successful');
+      this.start();
       const concatArray = await sendConnectCommand(this._client.keys);
       wsconn.send(concatArray);
     };
 
     wsconn.onmessage = (event) => {
+      this.reset();
       var respData = new Uint8Array(event.data);
       const PbType = respData[0];
       const bytes = respData.slice(1, respData.length);
-      if (PbType === PbTypeConnectRespCommand) {
-        const { nodeId } = ConnectCommand.fromBinary(bytes);
-        this.nodeId = nodeId;
-      } else {
-        this.receive(PbType, bytes);
-      }
+      this.onMessageCallback(PbType, bytes);
     };
     this.ws = wsconn;
+  }
+  onMessageCallback(PbType: number, bytes: Uint8Array) {
+    switch (PbType) {
+      case PbTypeConnectRespCommand:
+        const { nodeId } = ConnectCommand.fromBinary(bytes);
+        this.nodeId = nodeId;
+        break;
+      case PbTypePongCommand:
+        return WebsocketPingCommand.fromBinary(bytes);
+      default:
+        this.receive(PbType, bytes);
+        break;
+    }
+  }
+  sendPing() {
+    const { userid } = this._client.keys;
+    if (this.ws === null) {
+      throw new Error('WebSocket is not initialized');
+    }
+    if (userid == null) {
+      throw new Error('GenreateAndSaveKeyPair first');
+    }
+    const timestamp = Date.now();
+    const reqCommand: WebsocketPingCommand = {
+      timestamp: BigInt(timestamp),
+    };
+    let bytes = WebsocketPingCommand.toBinary(reqCommand);
+
+    const concatArray = GetContactBytes(PbTypePingCommand, bytes);
+
+    this.ws.send(concatArray);
+  }
+  reset() {
+    if (this.timeoutObj !== null) {
+      clearTimeout(this.timeoutObj);
+      this.start();
+    }
+  }
+  start() {
+    this.timeoutObj = setTimeout(() => {
+      this.sendPing();
+    }, this.timeout);
   }
   send(arr: Uint8Array) {
     if (!this.ws) {

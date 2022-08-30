@@ -262,57 +262,57 @@ class Web3MQRequestMessage$Type extends MessageType<Web3MQRequestMessage> {
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
-      case /* bytes payload */ 1:
-        message.payload = reader.bytes();
-        break;
-      case /* string contentTopic */ 2:
-        message.contentTopic = reader.string();
-        break;
-      case /* uint32 version */ 3:
-        message.version = reader.uint32();
-        break;
-      case /* string comeFrom */ 4:
-        message.comeFrom = reader.string();
-        break;
-      case /* string fromSign */ 5:
-        message.fromSign = reader.string();
-        break;
-      case /* string payloadType */ 6:
-        message.payloadType = reader.string();
-        break;
-      case /* string cipherSuite */ 7:
-        message.cipherSuite = reader.string();
-        break;
-      case /* bool needStore */ 8:
-        message.needStore = reader.bool();
-        break;
-      case /* uint64 timestamp */ 9:
-        message.timestamp = reader.uint64().toBigInt();
-        break;
-      case /* string messageId */ 10:
-        message.messageId = reader.string();
-        break;
-      case /* optional string messageType */ 11:
-        message.messageType = reader.string();
-        break;
-      case /* string nodeId */ 12:
-        message.nodeId = reader.string();
-        break;
-      default:
-        let u = options.readUnknownField;
-        if (u === 'throw')
-          throw new globalThis.Error(
-            `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
-          );
-        let d = reader.skip(wireType);
-        if (u !== false)
-          (u === true ? UnknownFieldHandler.onRead : u)(
-            this.typeName,
-            message,
-            fieldNo,
-            wireType,
-            d,
-          );
+        case /* bytes payload */ 1:
+          message.payload = reader.bytes();
+          break;
+        case /* string contentTopic */ 2:
+          message.contentTopic = reader.string();
+          break;
+        case /* uint32 version */ 3:
+          message.version = reader.uint32();
+          break;
+        case /* string comeFrom */ 4:
+          message.comeFrom = reader.string();
+          break;
+        case /* string fromSign */ 5:
+          message.fromSign = reader.string();
+          break;
+        case /* string payloadType */ 6:
+          message.payloadType = reader.string();
+          break;
+        case /* string cipherSuite */ 7:
+          message.cipherSuite = reader.string();
+          break;
+        case /* bool needStore */ 8:
+          message.needStore = reader.bool();
+          break;
+        case /* uint64 timestamp */ 9:
+          message.timestamp = reader.uint64().toBigInt();
+          break;
+        case /* string messageId */ 10:
+          message.messageId = reader.string();
+          break;
+        case /* optional string messageType */ 11:
+          message.messageType = reader.string();
+          break;
+        case /* string nodeId */ 12:
+          message.nodeId = reader.string();
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
       }
     }
     return message;
@@ -404,42 +404,42 @@ class Web3MQMessageStatusResp$Type extends MessageType<Web3MQMessageStatusResp> 
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
-      case /* string messageId */ 1:
-        message.messageId = reader.string();
-        break;
-      case /* string contentTopic */ 2:
-        message.contentTopic = reader.string();
-        break;
-      case /* string messageStatus */ 3:
-        message.messageStatus = reader.string();
-        break;
-      case /* string version */ 4:
-        message.version = reader.string();
-        break;
-      case /* string comeFrom */ 5:
-        message.comeFrom = reader.string();
-        break;
-      case /* string fromSign */ 6:
-        message.fromSign = reader.string();
-        break;
-      case /* uint64 timestamp */ 7:
-        message.timestamp = reader.uint64().toBigInt();
-        break;
-      default:
-        let u = options.readUnknownField;
-        if (u === 'throw')
-          throw new globalThis.Error(
-            `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
-          );
-        let d = reader.skip(wireType);
-        if (u !== false)
-          (u === true ? UnknownFieldHandler.onRead : u)(
-            this.typeName,
-            message,
-            fieldNo,
-            wireType,
-            d,
-          );
+        case /* string messageId */ 1:
+          message.messageId = reader.string();
+          break;
+        case /* string contentTopic */ 2:
+          message.contentTopic = reader.string();
+          break;
+        case /* string messageStatus */ 3:
+          message.messageStatus = reader.string();
+          break;
+        case /* string version */ 4:
+          message.version = reader.string();
+          break;
+        case /* string comeFrom */ 5:
+          message.comeFrom = reader.string();
+          break;
+        case /* string fromSign */ 6:
+          message.fromSign = reader.string();
+          break;
+        case /* uint64 timestamp */ 7:
+          message.timestamp = reader.uint64().toBigInt();
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
       }
     }
     return message;
@@ -519,42 +519,42 @@ class Web3MQChangeMessageStatus$Type extends MessageType<Web3MQChangeMessageStat
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
-      case /* string messageId */ 1:
-        message.messageId = reader.string();
-        break;
-      case /* string contentTopic */ 2:
-        message.contentTopic = reader.string();
-        break;
-      case /* string messageStatus */ 3:
-        message.messageStatus = reader.string();
-        break;
-      case /* string version */ 4:
-        message.version = reader.string();
-        break;
-      case /* string comeFrom */ 5:
-        message.comeFrom = reader.string();
-        break;
-      case /* string fromSign */ 6:
-        message.fromSign = reader.string();
-        break;
-      case /* uint64 timestamp */ 7:
-        message.timestamp = reader.uint64().toBigInt();
-        break;
-      default:
-        let u = options.readUnknownField;
-        if (u === 'throw')
-          throw new globalThis.Error(
-            `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
-          );
-        let d = reader.skip(wireType);
-        if (u !== false)
-          (u === true ? UnknownFieldHandler.onRead : u)(
-            this.typeName,
-            message,
-            fieldNo,
-            wireType,
-            d,
-          );
+        case /* string messageId */ 1:
+          message.messageId = reader.string();
+          break;
+        case /* string contentTopic */ 2:
+          message.contentTopic = reader.string();
+          break;
+        case /* string messageStatus */ 3:
+          message.messageStatus = reader.string();
+          break;
+        case /* string version */ 4:
+          message.version = reader.string();
+          break;
+        case /* string comeFrom */ 5:
+          message.comeFrom = reader.string();
+          break;
+        case /* string fromSign */ 6:
+          message.fromSign = reader.string();
+          break;
+        case /* uint64 timestamp */ 7:
+          message.timestamp = reader.uint64().toBigInt();
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
       }
     }
     return message;
@@ -647,54 +647,54 @@ class MessageItem$Type extends MessageType<MessageItem> {
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
-      case /* string messageId */ 1:
-        message.messageId = reader.string();
-        break;
-      case /* uint32 version */ 2:
-        message.version = reader.uint32();
-        break;
-      case /* bytes payload */ 3:
-        message.payload = reader.bytes();
-        break;
-      case /* string payloadType */ 4:
-        message.payloadType = reader.string();
-        break;
-      case /* string comeFrom */ 5:
-        message.comeFrom = reader.string();
-        break;
-      case /* string fromSign */ 6:
-        message.fromSign = reader.string();
-        break;
-      case /* string contentTopic */ 7:
-        message.contentTopic = reader.string();
-        break;
-      case /* string cipherSuite */ 8:
-        message.cipherSuite = reader.string();
-        break;
-      case /* uint64 timestamp */ 9:
-        message.timestamp = reader.uint64().toBigInt();
-        break;
-      case /* bool read */ 10:
-        message.read = reader.bool();
-        break;
-      case /* uint64 readTimestamp */ 11:
-        message.readTimestamp = reader.uint64().toBigInt();
-        break;
-      default:
-        let u = options.readUnknownField;
-        if (u === 'throw')
-          throw new globalThis.Error(
-            `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
-          );
-        let d = reader.skip(wireType);
-        if (u !== false)
-          (u === true ? UnknownFieldHandler.onRead : u)(
-            this.typeName,
-            message,
-            fieldNo,
-            wireType,
-            d,
-          );
+        case /* string messageId */ 1:
+          message.messageId = reader.string();
+          break;
+        case /* uint32 version */ 2:
+          message.version = reader.uint32();
+          break;
+        case /* bytes payload */ 3:
+          message.payload = reader.bytes();
+          break;
+        case /* string payloadType */ 4:
+          message.payloadType = reader.string();
+          break;
+        case /* string comeFrom */ 5:
+          message.comeFrom = reader.string();
+          break;
+        case /* string fromSign */ 6:
+          message.fromSign = reader.string();
+          break;
+        case /* string contentTopic */ 7:
+          message.contentTopic = reader.string();
+          break;
+        case /* string cipherSuite */ 8:
+          message.cipherSuite = reader.string();
+          break;
+        case /* uint64 timestamp */ 9:
+          message.timestamp = reader.uint64().toBigInt();
+          break;
+        case /* bool read */ 10:
+          message.read = reader.bool();
+          break;
+        case /* uint64 readTimestamp */ 11:
+          message.readTimestamp = reader.uint64().toBigInt();
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
       }
     }
     return message;
@@ -769,24 +769,24 @@ class Web3MQMessageListResponse$Type extends MessageType<Web3MQMessageListRespon
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
-      case /* repeated pb.MessageItem data */ 1:
-        message.data.push(MessageItem.internalBinaryRead(reader, reader.uint32(), options));
-        break;
-      default:
-        let u = options.readUnknownField;
-        if (u === 'throw')
-          throw new globalThis.Error(
-            `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
-          );
-        let d = reader.skip(wireType);
-        if (u !== false)
-          (u === true ? UnknownFieldHandler.onRead : u)(
-            this.typeName,
-            message,
-            fieldNo,
-            wireType,
-            d,
-          );
+        case /* repeated pb.MessageItem data */ 1:
+          message.data.push(MessageItem.internalBinaryRead(reader, reader.uint32(), options));
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
       }
     }
     return message;
@@ -846,33 +846,33 @@ class GetHistoryMessagesRequest$Type extends MessageType<GetHistoryMessagesReque
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
-      case /* string comeFrom */ 1:
-        message.comeFrom = reader.string();
-        break;
-      case /* string fromSign */ 2:
-        message.fromSign = reader.string();
-        break;
-      case /* uint32 version */ 3:
-        message.version = reader.uint32();
-        break;
-      case /* uint64 timestamp */ 4:
-        message.timestamp = reader.uint64().toBigInt();
-        break;
-      default:
-        let u = options.readUnknownField;
-        if (u === 'throw')
-          throw new globalThis.Error(
-            `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
-          );
-        let d = reader.skip(wireType);
-        if (u !== false)
-          (u === true ? UnknownFieldHandler.onRead : u)(
-            this.typeName,
-            message,
-            fieldNo,
-            wireType,
-            d,
-          );
+        case /* string comeFrom */ 1:
+          message.comeFrom = reader.string();
+          break;
+        case /* string fromSign */ 2:
+          message.fromSign = reader.string();
+          break;
+        case /* uint32 version */ 3:
+          message.version = reader.uint32();
+          break;
+        case /* uint64 timestamp */ 4:
+          message.timestamp = reader.uint64().toBigInt();
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
       }
     }
     return message;

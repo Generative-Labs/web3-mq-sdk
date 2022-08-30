@@ -31,6 +31,10 @@ const PbTypeGroupInfoRespCommand = 0b00100100;
 const PbTypeChatReqCommand = 0b01000000;
 const PbTypeChatListRespCommand = 0b01000001;
 
+// heartbeat
+const PbTypePingCommand = 0b10000000;
+const PbTypePongCommand = 0b10000001;
+
 export {
   PbTypeChatReqCommand,
   PbTypeChatListRespCommand,
@@ -52,4 +56,6 @@ export {
   PbTypeGroupRespCommand,
   PbTypeGroupMembersListRespCommand,
   PbTypeGroupListRespCommand,
+  PbTypePingCommand,
+  PbTypePongCommand,
 };

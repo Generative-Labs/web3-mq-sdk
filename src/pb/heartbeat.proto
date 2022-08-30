@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+message WebsocketPingCommand {
+    optional string nodeId = 1;
+    optional string userId = 2;
+    optional uint64 timestamp = 3;
+    optional string msgSign = 4;
+}
+
+message WebsocketPongCommand {
+    optional string nodeId = 1;
+    optional string userId = 2;
+    optional uint64 timestamp = 3;
+    optional string msgSign = 4;
+}

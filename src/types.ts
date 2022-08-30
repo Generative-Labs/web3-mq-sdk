@@ -24,6 +24,11 @@ export type EthAccountType = {
   shortAddress: string;
 };
 
+export type RegisterOptions = {
+  connectUrl?: string;
+  app_key?: string;
+};
+
 export interface ClientKeyPaires extends KeyPairsType {
   userid: string;
 }
@@ -36,6 +41,7 @@ export type SavePublicKeyParams = {
   wallet_address: string;
   wallet_type: 'eth';
   timestamp: number;
+  app_key?: string;
 };
 
 export type BaseParams = {
