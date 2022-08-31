@@ -24,7 +24,7 @@ export type EthAccountType = {
   shortAddress: string;
 };
 
-export type RegisterOptions = {
+export type initOptions = {
   connectUrl?: string;
   app_key?: string;
 };

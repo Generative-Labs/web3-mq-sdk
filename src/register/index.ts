@@ -1,11 +1,16 @@
 import { sha3_224 } from 'js-sha3';
-import { Request } from '../core/request';
-import { GenerateEd25519KeyPair, getCurrentDate, selectUrl } from '../utils';
+import { GenerateEd25519KeyPair, getCurrentDate } from '../utils';
 import { savePublicKeyRequest } from '../api';
-import { SavePublicKeyParams, EthAccountType, RegisterOptions } from '../types';
+import { SavePublicKeyParams, EthAccountType } from '../types';
 
 export class Register {
-  static getEthAccount = async () => {
+  appKey: string;
+
+  constructor(appKey?: string) {
+    this.appKey = appKey || '';
+  }
+
+  getEthAccount = async () => {
     let res: EthAccountType = {
       address: '',
       balance: 0,
@@ -51,11 +56,8 @@ export class Register {
     return res;
   };
 
-  static signMetaMask = async (domainUrl: string, options: RegisterOptions = {}) => {
-    const { connectUrl, app_key } = options;
-    new Request(selectUrl('http', connectUrl));
-
-    const { address } = await Register.getEthAccount();
+  signMetaMask = async (signContentURI: string) => {
+    const { address } = await this.getEthAccount();
     const { PrivateKey, PublicKey } = await GenerateEd25519KeyPair();
     const userid = `user:${PublicKey}`;
     const timestamp = Date.now();
@@ -67,7 +69,7 @@ export class Register {
     let signContent = `Web3MQ wants you to sign in with your Ethereum account:
     ${address}
     For Web3MQ registration
-    URI: ${domainUrl}
+    URI: ${signContentURI}
     Version: 1
     Nonce: ${NonceContent}
     Issued At: ${getCurrentDate()}`;
@@ -86,7 +88,7 @@ export class Register {
       wallet_address: address,
       wallet_type: 'eth',
       timestamp: timestamp,
-      app_key,
+      app_key: this.appKey,
     };
 
     await savePublicKeyRequest(payload);

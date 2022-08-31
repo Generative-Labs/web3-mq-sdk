@@ -18,13 +18,14 @@ export class Connect {
     this.init();
   }
   init() {
+    console.log(Client.wsUrl);
     if (!('WebSocket' in window)) {
       throw new Error('Browser not supported WebSocket');
     }
-    if (!this._client.wsUrl) {
+    if (!Client.wsUrl) {
       throw new Error('The url is required!');
     }
-    const wsconn = new WebSocket(this._client.wsUrl);
+    const wsconn = new WebSocket(Client.wsUrl);
     wsconn.binaryType = 'arraybuffer';
 
     wsconn.onopen = async () => {
