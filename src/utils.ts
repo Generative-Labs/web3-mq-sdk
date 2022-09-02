@@ -1,8 +1,10 @@
 import ed from '@noble/ed25519';
 import { sha3_224 } from 'js-sha3';
+import axios from 'axios';
 import { ClientKeyPaires } from './types';
 import { ConnectCommand, Web3MQRequestMessage } from './pb';
 import { PbTypeConnectReqCommand, PbTypeMessage } from './core/pbType';
+import { domainUrlList } from './core/config';
 
 const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {
   return Array.from(byteArray, (byte: any) => ('0' + (byte & 0xff).toString(16)).slice(-2)).join(
@@ -183,9 +185,8 @@ export const renderMessagesList = async (msglist: any) => {
   });
 };
 
-export const selectUrl = (type: string = 'http', url: string = 'us-west-2.web3mq.com') => {
-  let Domain: string = url;
-  // Domain = 'ap-singapore-1.web3mq.com';
+export const selectUrl = (type: string = 'http', url: string) => {
+  let Domain: string = url.split('://')[1];
 
   const BASE_URL = `https://${Domain}`;
   const BASE_WS = `ws://${Domain}/messages`;
@@ -194,4 +195,39 @@ export const selectUrl = (type: string = 'http', url: string = 'us-west-2.web3mq
     return BASE_WS;
   }
   return BASE_URL;
+};
+
+export const getAllDomainList = async () => {
+  const timestamp = Date.now();
+
+  const requestQueue = domainUrlList.map(async (item: string) => {
+    const { headers } = await axios.head(`${item}/api/ping/`);
+    const timeDifference = new Date(headers.date).valueOf() - timestamp;
+    return {
+      time: timeDifference,
+      url: item,
+      serverRate: headers['server-rate'],
+      nodeId: headers.nodeid,
+    };
+  });
+  return await Promise.all(requestQueue);
+};
+
+const handleSort = (key: string) => {
+  return (a: any, b: any) => {
+    const val1 = a[key];
+    const val2 = b[key];
+    return val1 - val2;
+  };
+};
+
+export const getFastestUrl = async () => {
+  try {
+    const list = await getAllDomainList();
+    // Sorting strategy
+    return list.sort(handleSort('time'))[0].url;
+  } catch (error) {
+    console.log(error, 'get fast url error');
+    return domainUrlList[0];
+  }
 };

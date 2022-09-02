@@ -25,7 +25,7 @@ export type EthAccountType = {
 };
 
 export type initOptions = {
-  connectUrl?: string;
+  connectUrl?: string | null;
   app_key?: string;
 };
 

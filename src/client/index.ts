@@ -8,11 +8,12 @@ import { Notify } from '../notify';
 import { Request } from '../core/request';
 
 import event from '../core/eventEmitter';
-import { selectUrl } from '../utils';
+import { selectUrl, getFastestUrl } from '../utils';
 import { KeyPairsType, ClientKeyPaires, EventTypes, initOptions } from '../types';
 export class Client {
   private static _instance: Client | null;
   static wsUrl: string;
+  static register: Register;
   keys: ClientKeyPaires;
   channel: Channel;
   listeners: event;
@@ -33,11 +34,17 @@ export class Client {
     this.notify = new Notify(this);
   }
 
-  public static init = (initOptions: initOptions = {}) => {
+  public static init = async (
+    initOptions: initOptions = {
+      connectUrl: null,
+    },
+  ) => {
     const { connectUrl, app_key } = initOptions;
-    Client.wsUrl = selectUrl('ws', connectUrl);
-    new Request(selectUrl('http', connectUrl));
-    return new Register(app_key);
+    const fastUrl = connectUrl || (await getFastestUrl());
+    Client.wsUrl = selectUrl('ws', fastUrl);
+    new Request(selectUrl('http', fastUrl));
+    Client.register = new Register(app_key);
+    return fastUrl;
   };
 
   public static getInstance = (keys: KeyPairsType) => {

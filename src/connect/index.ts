@@ -18,7 +18,6 @@ export class Connect {
     this.init();
   }
   init() {
-    console.log(Client.wsUrl);
     if (!('WebSocket' in window)) {
       throw new Error('Browser not supported WebSocket');
     }
