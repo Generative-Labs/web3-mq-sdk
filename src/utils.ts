@@ -26,11 +26,9 @@ const GenerateMessageID = async (
 };
 
 export const GetContactBytes = (command: any, bytes: Uint8Array) => {
-  const concatArray = new Uint8Array(bytes.length + 1);
-  concatArray[0] = command;
-  for (let i = 0; i < bytes.length; i++) {
-    concatArray[i + 1] = bytes[i];
-  }
+  // client category type
+  const categoryType = 10;
+  const concatArray = new Uint8Array([categoryType, command, ...bytes]);
   return concatArray;
 };
 

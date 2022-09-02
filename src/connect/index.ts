@@ -37,8 +37,8 @@ export class Connect {
     wsconn.onmessage = (event) => {
       this.reset();
       var respData = new Uint8Array(event.data);
-      const PbType = respData[0];
-      const bytes = respData.slice(1, respData.length);
+      const PbType = respData[1];
+      const bytes = respData.slice(2, respData.length);
       this.onMessageCallback(PbType, bytes);
     };
     this.ws = wsconn;
