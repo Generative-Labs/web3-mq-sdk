@@ -1,7 +1,7 @@
 import ed from '@noble/ed25519';
 import { sha3_224 } from 'js-sha3';
 import axios from 'axios';
-import { ClientKeyPaires } from './types';
+import { ClientKeyPaires, EnvTypes } from './types';
 import { ConnectCommand, Web3MQRequestMessage } from './pb';
 import { PbTypeConnectReqCommand, PbTypeMessage } from './core/pbType';
 import { domainUrlList } from './core/config';
@@ -195,10 +195,10 @@ export const selectUrl = (type: string = 'http', url: string) => {
   return BASE_URL;
 };
 
-export const getAllDomainList = async () => {
+export const getAllDomainList = async (env: EnvTypes) => {
   const timestamp = Date.now();
 
-  const requestQueue = domainUrlList.map(async (item: string) => {
+  const requestQueue = domainUrlList[env].map(async (item: string) => {
     const { headers } = await axios.head(`${item}/api/ping/`);
     const timeDifference = new Date(headers.date).valueOf() - timestamp;
     return {
@@ -219,13 +219,13 @@ const handleSort = (key: string) => {
   };
 };
 
-export const getFastestUrl = async () => {
+export const getFastestUrl = async (env: EnvTypes = 'test') => {
   try {
-    const list = await getAllDomainList();
+    const list = await getAllDomainList(env);
     // Sorting strategy
     return list.sort(handleSort('time'))[0].url;
   } catch (error) {
     console.log(error, 'get fast url error');
-    return domainUrlList[0];
+    return domainUrlList[env][0];
   }
 };

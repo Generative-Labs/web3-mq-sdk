@@ -27,7 +27,10 @@ export type EthAccountType = {
 export type initOptions = {
   connectUrl?: string | null;
   app_key?: string;
+  env?: EnvTypes;
 };
+
+export type EnvTypes = 'dev' | 'test';
 
 export interface ClientKeyPaires extends KeyPairsType {
   userid: string;
