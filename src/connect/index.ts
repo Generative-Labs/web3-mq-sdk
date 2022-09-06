@@ -1,6 +1,11 @@
 import { Client } from '../client';
 import { sendConnectCommand, GetContactBytes } from '../utils';
-import { PbTypeConnectRespCommand, PbTypePingCommand, PbTypePongCommand } from '../core/pbType';
+import {
+  PbTypeConnectRespCommand,
+  PbTypePingCommand,
+  PbTypePongCommand,
+  PbTypeNotificationListResp,
+} from '../core/pbType';
 import { ConnectCommand, WebsocketPingCommand } from '../pb';
 export class Connect {
   private _client: Client;
@@ -51,6 +56,9 @@ export class Connect {
         break;
       case PbTypePongCommand:
         return WebsocketPingCommand.fromBinary(bytes);
+      case PbTypeNotificationListResp:
+        this.receiveNotify(PbType, bytes);
+        break;
       default:
         this.receive(PbType, bytes);
         break;
@@ -93,4 +101,6 @@ export class Connect {
   }
   // eslint-disable-next-line no-unused-vars
   receive(pbType: number, bytes?: Uint8Array) {}
+  // eslint-disable-next-line no-unused-vars
+  receiveNotify(pbType: number, bytes?: Uint8Array) {}
 }

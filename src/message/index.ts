@@ -1,23 +1,9 @@
 import { Client } from '../client';
-import {
-  ClientKeyPaires,
-  PageParams,
-  MessageStatus,
-  MessageListItem,
-  NotifyResponse,
-} from '../types';
+import { ClientKeyPaires, PageParams, MessageStatus, MessageListItem } from '../types';
 import { sendMessageCommand, getDataSignature, renderMessagesList } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
-import {
-  PbTypeNotificationListResp,
-  PbTypeMessageStatusResp,
-  PbTypeMessageChangeStatus,
-} from '../core/pbType';
-import {
-  Web3MQChangeMessageStatus,
-  Web3MQMessageListResponse,
-  Web3MQMessageStatusResp,
-} from '../pb/message';
+import { PbTypeMessageStatusResp, PbTypeMessageChangeStatus } from '../core/pbType';
+import { Web3MQChangeMessageStatus, Web3MQMessageStatusResp } from '../pb/message';
 
 export class Message {
   private readonly _client: Client;
@@ -80,13 +66,7 @@ export class Message {
       connect.send(concatArray);
     }
   }
-  receive(pbType: number, bytes: Uint8Array) {
-    if (pbType === PbTypeNotificationListResp) {
-      console.log('Receive notification');
-      const notificationList = Web3MQMessageListResponse.fromBinary(bytes);
-      console.log('Receive notification----------', notificationList);
-      this._client.notify.receiveNotify(notificationList as unknown as NotifyResponse);
-    }
+  receive = (pbType: number, bytes: Uint8Array) => {
     if (pbType === PbTypeMessageStatusResp) {
       const resp = Web3MQMessageStatusResp.fromBinary(bytes);
       console.log('msgStatus:', resp);
@@ -96,5 +76,5 @@ export class Message {
       const resp = Web3MQChangeMessageStatus.fromBinary(bytes);
       console.log('changeMsgStatus:', resp);
     }
-  }
+  };
 }

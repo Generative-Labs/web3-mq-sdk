@@ -15,6 +15,10 @@ import {
   SearchUsersResponse,
   UpdateMyProfileResponse,
   ChangeNotificationStatusParams,
+  CreateTopicParams,
+  SubscribeTopicParams,
+  PublishTopicMessageParams,
+  GetTopicListParams,
 } from '../types';
 
 export const savePublicKeyRequest = async (payload: SavePublicKeyParams) => {
@@ -125,4 +129,24 @@ export const operationFriendRequest = async (payload: operationFriendParams) => 
  */
 export const changeNotificationStatusRequest = async (payload: ChangeNotificationStatusParams) => {
   return await request.post('/api/notification/status/', payload);
+};
+
+export const createTopicRequest = async (payload: CreateTopicParams) => {
+  return await request.post('/api/create_topic/', payload);
+};
+
+export const subscribeTopicRequest = async (payload: SubscribeTopicParams) => {
+  return await request.post('/api/subscribe_topic/', payload);
+};
+
+export const publishTopicMessageRequest = async (payload: PublishTopicMessageParams) => {
+  return await request.post('/api/publish_topic_message/', payload);
+};
+
+export const myCreateTopicListRequest = async (payload: GetTopicListParams) => {
+  return await request.get('/api/my_create_topic_list/', { params: payload });
+};
+
+export const mySubscribeTopicListRequest = async (payload: GetTopicListParams) => {
+  return await request.get('/api/my_subscribe_topic_list/', { params: payload });
 };

@@ -147,3 +147,27 @@ export type NotifyResponse = {
   version: number;
   timestamp: number;
 };
+
+export interface CreateTopicParams extends BaseParams {
+  topic_name: string;
+}
+
+export interface SubscribeTopicParams extends BaseParams {
+  topicid: string;
+}
+
+export interface PublishTopicMessageParams extends SubscribeTopicParams {
+  title: string;
+  content: string;
+}
+
+export interface GetTopicListParams extends PageParams, BaseParams {}
+
+export type SubscribeListType = {
+  topicid: string;
+  create_at: number;
+};
+
+export interface TopicListType extends SubscribeListType {
+  topic_name: string;
+}

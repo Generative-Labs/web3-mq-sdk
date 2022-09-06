@@ -32,6 +32,8 @@ export const EVENT_MAP = {
   'notification.messageNew': true,
   // 获取notification List
   'notification.getList': true,
+  'notification.getMyTopicList': true,
+  'notification.getMySubscribeList': true,
 };
 
 const IS_VALID_EVENT_MAP_TYPE = { ...EVENT_MAP, all: true };
