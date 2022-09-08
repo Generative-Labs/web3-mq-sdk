@@ -195,37 +195,56 @@ export const selectUrl = (type: string = 'http', url: string) => {
   return BASE_URL;
 };
 
-export const getAllDomainList = async (env: EnvTypes) => {
-  const timestamp = Date.now();
+// eslint-disable-next-line no-unused-vars
+const getServerList = async (arr: any[]) => {
+  let serverList = [];
+  for (let i = 0; i < arr.length; i++) {
+    const domain = arr[i];
+    try {
+      // eslint-disable-next-line no-unused-vars
+      serverList = await (await axios.get(`${domain}/api/server-list/`)).data.data;
+      break;
+    } catch (error) {
+      continue;
+    }
+  }
+  return serverList;
+};
 
-  const requestQueue = domainUrlList[env].map(async (item: string) => {
-    const { headers } = await axios.head(`${item}/api/ping/`);
-    const timeDifference = new Date(headers.date).valueOf() - timestamp;
-    return {
-      time: timeDifference,
-      url: item,
-      serverRate: headers['server-rate'],
-      nodeId: headers.nodeid,
-    };
-  });
-  return await Promise.all(requestQueue);
+export const getAllDomainList = async (env: EnvTypes) => {
+  const list = await getServerList(domainUrlList[env]);
+
+  const timestamp = Date.now();
+  let requestQueue = [];
+
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i].endpoint;
+    try {
+      const { headers } = await axios.head(`${item}/api/ping/`);
+      const timeDifference = new Date(headers.date).valueOf() - timestamp;
+      requestQueue.push({
+        time: timeDifference,
+        url: item,
+        serverRate: headers['server-rate'],
+        nodeId: headers.nodeid,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  return requestQueue;
 };
 
 const handleSort = (key: string) => {
   return (a: any, b: any) => {
-    const val1 = a[key];
-    const val2 = b[key];
+    const val1 = Number(a[key]);
+    const val2 = Number(b[key]);
     return val1 - val2;
   };
 };
 
 export const getFastestUrl = async (env: EnvTypes = 'test') => {
-  try {
-    const list = await getAllDomainList(env);
-    // Sorting strategy
-    return list.sort(handleSort('time'))[0].url;
-  } catch (error) {
-    console.log(error, 'get fast url error');
-    return domainUrlList[env][0];
-  }
+  const list = await getAllDomainList(env);
+  // Sorting strategy
+  return list.sort(handleSort('time'))[0].url;
 };

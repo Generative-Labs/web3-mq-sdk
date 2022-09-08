@@ -47,7 +47,6 @@ export class Notify {
     });
     this.myTopicList = data;
     this._client.emit('notification.getMyTopicList', { type: 'notification.getMyTopicList' });
-    console.log(data, 123);
     return data;
   }
 
@@ -66,7 +65,6 @@ export class Notify {
     this._client.emit('notification.getMySubscribeList', {
       type: 'notification.getMySubscribeList',
     });
-    console.log(data, 34535);
     return data;
   }
 
@@ -125,6 +123,8 @@ export class Notify {
     const { data } = Web3MQMessageListResponse.fromBinary(bytes);
     const list = data.map((item) => JSON.parse(new TextDecoder().decode(item.payload)));
     this.notificationList = list;
-    this._client.emit('notification.getList', { type: 'notification.getList' });
+    if (this._client.listeners.events['notification.getList']) {
+      this._client.emit('notification.getList', { type: 'notification.getList' });
+    }
   };
 }
