@@ -6,9 +6,11 @@ import { getDataSignature } from '../utils';
 export class User {
   private readonly _client: Client;
   private readonly _keys: ClientKeyPaires;
+  userInfo: SearchUsersResponse | null;
   constructor(client: Client) {
     this._client = client;
     this._keys = client.keys;
+    this.userInfo = null;
   }
 
   async searchUsers(walletAddress: string): Promise<SearchUsersResponse> {
@@ -17,12 +19,14 @@ export class User {
     const signContent = userid + walletAddress + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
 
-    const data = await searchUsersRequest({
+    const { data } = await searchUsersRequest({
       web3mq_signature,
       userid,
       timestamp,
       keyword: walletAddress,
     });
+    
+    this.userInfo = data;
     return data;
   }
 
@@ -32,7 +36,7 @@ export class User {
     const signContent = userid + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
 
-    const data = await getMyProfileRequest({ web3mq_signature, userid, timestamp });
+    const { data } = await getMyProfileRequest({ web3mq_signature, userid, timestamp });
     return data;
   }
 

@@ -122,6 +122,8 @@ export type ContactListItemType = {
 };
 
 export type SearchUsersResponse = {
+  avatar_url: string;
+  nickname: string;
   userid: string;
   wallet_address: string;
   wallet_type: string;

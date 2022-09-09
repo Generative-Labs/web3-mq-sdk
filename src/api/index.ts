@@ -12,7 +12,6 @@ import {
   profileParams,
   sendFriendParams,
   operationFriendParams,
-  SearchUsersResponse,
   UpdateMyProfileResponse,
   ChangeNotificationStatusParams,
   CreateTopicParams,
@@ -71,13 +70,13 @@ export const changeMessageStatusRequest = async (payload: changeMessageStatusPar
 /**
  * @API User
  */
-export const searchUsersRequest = async (payload: searchParams): Promise<SearchUsersResponse> => {
+export const searchUsersRequest = async (payload: searchParams) => {
   return await request.get('/api/users/search/', {
     params: payload,
   });
 };
 
-export const getMyProfileRequest = async (payload: BaseParams): Promise<SearchUsersResponse> => {
+export const getMyProfileRequest = async (payload: BaseParams) => {
   return await request.get('/api/my_profile/', {
     params: payload,
   });

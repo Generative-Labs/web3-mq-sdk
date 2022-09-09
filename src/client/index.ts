@@ -5,6 +5,7 @@ import { Message } from '../message';
 import { User } from '../user';
 import { Contact } from '../contact';
 import { Notify } from '../notify';
+import { Topic } from '../topic';
 import { Request } from '../core/request';
 
 import event from '../core/eventEmitter';
@@ -22,6 +23,7 @@ export class Client {
   user: User;
   contact: Contact;
   notify: Notify;
+  topic: Topic;
 
   constructor(keys: KeyPairsType) {
     this.keys = { ...keys, userid: `user:${keys.PublicKey}` };
@@ -32,6 +34,7 @@ export class Client {
     this.user = new User(this);
     this.contact = new Contact(this);
     this.notify = new Notify(this);
+    this.topic = new Topic(this);
   }
 
   public static init = async (
