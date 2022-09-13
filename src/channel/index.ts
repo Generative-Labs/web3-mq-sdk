@@ -21,7 +21,7 @@ export class Channel {
     this.activeChannel = null;
   }
 
-  setActiveChannel(channel: ActiveChannelType) {
+  setActiveChannel(channel: ActiveChannelType | null) {
     this.activeChannel = channel;
     this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
   }
@@ -40,9 +40,7 @@ export class Channel {
     } else {
       this.channelList = result;
     }
-    if (this.channelList) {
-      this.setActiveChannel(this.channelList[0]);
-    }
+
     this._client.emit('channel.getList', { type: 'channel.getList' });
   }
 
@@ -90,7 +88,7 @@ export class Channel {
       const timestamp = Date.now();
       const signContent = userid + groupid + timestamp;
       const web3mq_signature = await getDataSignature(PrivateKey, signContent);
-      
+
       const data = await inviteGroupMemberRequest({
         web3mq_signature,
         userid,

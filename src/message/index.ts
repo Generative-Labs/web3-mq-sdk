@@ -8,11 +8,13 @@ import { Web3MQChangeMessageStatus, Web3MQMessageStatusResp } from '../pb/messag
 export class Message {
   private readonly _client: Client;
   private readonly _keys: ClientKeyPaires;
+  msg_text: string;
   messageList: MessageListItem[] | null;
 
   constructor(client: Client) {
     this._client = client;
     this._keys = client.keys;
+    this.msg_text = '';
     client.connect.receive = this.receive;
     this.messageList = null;
   }
@@ -28,7 +30,12 @@ export class Message {
         data: { result = [] },
       } = await getMessageListRequest({ userid, timestamp, web3mq_signature, topic, ...option });
       const data = await renderMessagesList(result);
-      this.messageList = data.reverse() ?? [];
+      const list = data.reverse() ?? [];
+      if (this.messageList && option.page !== 1) {
+        this.messageList = [...this.messageList, ...list];
+      } else {
+        this.messageList = list;
+      }
       this._client.emit('message.getList', { type: 'message.getList' });
       // return data;
     }
@@ -61,6 +68,7 @@ export class Message {
   async sendMessage(msg: string) {
     const { keys, connect, channel } = this._client;
     if (channel.activeChannel) {
+      this.msg_text = msg;
       const { topic } = channel.activeChannel;
       const concatArray = await sendMessageCommand(keys, topic, msg, connect.nodeId);
       connect.send(concatArray);
