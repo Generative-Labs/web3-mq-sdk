@@ -187,7 +187,7 @@ export const selectUrl = (type: string = 'http', url: string) => {
   let Domain: string = url.split('://')[1];
 
   const BASE_URL = `https://${Domain}`;
-  const BASE_WS = `ws://${Domain}/messages`;
+  const BASE_WS = `wss://${Domain}/messages`;
 
   if (type === 'ws') {
     return BASE_WS;

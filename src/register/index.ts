@@ -1,7 +1,7 @@
 import { sha3_224 } from 'js-sha3';
 import { GenerateEd25519KeyPair, getCurrentDate } from '../utils';
 import { savePublicKeyRequest } from '../api';
-import { SavePublicKeyParams, EthAccountType } from '../types';
+import { SavePublicKeyParams, EthAccountType, signMetaMaskParams } from '../types';
 
 export class Register {
   appKey: string;
@@ -56,8 +56,9 @@ export class Register {
     return res;
   };
 
-  signMetaMask = async (signContentURI: string) => {
-    const { address } = await this.getEthAccount();
+  signMetaMask = async (options: signMetaMaskParams) => {
+    const { signContentURI, EthAddress } = options;
+    const address = EthAddress || (await (await this.getEthAccount()).address);
     const { PrivateKey, PublicKey } = await GenerateEd25519KeyPair();
     const userid = `user:${PublicKey}`;
     const timestamp = Date.now();

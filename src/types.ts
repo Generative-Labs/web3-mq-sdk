@@ -24,6 +24,11 @@ export type EthAccountType = {
   shortAddress: string;
 };
 
+export type signMetaMaskParams = {
+  signContentURI: string;
+  EthAddress?: string;
+};
+
 export type initOptions = {
   connectUrl?: string | null;
   app_key?: string;
