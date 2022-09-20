@@ -27,13 +27,17 @@ export class Topic {
     const timestamp = Date.now();
     const signContent = userid + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
-    const { data } = await myCreateTopicListRequest({
+    const { data = [] } = await myCreateTopicListRequest({
       web3mq_signature,
       userid,
       timestamp,
       ...options,
     });
-    this.myTopicList = data;
+    if (this.myTopicList && options.page !== 1) {
+      this.myTopicList = [...this.myTopicList, ...data];
+    } else {
+      this.myTopicList = data;
+    }
     this._client.emit('notification.getMyTopicList', { type: 'notification.getMyTopicList' });
     return data;
   }

@@ -35,7 +35,11 @@ export class Notify {
   receiveNotify = (pbType: number, bytes: Uint8Array) => {
     const { data } = Web3MQMessageListResponse.fromBinary(bytes);
     const list = data.map((item) => JSON.parse(new TextDecoder().decode(item.payload)));
-    this.notificationList = list;
+    if (!this.notificationList) {
+      this.notificationList = list;
+    } else {
+      this.notificationList = [...list, ...this.notificationList];
+    }
     if (this._client.listeners.events['notification.getList']) {
       this._client.emit('notification.getList', { type: 'notification.getList' });
     }
