@@ -68,12 +68,12 @@ export class Register {
     );
 
     let signContent = `Web3MQ wants you to sign in with your Ethereum account:
-    ${address}
-    For Web3MQ registration
-    URI: ${signContentURI}
-    Version: 1
-    Nonce: ${NonceContent}
-    Issued At: ${getCurrentDate()}`;
+${address}
+For Web3MQ registration
+URI: ${signContentURI}
+Version: 1
+Nonce: ${NonceContent}
+Issued At: ${getCurrentDate()}`;
 
     // @ts-ignore metamask signature
     const signature = await window.ethereum.request({
