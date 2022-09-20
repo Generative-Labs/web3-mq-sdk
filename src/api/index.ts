@@ -3,6 +3,7 @@ import { request } from '../core/request';
 import {
   SavePublicKeyParams,
   createRoomParams,
+  CommonGetListPatams,
   getMessageListParams,
   BaseParams,
   getGroupMemberListParams,
@@ -37,7 +38,7 @@ export const createRoomRequest = async (payload: createRoomParams) => {
 //   });
 // };
 
-export const getRoomListRequest = async (payload: createRoomParams) => {
+export const getRoomListRequest = async (payload: CommonGetListPatams) => {
   return await request.get('/api/chats/', {
     params: payload,
   });
@@ -97,7 +98,7 @@ export const searchContactRequest = async (payload: searchParams) => {
   });
 };
 
-export const getContactListRequest = async (payload: createRoomParams) => {
+export const getContactListRequest = async (payload: CommonGetListPatams) => {
   return await request.get('/api/contacts/', {
     params: payload,
   });
@@ -107,13 +108,13 @@ export const sendFriendRequest = async (payload: sendFriendParams) => {
   return await request.post('/api/contacts/add_friends/', payload);
 };
 
-export const getMyFriendListRequset = async (payload: createRoomParams) => {
+export const getMyFriendListRequset = async (payload: CommonGetListPatams) => {
   return await request.get('/api/contacts/add_friends/', {
     params: payload,
   });
 };
 
-export const getRreceiveFriendListRequests = async (payload: createRoomParams) => {
+export const getRreceiveFriendListRequests = async (payload: CommonGetListPatams) => {
   return await request.get('/api/contacts/friend_requests/', {
     params: payload,
   });

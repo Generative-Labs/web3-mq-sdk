@@ -44,7 +44,7 @@ export class Channel {
     this._client.emit('channel.getList', { type: 'channel.getList' });
   }
 
-  async createRoom() {
+  async createRoom(group_name?: string, avatar_url?: string) {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
@@ -54,6 +54,8 @@ export class Channel {
       web3mq_signature,
       userid,
       timestamp,
+      group_name,
+      avatar_url,
     });
     if (!this.channelList) {
       return;
