@@ -20,7 +20,7 @@ export class Message {
   }
 
   async getMessageList(option: PageParams) {
-    const topic = this._client.channel.activeChannel?.topic;
+    const topic = this._client.channel.activeChannel?.chatid;
     if (topic) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -46,7 +46,7 @@ export class Message {
    * if message from one chat: topic = userid
    */
   async changeMessageStatus(messages: string[], status: MessageStatus = 'delivered') {
-    const topic = this._client.channel.activeChannel?.topic;
+    const topic = this._client.channel.activeChannel?.chatid;
     if (topic) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -69,8 +69,8 @@ export class Message {
     const { keys, connect, channel } = this._client;
     if (channel.activeChannel) {
       this.msg_text = msg;
-      const { topic } = channel.activeChannel;
-      const concatArray = await sendMessageCommand(keys, topic, msg, connect.nodeId);
+      const { chatid } = channel.activeChannel;
+      const concatArray = await sendMessageCommand(keys, chatid, msg, connect.nodeId);
       connect.send(concatArray);
     }
   }

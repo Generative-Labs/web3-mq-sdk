@@ -6,7 +6,7 @@ import {
   inviteGroupMemberRequest,
 } from '../api';
 import { getDataSignature } from '../utils';
-import { PageParams, ActiveChannelType, ClientKeyPaires } from '../types';
+import { PageParams, ActiveChannelType, ClientKeyPaires, CreateRoomParams } from '../types';
 
 export class Channel {
   private readonly _client: Client;
@@ -44,28 +44,53 @@ export class Channel {
     this._client.emit('channel.getList', { type: 'channel.getList' });
   }
 
-  async createRoom(group_name?: string, avatar_url?: string) {
+  async createRoom(params: Pick<CreateRoomParams, 'group_name' | 'avatar_url' | 'avatar_base64'>) {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
 
-    const { data = { groupid: '' } } = await createRoomRequest({
-      web3mq_signature,
-      userid,
-      timestamp,
-      group_name,
-      avatar_url,
-    });
+    const { data = { groupid: '', group_name: '', avatar_base64: '', avatar_url: '' } } =
+      await createRoomRequest({
+        web3mq_signature,
+        userid,
+        timestamp,
+        ...params,
+      });
     if (!this.channelList) {
       return;
     }
-    this.channelList = [{ topic: data.groupid, topic_type: 'group' }, ...this.channelList];
+    this.channelList = [
+      {
+        chatid: data.groupid,
+        chat_type: 'group',
+        chat_name: data.group_name,
+        avatar_base64: data.avatar_base64,
+        avatar_url: data.avatar_url,
+      },
+      ...this.channelList,
+    ];
     this._client.emit('channel.getList', { type: 'channel.getList' });
   }
 
+  // async updateRoom(topic: string, topic_type: string) {
+  //   const { userid, PrivateKey } = this._keys;
+  //   const timestamp = Date.now();
+  //   const signContent = userid + timestamp;
+  //   const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+
+  //   const data = await updateRoomListRequest({
+  //     userid,
+  //     timestamp,
+  //     web3mq_signature,
+  //     topic,
+  //     topic_type,
+  //   });
+  //   return data;
+  // }
+
   async getGroupMemberList(option: PageParams) {
-    const groupid = this.activeChannel?.topic;
+    const groupid = this.activeChannel?.chatid;
     if (groupid) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -84,7 +109,7 @@ export class Channel {
   }
 
   async inviteGroupMember(members: string[]) {
-    const groupid = this.activeChannel?.topic;
+    const groupid = this.activeChannel?.chatid;
     if (groupid) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();

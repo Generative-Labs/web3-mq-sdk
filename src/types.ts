@@ -58,16 +58,22 @@ export type BaseParams = {
   timestamp: number;
 };
 
-export interface createRoomParams extends BaseParams {
+export interface CreateRoomParams extends BaseParams {
   group_name?: string;
   avatar_url?: string;
+  avatar_base64?: string;
 }
 
 export interface CommonGetListPatams extends BaseParams, PageParams {}
 
 export type ActiveChannelType = {
-  topic: string;
-  topic_type: string;
+  avatar_base64: string;
+  avatar_url: string;
+  chat_name: string;
+  chat_type: string;
+  chatid: string;
+  // topic: string;
+  // topic_type: string;
 };
 
 export interface getMessageListParams extends BaseParams, PageParams {

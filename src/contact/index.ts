@@ -54,7 +54,12 @@ export class Contact {
       timestamp,
       ...option,
     });
-    this.contactList = data.result;
+
+    if (this.contactList && option.page !== 1) {
+      this.contactList = [...this.contactList, ...data.result];
+    } else {
+      this.contactList = data.result;
+    }
     emit('contact.getList', { type: 'contact.getList' });
   }
 

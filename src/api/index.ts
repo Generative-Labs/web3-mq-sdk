@@ -2,7 +2,7 @@ import { request } from '../core/request';
 
 import {
   SavePublicKeyParams,
-  createRoomParams,
+  CreateRoomParams,
   CommonGetListPatams,
   getMessageListParams,
   BaseParams,
@@ -28,7 +28,7 @@ export const savePublicKeyRequest = async (payload: SavePublicKeyParams) => {
 /**
  * @API Channel
  */
-export const createRoomRequest = async (payload: createRoomParams) => {
+export const createRoomRequest = async (payload: CreateRoomParams) => {
   return await request.post('/api/groups/', payload);
 };
 
