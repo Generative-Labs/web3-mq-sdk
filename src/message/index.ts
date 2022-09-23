@@ -2,8 +2,12 @@ import { Client } from '../client';
 import { ClientKeyPaires, PageParams, MessageStatus, MessageListItem } from '../types';
 import { sendMessageCommand, getDataSignature, renderMessagesList } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
-import { PbTypeMessageStatusResp, PbTypeMessageChangeStatus } from '../core/pbType';
-import { Web3MQChangeMessageStatus, Web3MQMessageStatusResp } from '../pb/message';
+import { PbTypeMessage, PbTypeMessageStatusResp, PbTypeMessageChangeStatus } from '../core/pbType';
+import {
+  Web3MQRequestMessage,
+  Web3MQChangeMessageStatus,
+  Web3MQMessageStatusResp,
+} from '../pb/message';
 
 export class Message {
   private readonly _client: Client;
@@ -75,6 +79,42 @@ export class Message {
     }
   }
   receive = (pbType: number, bytes: Uint8Array) => {
+    if (pbType === PbTypeMessage) {
+      const resp = Web3MQRequestMessage.fromBinary(bytes);
+      console.log('msg:', resp);
+      const list: any = [resp].map((item) => {
+        const idx = this.messageList?.length || 0;
+
+        let date = new Date(Number(item.timestamp));
+
+        let timestampStr = date.getHours() + ':' + date.getMinutes();
+
+        let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        let message = {
+          _id: idx + 1,
+          id: idx + 1,
+          indexId: idx + 1,
+          content: new TextDecoder().decode(item.payload),
+          senderId: item.comeFrom,
+          username: '',
+          avatar: 'assets/imgs/doe.png',
+          // date: "13 November",
+          // timestamp: "10:20",
+          date: dateStr,
+          timestamp: timestampStr,
+          system: false,
+          saved: false,
+          distributed: true,
+          seen: true,
+          failure: false,
+        };
+        return message;
+      });
+      if (this.messageList) {
+        this.messageList = [...this.messageList, ...list];
+      }
+      this._client.emit('message.getList', { type: 'message.getList', data: resp });
+    }
     if (pbType === PbTypeMessageStatusResp) {
       const resp = Web3MQMessageStatusResp.fromBinary(bytes);
       console.log('msgStatus:', resp);
