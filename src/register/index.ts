@@ -1,7 +1,7 @@
 import { sha3_224 } from 'js-sha3';
 import { GenerateEd25519KeyPair, getCurrentDate } from '../utils';
-import { savePublicKeyRequest } from '../api';
-import { SavePublicKeyParams, EthAccountType, signMetaMaskParams } from '../types';
+import { getUserInfoRequest, userLoginRequest } from '../api';
+import { LoginParams, EthAccountType, signMetaMaskParams } from '../types';
 
 export class Register {
   appKey: string;
@@ -57,43 +57,58 @@ export class Register {
   };
 
   signMetaMask = async (options: signMetaMaskParams) => {
-    const { signContentURI, EthAddress } = options;
-    const address = EthAddress || (await (await this.getEthAccount()).address);
-    const { PrivateKey, PublicKey } = await GenerateEd25519KeyPair();
-    const userid = `user:${PublicKey}`;
+    const { signContentURI, EthAddress, nickname, avatar_url, avatar_base64 } = options;
+    const did_value = EthAddress || (await (await this.getEthAccount()).address);
     const timestamp = Date.now();
-    const wallet_type = 'eth';
+    const did_type = 'eth';
+    const pubkey_type = 'ed25519';
+    let userid: string = '';
+    try {
+      const { data } = await getUserInfoRequest({ did_type, did_value, timestamp });
+      userid = data.userid;
+    } catch (error) {
+      userid = `user: ${sha3_224(did_type + did_value + timestamp)}`;
+    }
+
+    const { PrivateKey, PublicKey } = await GenerateEd25519KeyPair();
+
     const NonceContent = sha3_224(
-      userid + address + wallet_type + PublicKey + timestamp.toString(),
+      userid + pubkey_type + PublicKey + did_type + did_value + timestamp.toString(),
     );
 
-    let signContent = `Web3MQ wants you to sign in with your Ethereum account:
-${address}
-For Web3MQ registration
-URI: ${signContentURI}
-Version: 1
-Nonce: ${NonceContent}
-Issued At: ${getCurrentDate()}`;
+    let signContent = `Web3MQ wants you to sign in with your Ethereum account:${did_value}
+    For Web3MQ registration
+    URI: ${signContentURI}
+    Version: 1
+    Nonce: ${NonceContent}
+    Issued At: ${getCurrentDate()}`;
 
     // @ts-ignore metamask signature
     const signature = await window.ethereum.request({
       method: 'personal_sign',
-      params: [signContent, address, 'web3mq'],
+      params: [signContent, did_value, 'web3mq'],
     });
 
-    let payload: SavePublicKeyParams = {
-      userid: userid,
-      pubkey: PublicKey,
-      metamask_signature: signature,
-      sign_content: signContent,
-      wallet_address: address,
-      wallet_type: 'eth',
+    let payload: LoginParams = {
+      userid,
+      did_type,
+      did_value,
+      did_signature: signature,
+      signature_content: signContent,
+      pubkey_type,
+      pubkey_value: PublicKey,
+      nickname,
+      avatar_url,
+      avatar_base64,
       timestamp: timestamp,
-      app_key: this.appKey,
+      testnet_access_key: this.appKey,
     };
 
-    await savePublicKeyRequest(payload);
-
-    return { PrivateKey, PublicKey };
+    try {
+      const { data } = await userLoginRequest(payload);
+      return { PrivateKey, PublicKey, ...data };
+    } catch (error) {
+      return { PrivateKey, PublicKey, userid };
+    }
   };
 }

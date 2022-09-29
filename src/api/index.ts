@@ -1,7 +1,6 @@
 import { request } from '../core/request';
 
 import {
-  SavePublicKeyParams,
   CreateRoomParams,
   CommonGetListPatams,
   getMessageListParams,
@@ -19,9 +18,14 @@ import {
   SubscribeTopicParams,
   PublishTopicMessageParams,
   GetTopicListParams,
+  getUserInfoParams,
+  LoginParams,
 } from '../types';
 
-export const savePublicKeyRequest = async (payload: SavePublicKeyParams) => {
+/**
+ * @deprecated
+ */
+export const savePublicKeyRequest = async (payload: any) => {
   return await request.post('/api/pubkey/', payload);
 };
 
@@ -87,6 +91,14 @@ export const updateMyProfileRequest = async (
   payload: profileParams,
 ): Promise<UpdateMyProfileResponse> => {
   return await request.post('/api/my_profile/', payload);
+};
+
+export const getUserInfoRequest = async (payload: getUserInfoParams) => {
+  return await request.post('/api/get_user_info/', payload);
+};
+
+export const userLoginRequest = async (payload: LoginParams) => {
+  return await request.post('/api/user_login/', payload);
 };
 
 /**

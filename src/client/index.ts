@@ -26,7 +26,7 @@ export class Client {
   topic: Topic;
 
   constructor(keys: KeyPairsType) {
-    this.keys = { ...keys, userid: `user:${keys.PublicKey}` };
+    this.keys = keys;
     this.listeners = new event();
     this.channel = new Channel(this);
     this.connect = new Connect(this);

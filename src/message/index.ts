@@ -23,8 +23,8 @@ export class Message {
     this.messageList = null;
   }
 
-  async getMessageList(option: PageParams) {
-    const topic = this._client.channel.activeChannel?.chatid;
+  async getMessageList(option: PageParams, userId?: string) {
+    const topic = userId || this._client.channel.activeChannel?.chatid;
     if (topic) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -69,12 +69,12 @@ export class Message {
     }
   }
 
-  async sendMessage(msg: string) {
+  async sendMessage(msg: string, userId?: string) {
     const { keys, connect, channel } = this._client;
-    if (channel.activeChannel) {
+    const topicId = userId || channel.activeChannel?.chatid;
+    if (topicId) {
       this.msg_text = msg;
-      const { chatid } = channel.activeChannel;
-      const concatArray = await sendMessageCommand(keys, chatid, msg, connect.nodeId);
+      const concatArray = await sendMessageCommand(keys, topicId, msg, connect.nodeId);
       connect.send(concatArray);
     }
   }

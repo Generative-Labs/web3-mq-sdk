@@ -16,6 +16,7 @@ export type PageParams = {
 export type KeyPairsType = {
   PrivateKey: string;
   PublicKey: string;
+  userid: string;
 };
 
 export type EthAccountType = {
@@ -27,6 +28,9 @@ export type EthAccountType = {
 export type signMetaMaskParams = {
   signContentURI: string;
   EthAddress?: string;
+  nickname?: string;
+  avatar_url?: string;
+  avatar_base64?: string;
 };
 
 export type initOptions = {
@@ -41,15 +45,19 @@ export interface ClientKeyPaires extends KeyPairsType {
   userid: string;
 }
 
-export type SavePublicKeyParams = {
+export type LoginParams = {
   userid: string;
-  pubkey: string;
-  metamask_signature: string;
-  sign_content: string;
-  wallet_address: string;
-  wallet_type: 'eth';
+  did_type: 'eth';
+  did_value: string;
+  did_signature: string;
+  pubkey_type: 'ed25519';
+  pubkey_value: string;
+  signature_content: string;
   timestamp: number;
-  app_key?: string;
+  nickname?: string;
+  avatar_base64?: string;
+  avatar_url?: string;
+  testnet_access_key?: string;
 };
 
 export type BaseParams = {
@@ -125,6 +133,12 @@ export interface profileParams extends BaseParams {
 export interface sendFriendParams extends BaseParams {
   target_userid: string;
 }
+
+export type getUserInfoParams = {
+  did_type: string;
+  did_value: string;
+  timestamp: number;
+};
 
 export type ActionType = 'agree';
 
