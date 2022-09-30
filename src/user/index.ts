@@ -1,6 +1,17 @@
 import { Client } from '../client';
-import { ClientKeyPaires, SearchUsersResponse, UpdateMyProfileResponse } from '../types';
-import { searchUsersRequest, getMyProfileRequest, updateMyProfileRequest } from '../api';
+import {
+  ClientKeyPaires,
+  SearchUsersResponse,
+  UpdateMyProfileResponse,
+  UserBindDidParams,
+} from '../types';
+import {
+  searchUsersRequest,
+  getMyProfileRequest,
+  updateMyProfileRequest,
+  getUserBindDidsRequest,
+  userBindDidRequest,
+} from '../api';
 import { getDataSignature } from '../utils';
 
 export class User {
@@ -25,7 +36,7 @@ export class User {
       timestamp,
       keyword: walletAddress,
     });
-    
+
     this.userInfo = data;
     return data;
   }
@@ -53,6 +64,26 @@ export class User {
       nickname,
       avatar_url,
     });
+    return data;
+  }
+
+  async getUserBindDids(): Promise<any> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await getUserBindDidsRequest({ web3mq_signature, userid, timestamp });
+    return data;
+  }
+
+  async userBindDid(
+    params: Pick<UserBindDidParams, 'provider_id' | 'did_type' | 'did_value'>,
+  ): Promise<any> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await userBindDidRequest({ web3mq_signature, userid, timestamp, ...params });
     return data;
   }
 }

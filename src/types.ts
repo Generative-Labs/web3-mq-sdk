@@ -140,6 +140,13 @@ export type getUserInfoParams = {
   timestamp: number;
 };
 
+export interface GetUserBindDidsParams extends BaseParams {}
+export interface UserBindDidParams extends BaseParams {
+  provider_id: string;
+  did_type: string;
+  did_value: string;
+}
+
 export type ActionType = 'agree';
 
 export interface operationFriendParams extends BaseParams {

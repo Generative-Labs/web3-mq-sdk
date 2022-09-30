@@ -20,6 +20,8 @@ import {
   GetTopicListParams,
   getUserInfoParams,
   LoginParams,
+  GetUserBindDidsParams,
+  UserBindDidParams,
 } from '../types';
 
 /**
@@ -99,6 +101,14 @@ export const getUserInfoRequest = async (payload: getUserInfoParams) => {
 
 export const userLoginRequest = async (payload: LoginParams) => {
   return await request.post('/api/user_login/', payload);
+};
+
+export const getUserBindDidsRequest = async (payload: GetUserBindDidsParams) => {
+  return await request.post('/api/get_user_binddids/', payload);
+};
+
+export const userBindDidRequest = async (payload: UserBindDidParams) => {
+  return await request.post('/api/user_binddid/', payload);
 };
 
 /**

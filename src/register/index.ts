@@ -67,7 +67,7 @@ export class Register {
       const { data } = await getUserInfoRequest({ did_type, did_value, timestamp });
       userid = data.userid;
     } catch (error) {
-      userid = `user: ${sha3_224(did_type + did_value + timestamp)}`;
+      userid = `user:${sha3_224(did_type + did_value + timestamp)}`;
     }
 
     const { PrivateKey, PublicKey } = await GenerateEd25519KeyPair();
@@ -76,12 +76,13 @@ export class Register {
       userid + pubkey_type + PublicKey + did_type + did_value + timestamp.toString(),
     );
 
-    let signContent = `Web3MQ wants you to sign in with your Ethereum account:${did_value}
-    For Web3MQ registration
-    URI: ${signContentURI}
-    Version: 1
-    Nonce: ${NonceContent}
-    Issued At: ${getCurrentDate()}`;
+    let signContent = `Web3MQ wants you to sign in with your Ethereum account:
+${did_value}
+For Web3MQ login
+URI: ${signContentURI}
+Version: 1
+Nonce: ${NonceContent}
+Issued At: ${getCurrentDate()}`;
 
     // @ts-ignore metamask signature
     const signature = await window.ethereum.request({
