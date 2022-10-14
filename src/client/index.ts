@@ -1,6 +1,6 @@
 import { Register } from '../register';
 import { Channel } from '../channel';
-import { Connect } from '../connect';
+import { Connect, SignConnect } from '../connect';
 import { Message } from '../message';
 import { User } from '../user';
 import { Contact } from '../contact';
@@ -10,7 +10,13 @@ import { Request } from '../core/request';
 
 import event from '../core/eventEmitter';
 import { selectUrl, getFastestUrl } from '../utils';
-import { KeyPairsType, ClientKeyPaires, EventTypes, initOptions } from '../types';
+import {
+  KeyPairsType,
+  ClientKeyPaires,
+  EventTypes,
+  initOptions,
+  SignClientOptions,
+} from '../types';
 export class Client {
   private static _instance: Client | null;
   static wsUrl: string;
@@ -58,6 +64,15 @@ export class Client {
       Client._instance = new Client(keys);
     }
     return Client._instance as Client;
+  };
+
+  public static getSignClient = async (options: SignClientOptions): Promise<SignConnect> => {
+    if (!options) {
+      throw new Error('The options is required!');
+    }
+    const { connectUrl = null, env } = options;
+    const fastUrl = connectUrl || (await getFastestUrl(env));
+    return new SignConnect({ wsUrl: selectUrl('ws', fastUrl), ...options });
   };
 
   on = (eventName: EventTypes, callback: any) => this.listeners.on(eventName, callback);

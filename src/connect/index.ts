@@ -1,3 +1,5 @@
+export * from './signConnect';
+
 import { Client } from '../client';
 import { sendConnectCommand, GetContactBytes } from '../utils';
 import {

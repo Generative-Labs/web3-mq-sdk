@@ -79,9 +79,10 @@ export class User {
   async userBindDid(
     params: Pick<UserBindDidParams, 'provider_id' | 'did_type' | 'did_value'>,
   ): Promise<any> {
+    const { did_type, did_value } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
-    const signContent = userid + timestamp;
+    const signContent = userid + did_type + did_value + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
     const data = await userBindDidRequest({ web3mq_signature, userid, timestamp, ...params });
     return data;

@@ -18,3 +18,20 @@ message DisconnectCommand {
     uint64 timestamp = 3;
     string msgSign = 4;
 }
+
+message UserTempConnectCommand {
+    string NodeID = 1;
+    string DAppID = 2;
+    string TopicID = 3;
+    uint64 SignatureTimestamp = 4;
+    string DAppSignature = 5;
+}
+
+message UserTempConnectResp {
+    string NodeID = 1;
+    string DAppID = 2;
+    string TopicID = 3;
+    int32 statusCode = 4; // 200 success      400 failure
+    string statusMsg = 5; // success / invalid request
+    uint64 Timestamp = 6;
+}

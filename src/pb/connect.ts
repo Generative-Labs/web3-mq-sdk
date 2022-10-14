@@ -11,8 +11,6 @@ import type { PartialMessage } from '@protobuf-ts/runtime';
 import { reflectionMergePartial } from '@protobuf-ts/runtime';
 import { MESSAGE_TYPE } from '@protobuf-ts/runtime';
 import { MessageType } from '@protobuf-ts/runtime';
-// msgSign = RSA(nodeId + userId + timestamp)
-
 /**
  * @generated from protobuf message pb.ConnectCommand
  */
@@ -54,6 +52,60 @@ export interface DisconnectCommand {
    * @generated from protobuf field: string msgSign = 4;
    */
   msgSign: string;
+}
+/**
+ * @generated from protobuf message pb.UserTempConnectCommand
+ */
+export interface UserTempConnectCommand {
+  /**
+   * @generated from protobuf field: string NodeID = 1 [json_name = "NodeID"];
+   */
+  nodeID: string;
+  /**
+   * @generated from protobuf field: string DAppID = 2 [json_name = "DAppID"];
+   */
+  dAppID: string;
+  /**
+   * @generated from protobuf field: string TopicID = 3 [json_name = "TopicID"];
+   */
+  topicID: string;
+  /**
+   * @generated from protobuf field: uint64 SignatureTimestamp = 4 [json_name = "SignatureTimestamp"];
+   */
+  signatureTimestamp: bigint;
+  /**
+   * @generated from protobuf field: string DAppSignature = 5 [json_name = "DAppSignature"];
+   */
+  dAppSignature: string;
+}
+/**
+ * @generated from protobuf message pb.UserTempConnectResp
+ */
+export interface UserTempConnectResp {
+  /**
+   * @generated from protobuf field: string NodeID = 1 [json_name = "NodeID"];
+   */
+  nodeID: string;
+  /**
+   * @generated from protobuf field: string DAppID = 2 [json_name = "DAppID"];
+   */
+  dAppID: string;
+  /**
+   * @generated from protobuf field: string TopicID = 3 [json_name = "TopicID"];
+   */
+  topicID: string;
+  /**
+   * @generated from protobuf field: int32 statusCode = 4;
+   */
+  statusCode: number; // 200 success      400 failure
+  /**
+   * @generated from protobuf field: string statusMsg = 5;
+   */
+  statusMsg: string; // success / invalid request
+  /**
+   * @generated from protobuf field: uint64 Timestamp = 6 [json_name = "Timestamp"];
+   */
+  timestamp: bigint;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class ConnectCommand$Type extends MessageType<ConnectCommand> {
@@ -227,3 +279,216 @@ class DisconnectCommand$Type extends MessageType<DisconnectCommand> {
  * @generated MessageType for protobuf message pb.DisconnectCommand
  */
 export const DisconnectCommand = new DisconnectCommand$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class UserTempConnectCommand$Type extends MessageType<UserTempConnectCommand> {
+  constructor() {
+    super('pb.UserTempConnectCommand', [
+      { no: 1, name: 'NodeID', kind: 'scalar', jsonName: 'NodeID', T: 9 /*ScalarType.STRING*/ },
+      { no: 2, name: 'DAppID', kind: 'scalar', jsonName: 'DAppID', T: 9 /*ScalarType.STRING*/ },
+      { no: 3, name: 'TopicID', kind: 'scalar', jsonName: 'TopicID', T: 9 /*ScalarType.STRING*/ },
+      {
+        no: 4,
+        name: 'SignatureTimestamp',
+        kind: 'scalar',
+        jsonName: 'SignatureTimestamp',
+        T: 4 /*ScalarType.UINT64*/,
+        L: 0 /*LongType.BIGINT*/,
+      },
+      {
+        no: 5,
+        name: 'DAppSignature',
+        kind: 'scalar',
+        jsonName: 'DAppSignature',
+        T: 9 /*ScalarType.STRING*/,
+      },
+    ]);
+  }
+  create(value?: PartialMessage<UserTempConnectCommand>): UserTempConnectCommand {
+    const message = {
+      nodeID: '',
+      dAppID: '',
+      topicID: '',
+      signatureTimestamp: 0n,
+      dAppSignature: '',
+    };
+    globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+    if (value !== undefined) reflectionMergePartial<UserTempConnectCommand>(this, message, value);
+    return message;
+  }
+  internalBinaryRead(
+    reader: IBinaryReader,
+    length: number,
+    options: BinaryReadOptions,
+    target?: UserTempConnectCommand,
+  ): UserTempConnectCommand {
+    let message = target ?? this.create(),
+      end = reader.pos + length;
+    while (reader.pos < end) {
+      let [fieldNo, wireType] = reader.tag();
+      switch (fieldNo) {
+        case /* string NodeID = 1 [json_name = "NodeID"];*/ 1:
+          message.nodeID = reader.string();
+          break;
+        case /* string DAppID = 2 [json_name = "DAppID"];*/ 2:
+          message.dAppID = reader.string();
+          break;
+        case /* string TopicID = 3 [json_name = "TopicID"];*/ 3:
+          message.topicID = reader.string();
+          break;
+        case /* uint64 SignatureTimestamp = 4 [json_name = "SignatureTimestamp"];*/ 4:
+          message.signatureTimestamp = reader.uint64().toBigInt();
+          break;
+        case /* string DAppSignature = 5 [json_name = "DAppSignature"];*/ 5:
+          message.dAppSignature = reader.string();
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
+      }
+    }
+    return message;
+  }
+  internalBinaryWrite(
+    message: UserTempConnectCommand,
+    writer: IBinaryWriter,
+    options: BinaryWriteOptions,
+  ): IBinaryWriter {
+    /* string NodeID = 1 [json_name = "NodeID"]; */
+    if (message.nodeID !== '') writer.tag(1, WireType.LengthDelimited).string(message.nodeID);
+    /* string DAppID = 2 [json_name = "DAppID"]; */
+    if (message.dAppID !== '') writer.tag(2, WireType.LengthDelimited).string(message.dAppID);
+    /* string TopicID = 3 [json_name = "TopicID"]; */
+    if (message.topicID !== '') writer.tag(3, WireType.LengthDelimited).string(message.topicID);
+    /* uint64 SignatureTimestamp = 4 [json_name = "SignatureTimestamp"]; */
+    if (message.signatureTimestamp !== 0n)
+      writer.tag(4, WireType.Varint).uint64(message.signatureTimestamp);
+    /* string DAppSignature = 5 [json_name = "DAppSignature"]; */
+    if (message.dAppSignature !== '')
+      writer.tag(5, WireType.LengthDelimited).string(message.dAppSignature);
+    let u = options.writeUnknownFields;
+    if (u !== false) (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+    return writer;
+  }
+}
+/**
+ * @generated MessageType for protobuf message pb.UserTempConnectCommand
+ */
+export const UserTempConnectCommand = new UserTempConnectCommand$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class UserTempConnectResp$Type extends MessageType<UserTempConnectResp> {
+  constructor() {
+    super('pb.UserTempConnectResp', [
+      { no: 1, name: 'NodeID', kind: 'scalar', jsonName: 'NodeID', T: 9 /*ScalarType.STRING*/ },
+      { no: 2, name: 'DAppID', kind: 'scalar', jsonName: 'DAppID', T: 9 /*ScalarType.STRING*/ },
+      { no: 3, name: 'TopicID', kind: 'scalar', jsonName: 'TopicID', T: 9 /*ScalarType.STRING*/ },
+      { no: 4, name: 'statusCode', kind: 'scalar', T: 5 /*ScalarType.INT32*/ },
+      { no: 5, name: 'statusMsg', kind: 'scalar', T: 9 /*ScalarType.STRING*/ },
+      {
+        no: 6,
+        name: 'Timestamp',
+        kind: 'scalar',
+        jsonName: 'Timestamp',
+        T: 4 /*ScalarType.UINT64*/,
+        L: 0 /*LongType.BIGINT*/,
+      },
+    ]);
+  }
+  create(value?: PartialMessage<UserTempConnectResp>): UserTempConnectResp {
+    const message = {
+      nodeID: '',
+      dAppID: '',
+      topicID: '',
+      statusCode: 0,
+      statusMsg: '',
+      timestamp: 0n,
+    };
+    globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+    if (value !== undefined) reflectionMergePartial<UserTempConnectResp>(this, message, value);
+    return message;
+  }
+  internalBinaryRead(
+    reader: IBinaryReader,
+    length: number,
+    options: BinaryReadOptions,
+    target?: UserTempConnectResp,
+  ): UserTempConnectResp {
+    let message = target ?? this.create(),
+      end = reader.pos + length;
+    while (reader.pos < end) {
+      let [fieldNo, wireType] = reader.tag();
+      switch (fieldNo) {
+        case /* string NodeID = 1 [json_name = "NodeID"];*/ 1:
+          message.nodeID = reader.string();
+          break;
+        case /* string DAppID = 2 [json_name = "DAppID"];*/ 2:
+          message.dAppID = reader.string();
+          break;
+        case /* string TopicID = 3 [json_name = "TopicID"];*/ 3:
+          message.topicID = reader.string();
+          break;
+        case /* int32 statusCode */ 4:
+          message.statusCode = reader.int32();
+          break;
+        case /* string statusMsg */ 5:
+          message.statusMsg = reader.string();
+          break;
+        case /* uint64 Timestamp = 6 [json_name = "Timestamp"];*/ 6:
+          message.timestamp = reader.uint64().toBigInt();
+          break;
+        default:
+          let u = options.readUnknownField;
+          if (u === 'throw')
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
+          let d = reader.skip(wireType);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
+      }
+    }
+    return message;
+  }
+  internalBinaryWrite(
+    message: UserTempConnectResp,
+    writer: IBinaryWriter,
+    options: BinaryWriteOptions,
+  ): IBinaryWriter {
+    /* string NodeID = 1 [json_name = "NodeID"]; */
+    if (message.nodeID !== '') writer.tag(1, WireType.LengthDelimited).string(message.nodeID);
+    /* string DAppID = 2 [json_name = "DAppID"]; */
+    if (message.dAppID !== '') writer.tag(2, WireType.LengthDelimited).string(message.dAppID);
+    /* string TopicID = 3 [json_name = "TopicID"]; */
+    if (message.topicID !== '') writer.tag(3, WireType.LengthDelimited).string(message.topicID);
+    /* int32 statusCode = 4; */
+    if (message.statusCode !== 0) writer.tag(4, WireType.Varint).int32(message.statusCode);
+    /* string statusMsg = 5; */
+    if (message.statusMsg !== '') writer.tag(5, WireType.LengthDelimited).string(message.statusMsg);
+    /* uint64 Timestamp = 6 [json_name = "Timestamp"]; */
+    if (message.timestamp !== 0n) writer.tag(6, WireType.Varint).uint64(message.timestamp);
+    let u = options.writeUnknownFields;
+    if (u !== false) (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+    return writer;
+  }
+}
+/**
+ * @generated MessageType for protobuf message pb.UserTempConnectResp
+ */
+export const UserTempConnectResp = new UserTempConnectResp$Type();

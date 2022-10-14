@@ -39,6 +39,26 @@ export type initOptions = {
   env?: EnvTypes;
 };
 
+export type SendTempConnectOptions = {
+  nodeID?: string;
+  dAppID: string;
+  topicID: string;
+  signatureTimestamp: number;
+  dAppSignature: string;
+};
+
+export type SendDappBridgeOptions = {
+  nodeId?: string;
+  topic: string;
+  msg: string;
+};
+
+export interface SignConnectOptions extends SendTempConnectOptions {
+  wsUrl: string;
+}
+
+export interface SignClientOptions extends SendTempConnectOptions, Omit<initOptions, 'app_key'> {}
+
 export type EnvTypes = 'dev' | 'test';
 
 export interface ClientKeyPaires extends KeyPairsType {

@@ -1,8 +1,8 @@
 import ed from '@noble/ed25519';
 import { sha3_224 } from 'js-sha3';
 import axios from 'axios';
-import { ClientKeyPaires, EnvTypes } from './types';
-import { ConnectCommand, Web3MQRequestMessage } from './pb';
+import { ClientKeyPaires, EnvTypes, SendTempConnectOptions, SendDappBridgeOptions } from './types';
+import { ConnectCommand, UserTempConnectCommand, Web3MQRequestMessage } from './pb';
 import { PbTypeConnectReqCommand, PbTypeMessage } from './core/pbType';
 import { domainUrlList } from './core/config';
 
@@ -99,6 +99,54 @@ export const sendConnectCommand = async (keys: ClientKeyPaires): Promise<Uint8Ar
   return concatArray;
 };
 
+export const sendTempConnectCommand = async (
+  options: SendTempConnectOptions,
+): Promise<Uint8Array> => {
+  const { nodeID = 'nodeId', dAppID, topicID, signatureTimestamp, dAppSignature } = options;
+
+  const reqCmd: UserTempConnectCommand = {
+    nodeID,
+    dAppID,
+    topicID,
+    signatureTimestamp: BigInt(signatureTimestamp),
+    dAppSignature,
+  };
+
+  const bytes = UserTempConnectCommand.toBinary(reqCmd);
+  const concatArray = GetContactBytes(PbTypeConnectReqCommand, bytes);
+
+  return concatArray;
+};
+
+export const sendDappBridgeCommand = async (options: SendDappBridgeOptions) => {
+  const { nodeId = 'nodeId', topic, msg } = options;
+
+  const timestamp = Date.now();
+  const cipherSuite = 'NONE';
+  const byteData = new TextEncoder().encode(msg);
+  const needStore = true;
+
+  const reqCmd: Web3MQRequestMessage = {
+    payload: byteData,
+    contentTopic: topic,
+    version: 1,
+    comeFrom: '',
+    fromSign: '',
+    payloadType: 'application/json',
+    cipherSuite: cipherSuite,
+    needStore: needStore,
+    timestamp: BigInt(timestamp),
+    messageId: '',
+    nodeId,
+    messageType: 'dapp_bridge',
+  };
+
+  const bytes = Web3MQRequestMessage.toBinary(reqCmd);
+  const concatArray = GetContactBytes(PbTypeConnectReqCommand, bytes);
+
+  return concatArray;
+};
+
 export const sendMessageCommand = async (
   keys: ClientKeyPaires,
   topic: string,
@@ -108,7 +156,7 @@ export const sendMessageCommand = async (
   const { userid, PrivateKey } = keys;
   const timestamp = Date.now();
   const cipherSuite = 'NONE';
-  var byteData = new TextEncoder().encode(msg);
+  const byteData = new TextEncoder().encode(msg);
 
   const msgid = await GenerateMessageID(userid, topic, timestamp, byteData);
 

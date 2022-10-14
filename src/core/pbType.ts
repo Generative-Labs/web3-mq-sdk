@@ -5,6 +5,9 @@ const PbTypePubKeyRespCommand = 0b00000001;
 const PbTypeConnectReqCommand = 0b00000010;
 const PbTypeConnectRespCommand = 0b00000011;
 
+const PbTypeUserTempConnectReqCommand = 0b00000101;
+const PbTypeUserTempConnectResp = 0b00000110;
+
 // contact
 const PbTypeContactReqCommand = 0b00001000;
 const PbTypeContactRespCommand = 0b00001001;
@@ -37,6 +40,8 @@ const PbTypePongCommand = 0b10000001;
 
 export {
   PbTypeChatReqCommand,
+  PbTypeUserTempConnectReqCommand,
+  PbTypeUserTempConnectResp,
   PbTypeChatListRespCommand,
   PbTypeGroupInfoRespCommand,
   PbTypePubKeyReqCommand,
