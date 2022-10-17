@@ -3,7 +3,11 @@ import { sha3_224 } from 'js-sha3';
 import axios from 'axios';
 import { ClientKeyPaires, EnvTypes, SendTempConnectOptions, SendDappBridgeOptions } from './types';
 import { ConnectCommand, UserTempConnectCommand, Web3MQRequestMessage } from './pb';
-import { PbTypeConnectReqCommand, PbTypeMessage } from './core/pbType';
+import {
+  PbTypeConnectReqCommand,
+  PbTypeMessage,
+  PbTypeUserTempConnectReqCommand,
+} from './core/pbType';
 import { domainUrlList } from './core/config';
 
 const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {
@@ -113,7 +117,7 @@ export const sendTempConnectCommand = async (
   };
 
   const bytes = UserTempConnectCommand.toBinary(reqCmd);
-  const concatArray = GetContactBytes(PbTypeConnectReqCommand, bytes);
+  const concatArray = GetContactBytes(PbTypeUserTempConnectReqCommand, bytes);
 
   return concatArray;
 };
@@ -142,7 +146,7 @@ export const sendDappBridgeCommand = async (options: SendDappBridgeOptions) => {
   };
 
   const bytes = Web3MQRequestMessage.toBinary(reqCmd);
-  const concatArray = GetContactBytes(PbTypeConnectReqCommand, bytes);
+  const concatArray = GetContactBytes(PbTypeMessage, bytes);
 
   return concatArray;
 };

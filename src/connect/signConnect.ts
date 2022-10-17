@@ -1,12 +1,10 @@
 import { sendTempConnectCommand, sendDappBridgeCommand } from '../utils';
-import { PbTypeUserTempConnectResp } from '../core/pbType';
-import { UserTempConnectResp } from '../pb';
+import { PbTypeUserTempConnectResp, PbTypeMessageStatusResp } from '../core/pbType';
+import { UserTempConnectResp, Web3MQMessageStatusResp } from '../pb';
 import { SignConnectOptions, SendTempConnectOptions, SendDappBridgeOptions } from '../types';
 
 export class SignConnect {
   private _options: SendTempConnectOptions;
-  private timeout: number;
-  private timeoutObj: null | NodeJS.Timeout;
   ws: WebSocket | null;
   wsUrl: string;
   nodeId: string;
@@ -16,8 +14,6 @@ export class SignConnect {
     this.wsUrl = options.wsUrl;
     this.ws = null;
     this.nodeId = '';
-    this.timeout = 55000;
-    this.timeoutObj = null;
     this.init();
   }
 
@@ -38,7 +34,6 @@ export class SignConnect {
     };
 
     wsconn.onmessage = (event) => {
-      console.log(event);
       var respData = new Uint8Array(event.data);
       const PbType = respData[1];
       const bytes = respData.slice(2, respData.length);
@@ -48,14 +43,18 @@ export class SignConnect {
   }
 
   onMessageCallback(PbType: number, bytes: Uint8Array) {
+    console.log(PbType);
     switch (PbType) {
       case PbTypeUserTempConnectResp:
         const resp = UserTempConnectResp.fromBinary(bytes);
         console.log(resp);
         break;
-      default:
-        this.receive(PbType, bytes);
+      case PbTypeMessageStatusResp:
+        const msgResp = Web3MQMessageStatusResp.fromBinary(bytes);
+        console.log('msgStatus:', msgResp);
         break;
+      default:
+        throw new Error('This type is not supported');
     }
   }
 
