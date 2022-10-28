@@ -76,12 +76,26 @@ export class Message {
       this.msg_text = msg;
       const concatArray = await sendMessageCommand(keys, topicId, msg, connect.nodeId);
       connect.send(concatArray);
+
+      if (this.messageList) {
+        const idx = this.messageList.length || 0;
+        let tempMessage = {
+          _id: idx + 1,
+          id: idx + 1,
+          indexId: idx + 1,
+          content: msg,
+        };
+        this.messageList = [...this.messageList, tempMessage as any];
+      }
     }
   }
   receive = (pbType: number, bytes: Uint8Array) => {
     if (pbType === PbTypeMessage) {
       const resp = Web3MQRequestMessage.fromBinary(bytes);
       console.log('msg:', resp);
+      if (resp.messageType === 'dapp_bridge') {
+        return;
+      }
       const list: any = [resp].map((item) => {
         const idx = this.messageList?.length || 0;
 

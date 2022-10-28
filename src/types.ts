@@ -39,25 +39,40 @@ export type initOptions = {
   env?: EnvTypes;
 };
 
+export type SignClientCallBackType = {
+  type: 'connect' | 'messageStatus' | 'keys';
+  data: any;
+};
+
+export type WalletUserInfoType = {
+  did_signature: string;
+  did_type: string;
+  did_value: string;
+  pubkey: string;
+  pubkey_type: string;
+  signature_content: string;
+  timestamp: number;
+  userid: string;
+  wallet_address: string;
+  wallet_type: string;
+};
+
 export type SendTempConnectOptions = {
-  nodeID?: string;
   dAppID: string;
   topicID: string;
   signatureTimestamp: number;
   dAppSignature: string;
 };
 
-export type SendDappBridgeOptions = {
-  nodeId?: string;
-  topic: string;
-  msg: string;
+export type getUserInfoParams = {
+  did_type: string;
+  did_value: string;
+  timestamp: number;
 };
 
 export interface SignConnectOptions extends SendTempConnectOptions {
   wsUrl: string;
 }
-
-export interface SignClientOptions extends SendTempConnectOptions, Omit<initOptions, 'app_key'> {}
 
 export type EnvTypes = 'dev' | 'test';
 
@@ -153,12 +168,6 @@ export interface profileParams extends BaseParams {
 export interface sendFriendParams extends BaseParams {
   target_userid: string;
 }
-
-export type getUserInfoParams = {
-  did_type: string;
-  did_value: string;
-  timestamp: number;
-};
 
 export interface GetUserBindDidsParams extends BaseParams {}
 export interface UserBindDidParams extends BaseParams {

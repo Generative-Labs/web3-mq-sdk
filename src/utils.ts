@@ -1,7 +1,7 @@
 import ed from '@noble/ed25519';
 import { sha3_224 } from 'js-sha3';
 import axios from 'axios';
-import { ClientKeyPaires, EnvTypes, SendTempConnectOptions, SendDappBridgeOptions } from './types';
+import { ClientKeyPaires, EnvTypes, SendTempConnectOptions } from './types';
 import { ConnectCommand, UserTempConnectCommand, Web3MQRequestMessage } from './pb';
 import {
   PbTypeConnectReqCommand,
@@ -57,6 +57,14 @@ export const DownloadKeyPair = (text: string, filename: string = 'KeyPairs') => 
   aTag.click();
 };
 
+export const GenerateRandomSixCode = () => {
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += String(Math.floor(Math.random() * 10));
+  }
+  return code;
+};
+
 export const getDataSignature = async (PrivateKey: string, signContent: string) => {
   if (!PrivateKey) {
     throw new Error('Ed25519PrivateKey not found');
@@ -106,12 +114,12 @@ export const sendConnectCommand = async (keys: ClientKeyPaires): Promise<Uint8Ar
 export const sendTempConnectCommand = async (
   options: SendTempConnectOptions,
 ): Promise<Uint8Array> => {
-  const { nodeID = 'nodeId', dAppID, topicID, signatureTimestamp, dAppSignature } = options;
+  const { dAppID, topicID, signatureTimestamp, dAppSignature } = options;
 
   const reqCmd: UserTempConnectCommand = {
-    nodeID,
+    nodeID: '',
     dAppID,
-    topicID,
+    topicID: topicID.toLowerCase(),
     signatureTimestamp: BigInt(signatureTimestamp),
     dAppSignature,
   };
@@ -122,23 +130,22 @@ export const sendTempConnectCommand = async (
   return concatArray;
 };
 
-export const sendDappBridgeCommand = async (options: SendDappBridgeOptions) => {
-  const { nodeId = 'nodeId', topic, msg } = options;
+export const sendDappBridgeCommand = async (options: any) => {
+  const { nodeId, payload, contentTopic, comeFrom } = options;
 
   const timestamp = Date.now();
   const cipherSuite = 'NONE';
-  const byteData = new TextEncoder().encode(msg);
   const needStore = true;
 
   const reqCmd: Web3MQRequestMessage = {
-    payload: byteData,
-    contentTopic: topic,
+    payload,
+    contentTopic,
     version: 1,
-    comeFrom: '',
+    comeFrom,
     fromSign: '',
     payloadType: 'application/json',
-    cipherSuite: cipherSuite,
-    needStore: needStore,
+    cipherSuite,
+    needStore,
     timestamp: BigInt(timestamp),
     messageId: '',
     nodeId,
@@ -189,62 +196,12 @@ export const sendMessageCommand = async (
   return concatArray;
 };
 
-export const renderMessagesList = async (msglist: any) => {
-  return msglist.map((msg: any, idx: number) => {
-    let content = '';
-    if (msg.cipher_suite == 'NONE') {
-      content = decodeURIComponent(escape(window.atob(msg.payload)));
-    }
-    // else if (msg.cipher_suite == 'RSA_OAEP') {
-    //   if (msg.payload) {
-    //     let byteContent = Uint8Array.from(atob(msg.payload), (c) => c.charCodeAt(0));
-
-    //     let decodeBytes = await getRsaDecryptData(RsaPrivateKeyStr ?? '', byteContent);
-    //     content = new TextDecoder().decode(decodeBytes);
-    //   } else {
-    //     content = '';
-    //   }
-    // }
-    else {
-      content = '不支持的加密类型 ' + msg.cipher_suite;
-    }
-    let date = new Date(msg.timestamp);
-
-    let timestampStr = date.getHours() + ':' + date.getMinutes();
-
-    let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    let message = {
-      _id: idx + 1,
-      id: idx + 1,
-      indexId: idx + 1,
-      content: content,
-      senderId: msg.from,
-      username: '',
-      avatar: 'assets/imgs/doe.png',
-      // date: "13 November",
-      // timestamp: "10:20",
-      date: dateStr,
-      timestamp: timestampStr,
-      system: false,
-      saved: false,
-      distributed: true,
-      seen: true,
-      failure: false,
-    };
-    return message;
-  });
-};
-
-export const selectUrl = (type: string = 'http', url: string) => {
-  let Domain: string = url.split('://')[1];
-
-  const BASE_URL = `https://${Domain}`;
-  const BASE_WS = `wss://${Domain}/messages`;
-
+export const selectUrl = (url: string, type: string = 'http') => {
   if (type === 'ws') {
-    return BASE_WS;
+    let Domain: string = url.split('://')[1];
+    return `wss://${Domain}/messages`;
   }
-  return BASE_URL;
+  return url;
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -299,4 +256,50 @@ export const getFastestUrl = async (env: EnvTypes = 'test') => {
   const list = await getAllDomainList(env);
   // Sorting strategy
   return list.sort(handleSort('time'))[0].url;
+};
+
+export const renderMessagesList = async (msglist: any) => {
+  return msglist.map((msg: any, idx: number) => {
+    let content = '';
+    if (msg.cipher_suite == 'NONE') {
+      content = decodeURIComponent(escape(window.atob(msg.payload)));
+    }
+    // else if (msg.cipher_suite == 'RSA_OAEP') {
+    //   if (msg.payload) {
+    //     let byteContent = Uint8Array.from(atob(msg.payload), (c) => c.charCodeAt(0));
+
+    //     let decodeBytes = await getRsaDecryptData(RsaPrivateKeyStr ?? '', byteContent);
+    //     content = new TextDecoder().decode(decodeBytes);
+    //   } else {
+    //     content = '';
+    //   }
+    // }
+    else {
+      content = '不支持的加密类型 ' + msg.cipher_suite;
+    }
+    let date = new Date(msg.timestamp);
+
+    let timestampStr = date.getHours() + ':' + date.getMinutes();
+
+    let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    let message = {
+      _id: idx + 1,
+      id: idx + 1,
+      indexId: idx + 1,
+      content: content,
+      senderId: msg.from,
+      username: '',
+      avatar: 'assets/imgs/doe.png',
+      // date: "13 November",
+      // timestamp: "10:20",
+      date: dateStr,
+      timestamp: timestampStr,
+      system: false,
+      saved: false,
+      distributed: true,
+      seen: true,
+      failure: false,
+    };
+    return message;
+  });
 };

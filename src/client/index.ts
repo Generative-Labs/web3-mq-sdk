@@ -15,12 +15,14 @@ import {
   ClientKeyPaires,
   EventTypes,
   initOptions,
-  SignClientOptions,
+  SendTempConnectOptions,
+  SignClientCallBackType,
 } from '../types';
 export class Client {
   private static _instance: Client | null;
   static wsUrl: string;
   static register: Register;
+  static signClient: SignConnect;
   keys: ClientKeyPaires;
   channel: Channel;
   listeners: event;
@@ -50,8 +52,8 @@ export class Client {
   ) => {
     const { connectUrl, app_key, env } = initOptions;
     const fastUrl = connectUrl || (await getFastestUrl(env));
-    Client.wsUrl = selectUrl('ws', fastUrl);
-    new Request(selectUrl('http', fastUrl));
+    Client.wsUrl = selectUrl(fastUrl, 'ws');
+    new Request(selectUrl(fastUrl));
     Client.register = new Register(app_key);
     return fastUrl;
   };
@@ -66,13 +68,15 @@ export class Client {
     return Client._instance as Client;
   };
 
-  public static getSignClient = async (options: SignClientOptions): Promise<SignConnect> => {
+  public static getSignClient = (
+    options: SendTempConnectOptions,
+    // eslint-disable-next-line no-unused-vars
+    callback: (params: SignClientCallBackType) => void,
+  ) => {
     if (!options) {
       throw new Error('The options is required!');
     }
-    const { connectUrl = null, env } = options;
-    const fastUrl = connectUrl || (await getFastestUrl(env));
-    return new SignConnect({ wsUrl: selectUrl('ws', fastUrl), ...options });
+    Client.signClient = new SignConnect({ wsUrl: Client.wsUrl, ...options }, callback);
   };
 
   on = (eventName: EventTypes, callback: any) => this.listeners.on(eventName, callback);
