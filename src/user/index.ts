@@ -77,7 +77,7 @@ export class User {
   }
 
   async userBindDid(
-    params: Pick<UserBindDidParams, 'provider_id' | 'did_type' | 'did_value'>,
+    params: Omit<UserBindDidParams, 'userid' | 'web3mq_signature' | 'timestamp'>,
   ): Promise<any> {
     const { did_type, did_value } = params;
     const { userid, PrivateKey } = this._keys;

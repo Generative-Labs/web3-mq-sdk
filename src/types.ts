@@ -174,6 +174,8 @@ export interface UserBindDidParams extends BaseParams {
   provider_id: string;
   did_type: string;
   did_value: string;
+  did_action?: string;
+  did_content?: string;
 }
 
 export type ActionType = 'agree';
