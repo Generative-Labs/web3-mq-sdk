@@ -112,6 +112,7 @@ export class Contact {
 
   async operationFriend(target_userid: string, action: ActionType = 'agree') {
     const { userid, PrivateKey } = this._keys;
+    const { emit } = this._client;
     const timestamp = Date.now();
     const signContent = userid + action + target_userid + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
@@ -123,6 +124,8 @@ export class Contact {
       target_userid,
       action,
     });
+
+    emit('contact.getList', { type: 'contact.getList' });
     return data;
   }
 }
