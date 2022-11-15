@@ -1,6 +1,11 @@
 import { Client } from '../client';
 import { ClientKeyPaires, PageParams, MessageStatus, MessageListItem } from '../types';
-import { sendMessageCommand, getDataSignature, renderMessagesList } from '../utils';
+import {
+  sendMessageCommand,
+  getDataSignature,
+  renderMessagesList,
+  transformAddress,
+} from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
 import { PbTypeMessage, PbTypeMessageStatusResp, PbTypeMessageChangeStatus } from '../core/pbType';
 import {
@@ -71,7 +76,9 @@ export class Message {
 
   async sendMessage(msg: string, userId?: string) {
     const { keys, connect, channel } = this._client;
-    const topicId = userId || channel.activeChannel?.chatid;
+    const topicId = userId ? await transformAddress(userId) : channel.activeChannel?.chatid;
+
+    console.log(topicId);
     if (topicId) {
       this.msg_text = msg;
       const concatArray = await sendMessageCommand(keys, topicId, msg, connect.nodeId);

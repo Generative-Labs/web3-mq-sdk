@@ -9,6 +9,7 @@ import {
   PbTypeUserTempConnectReqCommand,
 } from './core/pbType';
 import { domainUrlList } from './core/config';
+import { getUserInfoRequest } from './api';
 
 const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {
   return Array.from(byteArray, (byte: any) => ('0' + (byte & 0xff).toString(16)).slice(-2)).join(
@@ -302,4 +303,22 @@ export const renderMessagesList = async (msglist: any) => {
     };
     return message;
   });
+};
+
+export const transformAddress = async (walletAddress: string) => {
+  if (walletAddress.toLowerCase().startsWith('0x')) {
+    const cacheUserId = localStorage.getItem(walletAddress);
+    if (cacheUserId) {
+      return cacheUserId;
+    }
+    const { data } = await getUserInfoRequest({
+      did_type: 'eth',
+      did_value: walletAddress,
+      timestamp: Date.now(),
+    });
+    const userid = data.userid;
+    localStorage.setItem(walletAddress, userid);
+    return userid;
+  }
+  return walletAddress;
 };
