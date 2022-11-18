@@ -22,6 +22,9 @@ import {
   LoginParams,
   GetUserBindDidsParams,
   UserBindDidParams,
+  FollowOperationParams,
+  GetFollowerListParams,
+  getUserPublicProfileParams,
 } from '../types';
 
 /**
@@ -109,6 +112,28 @@ export const getUserBindDidsRequest = async (payload: GetUserBindDidsParams) => 
 
 export const userBindDidRequest = async (payload: UserBindDidParams) => {
   return await request.post('/api/user_binddid/', payload);
+};
+
+export const followOperationRequest = async (payload: FollowOperationParams) => {
+  return await request.post('/api/following/', payload);
+};
+
+export const getFollowerListRequest = async (payload: GetFollowerListParams) => {
+  return await request.get('/api/user_followers/', {
+    params: payload,
+  });
+};
+
+export const getFollowingListRequest = async (payload: GetFollowerListParams) => {
+  return await request.get('/api/user_following/', {
+    params: payload,
+  });
+};
+
+export const getUserPublicProfileRequest = async (payload: getUserPublicProfileParams) => {
+  return await request.get('/api/get_user_public_profile/', {
+    params: payload,
+  });
 };
 
 /**

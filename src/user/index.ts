@@ -4,6 +4,8 @@ import {
   SearchUsersResponse,
   UpdateMyProfileResponse,
   UserBindDidParams,
+  PageParams,
+  FollowOperationParams,
 } from '../types';
 import {
   searchUsersRequest,
@@ -11,6 +13,9 @@ import {
   updateMyProfileRequest,
   getUserBindDidsRequest,
   userBindDidRequest,
+  followOperationRequest,
+  getFollowerListRequest,
+  getFollowingListRequest,
 } from '../api';
 import { getDataSignature } from '../utils';
 
@@ -85,6 +90,46 @@ export class User {
     const signContent = userid + did_type + did_value + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
     const data = await userBindDidRequest({ web3mq_signature, userid, timestamp, ...params });
+    return data;
+  }
+
+  async followOperation(
+    params: Pick<FollowOperationParams, 'target_userid' | 'action'>,
+  ): Promise<any> {
+    const { target_userid, action } = params;
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + target_userid + action + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await followOperationRequest({ web3mq_signature, userid, timestamp, ...params });
+    return data;
+  }
+
+  async getFollowerList(params: PageParams): Promise<any> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await getFollowerListRequest({
+      web3mq_signature,
+      userid,
+      timestamp,
+      ...params,
+    });
+    return data;
+  }
+
+  async getFollowingList(params: PageParams): Promise<any> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await getFollowingListRequest({
+      web3mq_signature,
+      userid,
+      timestamp,
+      ...params,
+    });
     return data;
   }
 }

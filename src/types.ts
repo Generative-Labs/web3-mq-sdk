@@ -178,6 +178,20 @@ export interface UserBindDidParams extends BaseParams {
   did_content?: string;
 }
 
+export interface FollowOperationParams extends BaseParams {
+  target_userid: string;
+  action: 'follow' | 'cancel';
+}
+
+export interface GetFollowerListParams extends BaseParams, PageParams {}
+
+export interface getUserPublicProfileParams {
+  did_type: string;
+  did_value: string;
+  timestamp: number;
+  my_userid: string;
+}
+
 export type ActionType = 'agree';
 
 export interface operationFriendParams extends BaseParams {
