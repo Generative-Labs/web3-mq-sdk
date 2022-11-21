@@ -11,7 +11,12 @@ import {
 import { domainUrlList } from './core/config';
 import { getUserInfoRequest } from './api';
 
-export { getUserInfoRequest, getUserPublicProfileRequest } from './api';
+export {
+  getUserInfoRequest,
+  getUserPublicProfileRequest,
+  getPublicFollowerListRequest,
+  getPublicFollowingListRequest,
+} from './api';
 
 const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {
   return Array.from(byteArray, (byte: any) => ('0' + (byte & 0xff).toString(16)).slice(-2)).join(

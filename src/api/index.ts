@@ -25,6 +25,7 @@ import {
   FollowOperationParams,
   GetFollowerListParams,
   getUserPublicProfileParams,
+  GetPublicFollowerListParams,
 } from '../types';
 
 /**
@@ -132,6 +133,18 @@ export const getFollowingListRequest = async (payload: GetFollowerListParams) =>
 
 export const getUserPublicProfileRequest = async (payload: getUserPublicProfileParams) => {
   return await request.get('/api/get_user_public_profile/', {
+    params: payload,
+  });
+};
+
+export const getPublicFollowerListRequest = async (payload: GetPublicFollowerListParams) => {
+  return await request.get('/api/user_public_followers/', {
+    params: payload,
+  });
+};
+
+export const getPublicFollowingListRequest = async (payload: GetPublicFollowerListParams) => {
+  return await request.get('/api/user_public_following/', {
     params: payload,
   });
 };

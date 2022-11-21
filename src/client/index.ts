@@ -6,6 +6,7 @@ import { User } from '../user';
 import { Contact } from '../contact';
 import { Notify } from '../notify';
 import { Topic } from '../topic';
+import { Storage } from '../storage';
 import { Request } from '../core/request';
 
 import event from '../core/eventEmitter';
@@ -32,6 +33,7 @@ export class Client {
   contact: Contact;
   notify: Notify;
   topic: Topic;
+  storage: Storage;
 
   constructor(keys: KeyPairsType) {
     this.keys = keys;
@@ -43,6 +45,7 @@ export class Client {
     this.contact = new Contact(this);
     this.notify = new Notify(this);
     this.topic = new Topic(this);
+    this.storage = new Storage(this);
   }
 
   public static init = async (

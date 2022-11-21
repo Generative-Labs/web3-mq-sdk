@@ -12,6 +12,17 @@ export type PageParams = {
   page?: number;
   size?: number;
 };
+export type Web3MQDBValuePayload = {
+  [key: string]: any;
+};
+
+export type Web3MQDBValue = {
+  messageId: string;
+  from: string;
+  contentTopic: string;
+  timestamp: number;
+  payload: Web3MQDBValuePayload;
+};
 
 export type KeyPairsType = {
   PrivateKey: string;
@@ -101,6 +112,12 @@ export type BaseParams = {
   timestamp: number;
 };
 
+export type NewBaseParams = {
+  userid: string;
+  web3mq_user_signature: string;
+  timestamp: number;
+};
+
 export interface CreateRoomParams extends BaseParams {
   group_name?: string;
   avatar_url?: string;
@@ -178,18 +195,23 @@ export interface UserBindDidParams extends BaseParams {
   did_content?: string;
 }
 
-export interface FollowOperationParams extends BaseParams {
+export interface FollowOperationParams extends NewBaseParams {
   target_userid: string;
   action: 'follow' | 'cancel';
 }
 
-export interface GetFollowerListParams extends BaseParams, PageParams {}
+export interface GetFollowerListParams extends NewBaseParams, PageParams {}
 
 export interface getUserPublicProfileParams {
   did_type: string;
   did_value: string;
   timestamp: number;
   my_userid: string;
+}
+
+export interface GetPublicFollowerListParams extends PageParams {
+  userid: string;
+  timestamp: number;
 }
 
 export type ActionType = 'agree';

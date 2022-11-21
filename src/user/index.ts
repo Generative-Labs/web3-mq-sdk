@@ -100,8 +100,8 @@ export class User {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + target_userid + action + timestamp;
-    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
-    const data = await followOperationRequest({ web3mq_signature, userid, timestamp, ...params });
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await followOperationRequest({ web3mq_user_signature, userid, timestamp, ...params });
     return data;
   }
 
@@ -109,9 +109,9 @@ export class User {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
-    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
     const { data } = await getFollowerListRequest({
-      web3mq_signature,
+      web3mq_user_signature,
       userid,
       timestamp,
       ...params,
@@ -123,9 +123,9 @@ export class User {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
-    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
     const { data } = await getFollowingListRequest({
-      web3mq_signature,
+      web3mq_user_signature,
       userid,
       timestamp,
       ...params,
