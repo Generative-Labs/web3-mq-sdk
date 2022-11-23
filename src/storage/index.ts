@@ -41,6 +41,48 @@ export class Storage {
     if (!this.db) {
       throw new Error('indexDB is not initialized');
     }
-    await this.db.put('chat_history', data, key);
+    return await this.db.put('chat_history', data, key);
+  }
+
+  async getData(key: string) {
+    if (!this.db) {
+      throw new Error('indexDB is not initialized');
+    }
+    return await this.db.get('chat_history', key);
+  }
+
+  async getDataFromIndex(indexKey: string) {
+    if (!this.db) {
+      throw new Error('indexDB is not initialized');
+    }
+    return await this.db.getFromIndex('chat_history', 'roomId', indexKey);
+  }
+
+  async delData(key: string) {
+    if (!this.db) {
+      throw new Error('indexDB is not initialized');
+    }
+    return await this.db.delete('chat_history', key);
+  }
+
+  async clearData() {
+    if (!this.db) {
+      throw new Error('indexDB is not initialized');
+    }
+    return await this.db.clear('chat_history');
+  }
+
+  async getAllData() {
+    if (!this.db) {
+      throw new Error('indexDB is not initialized');
+    }
+    return await this.db.getAll('chat_history');
+  }
+
+  async getAllKeys() {
+    if (!this.db) {
+      throw new Error('indexDB is not initialized');
+    }
+    return await this.db.getAllKeys('chat_history');
   }
 }
