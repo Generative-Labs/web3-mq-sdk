@@ -6,6 +6,8 @@ import {
   UserBindDidParams,
   PageParams,
   FollowOperationParams,
+  PublishNotificationToFollowersParams,
+  UpdateUserPermissionsParams,
 } from '../types';
 import {
   searchUsersRequest,
@@ -16,6 +18,9 @@ import {
   followOperationRequest,
   getFollowerListRequest,
   getFollowingListRequest,
+  publishNotificationToFollowersRequest,
+  getUserPermissionsRequest,
+  updateUserPermissionsRequest,
 } from '../api';
 import { getDataSignature } from '../utils';
 
@@ -101,7 +106,12 @@ export class User {
     const timestamp = Date.now();
     const signContent = userid + target_userid + action + timestamp;
     const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
-    const data = await followOperationRequest({ web3mq_user_signature, userid, timestamp, ...params });
+    const data = await followOperationRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      ...params,
+    });
     return data;
   }
 
@@ -125,6 +135,52 @@ export class User {
     const signContent = userid + timestamp;
     const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
     const { data } = await getFollowingListRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      ...params,
+    });
+    return data;
+  }
+
+  async publishNotificationToFollowers(
+    params: Pick<PublishNotificationToFollowersParams, 'title' | 'content'>,
+  ): Promise<any> {
+    const { title } = params;
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + title + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await publishNotificationToFollowersRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      ...params,
+    });
+    return data;
+  }
+
+  async getUserPermissions(): Promise<any> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await getUserPermissionsRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+    });
+    return data;
+  }
+
+  async updateUserPermissions(params: Pick<UpdateUserPermissionsParams, 'permissions'>) {
+    const { permissions } = params;
+    const permissionsStr = JSON.stringify(permissions);
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + permissionsStr + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await updateUserPermissionsRequest({
       web3mq_user_signature,
       userid,
       timestamp,

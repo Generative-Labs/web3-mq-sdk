@@ -214,6 +214,14 @@ export interface GetPublicFollowerListParams extends PageParams {
   timestamp: number;
 }
 
+export interface PublishNotificationToFollowersParams extends NewBaseParams {
+  title: string;
+  content: string;
+}
+export interface UpdateUserPermissionsParams extends NewBaseParams {
+  permissions: Record<string, { type: string; value: boolean }>;
+}
+
 export type ActionType = 'agree';
 
 export interface operationFriendParams extends BaseParams {

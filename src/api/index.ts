@@ -5,6 +5,7 @@ import {
   CommonGetListPatams,
   getMessageListParams,
   BaseParams,
+  NewBaseParams,
   getGroupMemberListParams,
   inviteGroupMemberParams,
   changeMessageStatusParams,
@@ -26,6 +27,8 @@ import {
   GetFollowerListParams,
   getUserPublicProfileParams,
   GetPublicFollowerListParams,
+  PublishNotificationToFollowersParams,
+  UpdateUserPermissionsParams,
 } from '../types';
 
 /**
@@ -147,6 +150,22 @@ export const getPublicFollowingListRequest = async (payload: GetPublicFollowerLi
   return await request.get('/api/user_public_following/', {
     params: payload,
   });
+};
+
+export const publishNotificationToFollowersRequest = async (
+  payload: PublishNotificationToFollowersParams,
+) => {
+  return await request.post('/api/publish_notification_to_followers/', payload);
+};
+
+export const getUserPermissionsRequest = async (payload: NewBaseParams) => {
+  return await request.get('/api/get_user_permissions/', {
+    params: payload,
+  });
+};
+
+export const updateUserPermissionsRequest = async (payload: UpdateUserPermissionsParams) => {
+  return await request.post('/api/update_user_permissions/', payload);
 };
 
 /**
