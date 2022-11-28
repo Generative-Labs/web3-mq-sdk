@@ -1,11 +1,14 @@
 import ed from '@noble/ed25519';
 import { sha3_224 } from 'js-sha3';
 import axios from 'axios';
+
+import type { Client } from './client';
 import { ClientKeyPaires, EnvTypes, SendTempConnectOptions } from './types';
 import { ConnectCommand, UserTempConnectCommand, Web3MQRequestMessage } from './pb';
 import {
   PbTypeConnectReqCommand,
   PbTypeMessage,
+  PbTypeMessageStatusResp,
   PbTypeUserTempConnectReqCommand,
 } from './core/pbType';
 import { domainUrlList } from './core/config';
@@ -310,6 +313,49 @@ export const renderMessagesList = async (msglist: any) => {
     };
     return message;
   });
+};
+
+export const renderMessage = (pbType: number, msg: any, client: Client) => {
+  const { comeFrom, messageId, timestamp, payload } = msg;
+  let content = '';
+  let senderId = '';
+  if (pbType === PbTypeMessage) {
+    // received message
+    content = new TextDecoder().decode(payload);
+    senderId = comeFrom;
+  }
+  if (pbType === PbTypeMessageStatusResp) {
+    // send message
+    content = client.message.msg_text;
+    senderId = client.keys.userid;
+  }
+
+  let date =
+    pbType === PbTypeMessage ? new Date(Number(timestamp)) : new Date(Number(timestamp) * 1000);
+
+  let timestampStr = date.getHours() + ':' + date.getMinutes();
+
+  let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+
+  let message: any = {
+    _id: messageId,
+    id: messageId,
+    indexId: messageId,
+    content: content,
+    senderId: senderId,
+    username: '',
+    avatar: 'assets/imgs/doe.png',
+    // date: "13 November",
+    // timestamp: "10:20",
+    date: dateStr,
+    timestamp: timestampStr,
+    system: false,
+    saved: false,
+    distributed: true,
+    seen: true,
+    failure: false,
+  };
+  return message;
 };
 
 export const transformAddress = async (walletAddress: string) => {

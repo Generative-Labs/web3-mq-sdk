@@ -21,6 +21,7 @@ export type Web3MQDBValue = {
   from: string;
   contentTopic: string;
   timestamp: number;
+  unread: number;
   payload: Web3MQDBValuePayload;
 };
 
@@ -132,6 +133,7 @@ export type ActiveChannelType = {
   chat_name: string;
   chat_type: string;
   chatid: string;
+  unread?: number;
   // topic: string;
   // topic_type: string;
 };

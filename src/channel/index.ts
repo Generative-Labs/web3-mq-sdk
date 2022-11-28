@@ -21,9 +21,26 @@ export class Channel {
     this.activeChannel = null;
   }
 
-  setActiveChannel(channel: ActiveChannelType | null) {
+  async setActiveChannel(channel: ActiveChannelType | null) {
+    const data = await this._client.storage.getData(channel?.chatid as string);
     this.activeChannel = channel;
+    (this.activeChannel as ActiveChannelType).unread = 0;
+    if (data && data.unread !== 0) {
+      data.unread = 0;
+      await this._client.storage.setData(channel?.chatid as string, data);
+    }
     this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
+    // if (data && data.unread !== 0) {
+    //   data.unread = 0;
+    //   await this._client.storage.setData(channel?.chatid as string, data);
+    //   this.channelList = (this.channelList as Array<ActiveChannelType>).map((item) => {
+    //     if (item.chatid === channel?.chatid) {
+    //       item.unread = 0;
+    //     }
+    //     return item;
+    //   });
+    //   this._client.emit('channel.updated', { type: 'channel.updated' });
+    // }
   }
 
   async queryChannels(option: PageParams) {
@@ -35,10 +52,21 @@ export class Channel {
     const {
       data: { result = [] },
     } = await getRoomListRequest({ web3mq_signature, userid, timestamp, ...option });
+
+    const list = await Promise.all(
+      result.map(async (item: ActiveChannelType) => {
+        const data = await this._client.storage.getData(item.chatid);
+        if (data) {
+          item.unread = data.unread;
+        }
+        return item;
+      }),
+    );
+
     if (this.channelList && option.page !== 1) {
-      this.channelList = [...this.channelList, ...result];
+      this.channelList = [...this.channelList, ...list];
     } else {
-      this.channelList = result;
+      this.channelList = list;
     }
 
     this._client.emit('channel.getList', { type: 'channel.getList' });

@@ -1,9 +1,16 @@
 import { Client } from '../client';
-import { ClientKeyPaires, PageParams, MessageStatus, MessageListItem } from '../types';
+import {
+  ClientKeyPaires,
+  PageParams,
+  MessageStatus,
+  MessageListItem,
+  Web3MQDBValue,
+} from '../types';
 import {
   sendMessageCommand,
   getDataSignature,
   renderMessagesList,
+  renderMessage,
   transformAddress,
 } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
@@ -26,6 +33,41 @@ export class Message {
     this.msg_text = '';
     client.connect.receive = this.receive;
     this.messageList = null;
+  }
+
+  private async handleUnread(resp: Web3MQRequestMessage, msg: any) {
+    const { channel, storage, emit } = this._client;
+    if (resp.comeFrom === channel.activeChannel?.chatid) {
+      if (this.messageList) {
+        this.messageList = [...this.messageList, msg];
+      }
+      this._client.emit('message.getList', { type: 'message.getList', data: resp });
+      return;
+    }
+    const data = await storage.getData(resp.comeFrom);
+    const msglist = !data ? [msg] : [...data.payload.messageList, msg];
+
+    const indexeddbData: Web3MQDBValue = {
+      messageId: resp.messageId,
+      from: resp.comeFrom,
+      contentTopic: resp.contentTopic,
+      timestamp: Number(resp.timestamp),
+      unread: !data ? 1 : data.unread + 1,
+      payload: {
+        messageList: msglist,
+      },
+    };
+
+    await storage.setData(resp.comeFrom, indexeddbData);
+    if (channel.channelList) {
+      channel.channelList = channel.channelList?.map((channel) => {
+        if (channel.chatid === resp.comeFrom) {
+          channel.unread = indexeddbData.unread;
+        }
+        return channel;
+      });
+    }
+    emit('channel.updated', { type: 'channel.updated' });
   }
 
   async getMessageList(option: PageParams, userId?: string) {
@@ -78,67 +120,31 @@ export class Message {
     const { keys, connect, channel } = this._client;
     const topicId = userId ? await transformAddress(userId) : channel.activeChannel?.chatid;
 
-    console.log(topicId);
     if (topicId) {
       this.msg_text = msg;
       const concatArray = await sendMessageCommand(keys, topicId, msg, connect.nodeId);
       connect.send(concatArray);
-
-      if (this.messageList) {
-        const idx = this.messageList.length || 0;
-        let tempMessage = {
-          _id: idx + 1,
-          id: idx + 1,
-          indexId: idx + 1,
-          content: msg,
-        };
-        this.messageList = [...this.messageList, tempMessage as any];
-      }
     }
   }
-  receive = (pbType: number, bytes: Uint8Array) => {
+  receive = async (pbType: number, bytes: Uint8Array) => {
     if (pbType === PbTypeMessage) {
       const resp = Web3MQRequestMessage.fromBinary(bytes);
       console.log('msg:', resp);
       if (resp.messageType === 'dapp_bridge') {
         return;
       }
-      const list: any = [resp].map((item) => {
-        const idx = this.messageList?.length || 0;
+      const msg = renderMessage(pbType, resp, this._client);
 
-        let date = new Date(Number(item.timestamp));
-
-        let timestampStr = date.getHours() + ':' + date.getMinutes();
-
-        let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-        let message = {
-          _id: idx + 1,
-          id: idx + 1,
-          indexId: idx + 1,
-          content: new TextDecoder().decode(item.payload),
-          senderId: item.comeFrom,
-          username: '',
-          avatar: 'assets/imgs/doe.png',
-          // date: "13 November",
-          // timestamp: "10:20",
-          date: dateStr,
-          timestamp: timestampStr,
-          system: false,
-          saved: false,
-          distributed: true,
-          seen: true,
-          failure: false,
-        };
-        return message;
-      });
-      if (this.messageList) {
-        this.messageList = [...this.messageList, ...list];
-      }
-      this._client.emit('message.getList', { type: 'message.getList', data: resp });
+      // unread
+      await this.handleUnread(resp, msg);
     }
     if (pbType === PbTypeMessageStatusResp) {
       const resp = Web3MQMessageStatusResp.fromBinary(bytes);
       console.log('msgStatus:', resp);
+      const msg = renderMessage(pbType, resp, this._client);
+      if (this.messageList) {
+        this.messageList = [...this.messageList, { ...msg }];
+      }
       this._client.emit('message.delivered', { type: 'message.delivered', data: resp });
     }
     if (pbType === PbTypeMessageChangeStatus) {
