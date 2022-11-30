@@ -26,7 +26,7 @@ export class Storage {
   }
 
   async createDB() {
-    const db = await openDB<Web3MQDB>(this.dbName, 1, {
+    const db = await openDB<Web3MQDB>(this._keys.userid, 1, {
       upgrade(db) {
         const store = db.createObjectStore('chat_history');
         store.createIndex('roomId', 'from');

@@ -22,13 +22,15 @@ export class Channel {
   }
 
   async setActiveChannel(channel: ActiveChannelType | null) {
-    const data = await this._client.storage.getData(channel?.chatid as string);
+    if (channel) {
+      const data = await this._client.storage.getData(channel?.chatid);
+      if (data && data.unread !== 0) {
+        data.unread = 0;
+        await this._client.storage.setData(channel?.chatid as string, data);
+      }
+    }
     this.activeChannel = channel;
     (this.activeChannel as ActiveChannelType).unread = 0;
-    if (data && data.unread !== 0) {
-      data.unread = 0;
-      await this._client.storage.setData(channel?.chatid as string, data);
-    }
     this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
     // if (data && data.unread !== 0) {
     //   data.unread = 0;

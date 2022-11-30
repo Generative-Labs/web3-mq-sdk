@@ -15,6 +15,7 @@ import { domainUrlList } from './core/config';
 import { getUserInfoRequest } from './api';
 
 export {
+  userLoginRequest,
   getUserInfoRequest,
   getUserPublicProfileRequest,
   getPublicFollowerListRequest,
