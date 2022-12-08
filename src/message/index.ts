@@ -1,11 +1,5 @@
 import { Client } from '../client';
-import {
-  ClientKeyPaires,
-  PageParams,
-  MessageStatus,
-  MessageListItem,
-  Web3MQDBValue,
-} from '../types';
+import { ClientKeyPaires, PageParams, MessageStatus, MessageListItem } from '../types';
 import {
   sendMessageCommand,
   getDataSignature,
@@ -33,41 +27,6 @@ export class Message {
     this.msg_text = '';
     client.connect.receive = this.receive;
     this.messageList = null;
-  }
-
-  private async handleUnread(resp: Web3MQRequestMessage, msg: any) {
-    const { channel, storage, emit } = this._client;
-    if (resp.comeFrom === channel.activeChannel?.chatid) {
-      if (this.messageList) {
-        this.messageList = [...this.messageList, msg];
-      }
-      this._client.emit('message.getList', { type: 'message.getList', data: resp });
-      return;
-    }
-    const data = await storage.getData(resp.comeFrom);
-    const msglist = !data ? [msg] : [...data.payload.messageList, msg];
-
-    const indexeddbData: Web3MQDBValue = {
-      messageId: resp.messageId,
-      from: resp.comeFrom,
-      contentTopic: resp.contentTopic,
-      timestamp: Number(resp.timestamp),
-      unread: !data ? 1 : data.unread + 1,
-      payload: {
-        messageList: msglist,
-      },
-    };
-
-    await storage.setData(resp.comeFrom, indexeddbData);
-    if (channel.channelList) {
-      channel.channelList = channel.channelList?.map((channel) => {
-        if (channel.chatid === resp.comeFrom) {
-          channel.unread = indexeddbData.unread;
-        }
-        return channel;
-      });
-    }
-    emit('channel.updated', { type: 'channel.updated' });
   }
 
   async getMessageList(option: PageParams, userId?: string) {
@@ -135,13 +94,23 @@ export class Message {
       }
       const msg = renderMessage(pbType, resp, this._client);
 
+      // if current channel is active, update msg list
+      if (resp.comeFrom === this._client.channel.activeChannel?.chatid) {
+        if (this.messageList) {
+          this.messageList = [...this.messageList, msg];
+        }
+        // channel.handleLastMessage(resp.comeFrom, msg);
+        this._client.emit('message.getList', { type: 'message.getList', data: resp });
+      }
+
       // unread
-      await this.handleUnread(resp, msg);
+      await this._client.channel.handleUnread(resp, msg);
     }
     if (pbType === PbTypeMessageStatusResp) {
       const resp = Web3MQMessageStatusResp.fromBinary(bytes);
       console.log('msgStatus:', resp);
       const msg = renderMessage(pbType, resp, this._client);
+      this._client.channel.handleUnread(resp, msg);
       if (this.messageList) {
         this.messageList = [...this.messageList, { ...msg }];
       }

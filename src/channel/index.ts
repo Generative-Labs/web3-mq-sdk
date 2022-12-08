@@ -6,7 +6,14 @@ import {
   inviteGroupMemberRequest,
 } from '../api';
 import { getDataSignature } from '../utils';
-import { PageParams, ActiveChannelType, ClientKeyPaires, CreateRoomParams } from '../types';
+import {
+  PageParams,
+  ActiveChannelType,
+  ClientKeyPaires,
+  CreateRoomParams,
+  Web3MQDBValue,
+} from '../types';
+import { Web3MQMessageStatusResp, Web3MQRequestMessage } from '../pb';
 
 export class Channel {
   private readonly _client: Client;
@@ -21,16 +28,62 @@ export class Channel {
     this.activeChannel = null;
   }
 
+  private handleUpdateChannel(msg: any, chatid: string) {
+    if (!this.channelList) {
+      return;
+    }
+    this.channelList.map((item) => {
+      if (item.chatid === chatid) {
+        item.lastMessage = msg.lastMessage;
+        item.updatedAt = msg.updatedAt;
+        item.unread = msg.unread || 0;
+      }
+    });
+    this._client.emit('channel.updated', { type: 'channel.updated' });
+  }
+
+  async handleUnread(resp: Web3MQRequestMessage | Web3MQMessageStatusResp, msg: any) {
+    if (!this.activeChannel) {
+      return;
+    }
+    const { storage } = this._client;
+    let count = 0;
+    const comeFrom = resp.comeFrom || this.activeChannel.chatid;
+    const data = await storage.getData(comeFrom);
+    const msglist = !data ? [msg] : [...data.payload.messageList, msg];
+
+    if (comeFrom !== this.activeChannel?.chatid) {
+      count = !data ? 1 : data.unread + 1;
+    }
+
+    const indexeddbData: Web3MQDBValue = {
+      messageId: resp.messageId,
+      from: comeFrom,
+      contentTopic: resp.contentTopic,
+      timestamp: Number(resp.timestamp),
+      unread: count,
+      lastMessage: msg.content,
+      updatedAt: msg.date,
+      payload: {
+        messageList: msglist,
+      },
+    };
+
+    await storage.setData(comeFrom, indexeddbData);
+
+    this.handleUpdateChannel(indexeddbData, comeFrom);
+  }
+
   async setActiveChannel(channel: ActiveChannelType | null) {
+    this.activeChannel = channel;
     if (channel) {
+      (this.activeChannel as ActiveChannelType).unread = 0;
       const data = await this._client.storage.getData(channel?.chatid);
       if (data && data.unread !== 0) {
         data.unread = 0;
         await this._client.storage.setData(channel?.chatid as string, data);
       }
     }
-    this.activeChannel = channel;
-    (this.activeChannel as ActiveChannelType).unread = 0;
     this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
     // if (data && data.unread !== 0) {
     //   data.unread = 0;
@@ -59,7 +112,10 @@ export class Channel {
       result.map(async (item: ActiveChannelType) => {
         const data = await this._client.storage.getData(item.chatid);
         if (data) {
-          item.unread = data.unread;
+          const { unread, lastMessage, updatedAt } = data;
+          item.unread = unread;
+          item.lastMessage = lastMessage;
+          item.updatedAt = updatedAt;
         }
         return item;
       }),
