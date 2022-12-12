@@ -163,6 +163,13 @@ export interface changeMessageStatusParams extends BaseParams {
   status: MessageStatus;
 }
 
+export interface syncNewMessagesParams {
+  sync_timestamp: number;
+  timestamp: number;
+  userid: string;
+  web3mq_user_signature: string;
+}
+
 export type MessageListItem = {
   cipher_suite: string;
   from: string;

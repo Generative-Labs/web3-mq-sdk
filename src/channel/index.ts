@@ -4,8 +4,9 @@ import {
   getRoomListRequest,
   getGroupMemberListRequest,
   inviteGroupMemberRequest,
+  syncNewMessagesRequest,
 } from '../api';
-import { getDataSignature } from '../utils';
+import { getDataSignature, getMessageUpdateDate } from '../utils';
 import {
   PageParams,
   ActiveChannelType,
@@ -40,6 +41,24 @@ export class Channel {
       }
     });
     this._client.emit('channel.updated', { type: 'channel.updated' });
+  }
+
+  private async syncNewMessages(): Promise<Record<string, any>> {
+    const sync_timestamp = getMessageUpdateDate();
+    if (!sync_timestamp) {
+      return {};
+    }
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + sync_timestamp + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await syncNewMessagesRequest({
+      sync_timestamp,
+      timestamp,
+      userid,
+      web3mq_user_signature: web3mq_signature,
+    });
+    return data;
   }
 
   async handleUnread(resp: Web3MQRequestMessage | Web3MQMessageStatusResp, msg: any) {
@@ -78,7 +97,7 @@ export class Channel {
     this.activeChannel = channel;
     if (channel) {
       (this.activeChannel as ActiveChannelType).unread = 0;
-      const data = await this._client.storage.getData(channel?.chatid);
+      const data = await this._client.storage.getData(channel.chatid);
       if (data && data.unread !== 0) {
         data.unread = 0;
         await this._client.storage.setData(channel?.chatid as string, data);
@@ -108,10 +127,23 @@ export class Channel {
       data: { result = [] },
     } = await getRoomListRequest({ web3mq_signature, userid, timestamp, ...option });
 
+    const allNewMessageData = await this.syncNewMessages();
+
     const list = await Promise.all(
       result.map(async (item: ActiveChannelType) => {
         const data = await this._client.storage.getData(item.chatid);
+        const currentNewMsgObj = allNewMessageData[item.chatid];
+        let newMessageUnread = 0;
+        for (let messageid in currentNewMsgObj) {
+          if (currentNewMsgObj.hasOwnProperty(messageid) && currentNewMsgObj[messageid] !== 'read') {
+            newMessageUnread++;
+          }
+        }
         if (data) {
+          if (newMessageUnread) {
+            data.unread = newMessageUnread;
+            await this._client.storage.setData(item.chatid, data);
+          }
           const { unread, lastMessage, updatedAt } = data;
           item.unread = unread;
           item.lastMessage = lastMessage;

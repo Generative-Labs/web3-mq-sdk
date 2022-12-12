@@ -376,3 +376,11 @@ export const transformAddress = async (walletAddress: string) => {
   }
   return walletAddress;
 };
+
+export const saveMessageUpdateDate = () => {
+  localStorage.setItem('MESSAGEUPDATEDATE', String(Date.now()));
+};
+
+export const getMessageUpdateDate = () => {
+  return Number(localStorage.getItem('MESSAGEUPDATEDATE'));
+};

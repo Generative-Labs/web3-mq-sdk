@@ -6,6 +6,7 @@ import {
   renderMessagesList,
   renderMessage,
   transformAddress,
+  saveMessageUpdateDate,
 } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
 import { PbTypeMessage, PbTypeMessageStatusResp, PbTypeMessageChangeStatus } from '../core/pbType';
@@ -92,6 +93,7 @@ export class Message {
       if (resp.messageType === 'dapp_bridge') {
         return;
       }
+      saveMessageUpdateDate();
       const msg = renderMessage(pbType, resp, this._client);
 
       // if current channel is active, update msg list
@@ -109,6 +111,7 @@ export class Message {
     if (pbType === PbTypeMessageStatusResp) {
       const resp = Web3MQMessageStatusResp.fromBinary(bytes);
       console.log('msgStatus:', resp);
+      saveMessageUpdateDate();
       const msg = renderMessage(pbType, resp, this._client);
       this._client.channel.handleUnread(resp, msg);
       if (this.messageList) {

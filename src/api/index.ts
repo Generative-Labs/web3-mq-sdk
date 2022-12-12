@@ -15,6 +15,7 @@ import {
   operationFriendParams,
   UpdateMyProfileResponse,
   ChangeNotificationStatusParams,
+  syncNewMessagesParams,
   CreateTopicParams,
   SubscribeTopicParams,
   PublishTopicMessageParams,
@@ -79,6 +80,10 @@ export const getMessageListRequest = async (payload: getMessageListParams) => {
 
 export const changeMessageStatusRequest = async (payload: changeMessageStatusParams) => {
   return await request.post('/api/messages/status/', payload);
+};
+
+export const syncNewMessagesRequest = async (payload: syncNewMessagesParams) => {
+  return await request.post('/api/get_new_messages/', payload);
 };
 
 /**
