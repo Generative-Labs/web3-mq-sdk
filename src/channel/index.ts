@@ -6,7 +6,7 @@ import {
   inviteGroupMemberRequest,
   syncNewMessagesRequest,
 } from '../api';
-import { getDataSignature, getMessageUpdateDate } from '../utils';
+import { getDataSignature, getGroupId, getMessageUpdateDate } from '../utils';
 import {
   PageParams,
   ActiveChannelType,
@@ -67,7 +67,7 @@ export class Channel {
     }
     const { storage } = this._client;
     let count = 0;
-    const comeFrom = resp.comeFrom || this.activeChannel.chatid;
+    const comeFrom = getGroupId(resp, this._client) || this.activeChannel.chatid;
     const data = await storage.getData(comeFrom);
     const msglist = !data ? [msg] : [...data.payload.messageList, msg];
 
@@ -135,7 +135,10 @@ export class Channel {
         const currentNewMsgObj = allNewMessageData[item.chatid];
         let newMessageUnread = 0;
         for (let messageid in currentNewMsgObj) {
-          if (currentNewMsgObj.hasOwnProperty(messageid) && currentNewMsgObj[messageid] !== 'read') {
+          if (
+            currentNewMsgObj.hasOwnProperty(messageid) &&
+            currentNewMsgObj[messageid] !== 'read'
+          ) {
             newMessageUnread++;
           }
         }

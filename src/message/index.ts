@@ -7,6 +7,7 @@ import {
   renderMessage,
   transformAddress,
   saveMessageUpdateDate,
+  getGroupId,
 } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
 import { PbTypeMessage, PbTypeMessageStatusResp, PbTypeMessageChangeStatus } from '../core/pbType';
@@ -97,7 +98,7 @@ export class Message {
       const msg = renderMessage(pbType, resp, this._client);
 
       // if current channel is active, update msg list
-      if (resp.comeFrom === this._client.channel.activeChannel?.chatid) {
+      if (getGroupId(resp, this._client) === this._client.channel.activeChannel?.chatid) {
         if (this.messageList) {
           this.messageList = [...this.messageList, msg];
         }

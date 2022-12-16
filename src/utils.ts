@@ -316,14 +316,24 @@ export const renderMessagesList = async (msglist: any) => {
   });
 };
 
+export const getGroupId = (msg: any, client: Client): string => {
+  const { comeFrom, contentTopic } = msg;
+  const { userid } = client.keys;
+  if (contentTopic === userid) {
+    return comeFrom;
+  }
+  return contentTopic;
+};
+
 export const renderMessage = (pbType: number, msg: any, client: Client) => {
-  const { comeFrom, messageId, timestamp, payload } = msg;
+  const { messageId, timestamp, payload } = msg;
+
   let content = '';
   let senderId = '';
   if (pbType === PbTypeMessage) {
     // received message
     content = new TextDecoder().decode(payload);
-    senderId = comeFrom;
+    senderId = getGroupId(msg, client);
   }
   if (pbType === PbTypeMessageStatusResp) {
     // send message
