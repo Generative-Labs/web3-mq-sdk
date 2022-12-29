@@ -1,3 +1,3 @@
 # docs
 
-https://docs.web3messaging.online/docs/Web3MQ-SDK/JS-SDK-V2/quickStart/
+https://docs.web3mq.com/docs/Web3MQ-SDK/JS-SDK/quickStart/

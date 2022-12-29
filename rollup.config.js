@@ -42,7 +42,14 @@ const commonConf = {
       exclude: '**/node_modules/**',
     }),
   ],
-  external: ['axios', '@protobuf-ts/plugin', 'js-sha3', '@noble/ed25519'],
+  external: [
+    'axios',
+    '@protobuf-ts/plugin',
+    'js-sha3',
+    '@noble/ed25519',
+    // 'get-starknet', // 暂时不能做为外部依赖，只能先打到js包里面
+    'starknet',
+  ],
 };
 
 // 需要导出的模块类型
@@ -55,6 +62,8 @@ const outputMap = [
       '@noble/ed25519': 'ed',
       '@protobuf-ts/plugin': 'pb',
       'js-sha3': 'js-sha3',
+      'get-starknet': 'get-starknet',
+      starknet: 'starknet',
     },
   },
   // {
