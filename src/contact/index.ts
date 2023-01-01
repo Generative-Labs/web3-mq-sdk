@@ -63,13 +63,19 @@ export class Contact {
     emit('contact.getList', { type: 'contact.getList' });
   }
 
-  async sendFriend(target_userid: string) {
+  async sendFriend(target_userid: string, content: string = '') {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + target_userid + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
 
-    const data = await sendFriendRequest({ web3mq_signature, userid, timestamp, target_userid });
+    const data = await sendFriendRequest({
+      content,
+      web3mq_signature,
+      userid,
+      timestamp,
+      target_userid,
+    });
     return data;
   }
 

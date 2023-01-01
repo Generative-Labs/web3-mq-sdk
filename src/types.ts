@@ -196,6 +196,7 @@ export interface profileParams extends BaseParams {
 }
 
 export interface sendFriendParams extends BaseParams {
+  content: string;
   target_userid: string;
 }
 
