@@ -39,18 +39,33 @@ export type EthAccountType = {
   shortAddress: string;
 };
 
-export type signMetaMaskParams = {
-  signContentURI: string;
-  EthAddress?: string;
+export type RegisterMetaMaskParams = {
+  password: string;
+  userid: string;
+  did_value: string;
+  did_type?: string;
+  signContentURI?: string;
   nickname?: string;
   avatar_url?: string;
   avatar_base64?: string;
+};
+
+export type SignMetaMaskParams = {
+  password: string;
+  userid: string;
+  did_value: string;
+  did_type?: string;
+  mainPrivateKey?: string;
+  mainPublicKey?: string;
+  pubkeyExpiredTimestamp?: number;
 };
 
 export type initOptions = {
   connectUrl?: string | null;
   app_key?: string;
   env?: EnvTypes;
+  tempPubkey?: string;
+  didKey?: string;
 };
 
 export type SignClientCallBackType = {
@@ -84,6 +99,12 @@ export type getUserInfoParams = {
   timestamp: number;
 };
 
+export type GetMainKeypairParams = {
+  password: string;
+  did_type: string;
+  did_value: string;
+};
+
 export interface SignConnectOptions extends SendTempConnectOptions {
   wsUrl: string;
 }
@@ -94,12 +115,12 @@ export interface ClientKeyPaires extends KeyPairsType {
   userid: string;
 }
 
-export type LoginParams = {
+export type RegisterParams = {
   userid: string;
-  did_type: 'eth';
+  did_type: string;
   did_value: string;
   did_signature: string;
-  pubkey_type: 'ed25519';
+  pubkey_type: string;
   pubkey_value: string;
   signature_content: string;
   timestamp: number;
@@ -107,6 +128,19 @@ export type LoginParams = {
   avatar_base64?: string;
   avatar_url?: string;
   testnet_access_key?: string;
+};
+
+export type LoginParams = {
+  userid: string;
+  did_type: string;
+  did_value: string;
+  login_signature: string;
+  signature_content: string;
+  main_pubkey: string;
+  pubkey_value: string;
+  pubkey_type: string;
+  timestamp: number;
+  pubkey_expired_timestamp: number;
 };
 
 export type BaseParams = {

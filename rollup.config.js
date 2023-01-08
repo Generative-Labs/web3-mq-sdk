@@ -46,6 +46,7 @@ const commonConf = {
     'axios',
     '@protobuf-ts/plugin',
     'js-sha3',
+    'js-sha256',
     '@noble/ed25519',
     // 'get-starknet', // 暂时不能做为外部依赖，只能先打到js包里面
     'starknet',
@@ -63,6 +64,7 @@ const outputMap = [
       '@protobuf-ts/plugin': 'pb',
       'js-sha3': 'js-sha3',
       'get-starknet': 'get-starknet',
+      'js-sha256': 'js-sha256',
       starknet: 'starknet',
     },
   },

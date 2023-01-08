@@ -63,6 +63,18 @@ export interface Web3MQRequestMessage {
    * @generated from protobuf field: string nodeId = 12;
    */
   nodeId: string;
+  /**
+   * user signing key <-> pubkey
+   *
+   * @generated from protobuf field: string validatePubKey = 13;
+   */
+  validatePubKey: string;
+  /**
+   * @generated from protobuf field: map<string, string> extraData = 14;
+   */
+  extraData: {
+    [key: string]: string;
+  };
 }
 /**
  * @generated from protobuf message pb.Web3MQMessageStatusResp
@@ -231,6 +243,14 @@ class Web3MQRequestMessage$Type extends MessageType<Web3MQRequestMessage> {
       { no: 10, name: 'messageId', kind: 'scalar', T: 9 /*ScalarType.STRING*/ },
       { no: 11, name: 'messageType', kind: 'scalar', opt: true, T: 9 /*ScalarType.STRING*/ },
       { no: 12, name: 'nodeId', kind: 'scalar', T: 9 /*ScalarType.STRING*/ },
+      { no: 13, name: 'validatePubKey', kind: 'scalar', T: 9 /*ScalarType.STRING*/ },
+      {
+        no: 14,
+        name: 'extraData',
+        kind: 'map',
+        K: 9 /*ScalarType.STRING*/,
+        V: { kind: 'scalar', T: 9 /*ScalarType.STRING*/ },
+      },
     ]);
   }
   create(value?: PartialMessage<Web3MQRequestMessage>): Web3MQRequestMessage {
@@ -246,6 +266,8 @@ class Web3MQRequestMessage$Type extends MessageType<Web3MQRequestMessage> {
       timestamp: 0n,
       messageId: '',
       nodeId: '',
+      validatePubKey: '',
+      extraData: {},
     };
     globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== undefined) reflectionMergePartial<Web3MQRequestMessage>(this, message, value);
@@ -298,6 +320,12 @@ class Web3MQRequestMessage$Type extends MessageType<Web3MQRequestMessage> {
         case /* string nodeId */ 12:
           message.nodeId = reader.string();
           break;
+        case /* string validatePubKey */ 13:
+          message.validatePubKey = reader.string();
+          break;
+        case /* map<string, string> extraData */ 14:
+          this.binaryReadMap14(message.extraData, reader);
+          break;
         default:
           let u = options.readUnknownField;
           if (u === 'throw')
@@ -316,6 +344,28 @@ class Web3MQRequestMessage$Type extends MessageType<Web3MQRequestMessage> {
       }
     }
     return message;
+  }
+  private binaryReadMap14(map: Web3MQRequestMessage['extraData'], reader: IBinaryReader): void {
+    let len = reader.uint32(),
+      end = reader.pos + len,
+      key: keyof Web3MQRequestMessage['extraData'] | undefined,
+      val: Web3MQRequestMessage['extraData'][any] | undefined;
+    while (reader.pos < end) {
+      let [fieldNo] = reader.tag();
+      switch (fieldNo) {
+        case 1:
+          key = reader.string();
+          break;
+        case 2:
+          val = reader.string();
+          break;
+        default:
+          throw new globalThis.Error(
+            'unknown map entry field for field pb.Web3MQRequestMessage.extraData',
+          );
+      }
+    }
+    map[key ?? ''] = val ?? '';
   }
   internalBinaryWrite(
     message: Web3MQRequestMessage,
@@ -351,6 +401,19 @@ class Web3MQRequestMessage$Type extends MessageType<Web3MQRequestMessage> {
       writer.tag(11, WireType.LengthDelimited).string(message.messageType);
     /* string nodeId = 12; */
     if (message.nodeId !== '') writer.tag(12, WireType.LengthDelimited).string(message.nodeId);
+    /* string validatePubKey = 13; */
+    if (message.validatePubKey !== '')
+      writer.tag(13, WireType.LengthDelimited).string(message.validatePubKey);
+    /* map<string, string> extraData = 14; */
+    for (let k of Object.keys(message.extraData))
+      writer
+        .tag(14, WireType.LengthDelimited)
+        .fork()
+        .tag(1, WireType.LengthDelimited)
+        .string(k)
+        .tag(2, WireType.LengthDelimited)
+        .string(message.extraData[k])
+        .join();
     let u = options.writeUnknownFields;
     if (u !== false) (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;

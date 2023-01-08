@@ -21,6 +21,7 @@ import {
   PublishTopicMessageParams,
   GetTopicListParams,
   getUserInfoParams,
+  RegisterParams,
   LoginParams,
   GetUserBindDidsParams,
   UserBindDidParams,
@@ -111,8 +112,16 @@ export const getUserInfoRequest = async (payload: getUserInfoParams) => {
   return await request.post('/api/get_user_info/', payload);
 };
 
+export const userRegisterRequest = async (payload: RegisterParams) => {
+  return await request.post('/api/user_register_v2/', payload);
+};
+
+export const resetPasswordRequest = async (payload: RegisterParams) => {
+  return await request.post('/api/user_reset_password_v2/', payload);
+};
+
 export const userLoginRequest = async (payload: LoginParams) => {
-  return await request.post('/api/user_login/', payload);
+  return await request.post('/api/user_login_v2/', payload);
 };
 
 export const getUserBindDidsRequest = async (payload: GetUserBindDidsParams) => {

@@ -4,11 +4,13 @@ import { ServiceResponse } from '../types';
 
 export let request: AxiosInstance;
 export class Request {
-  constructor(httpUrl: string) {
+  constructor(httpUrl: string, tempPubkey: string = '', didKey: string = '') {
     request = axios.create({
       baseURL: httpUrl,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
+        'web3mq-request-pubkey': tempPubkey,
+        didkey: didKey,
       },
       timeout: 10000,
       // withCredentials: true,

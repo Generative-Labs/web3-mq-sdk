@@ -53,10 +53,10 @@ export class Client {
       connectUrl: null,
     },
   ) => {
-    const { connectUrl, app_key, env } = initOptions;
+    const { connectUrl, app_key, env, tempPubkey, didKey } = initOptions;
     const fastUrl = connectUrl || (await getFastestUrl(env));
     Client.wsUrl = selectUrl(fastUrl, 'ws');
-    new Request(selectUrl(fastUrl));
+    new Request(selectUrl(fastUrl), tempPubkey, didKey);
     Client.register = new Register(app_key);
     return fastUrl;
   };

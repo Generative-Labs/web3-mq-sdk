@@ -1,5 +1,6 @@
 import ed from '@noble/ed25519';
 import { sha3_224 } from 'js-sha3';
+import jssha256 from 'js-sha256';
 import axios from 'axios';
 
 import type { Client } from './client';
@@ -22,7 +23,7 @@ export {
   getPublicFollowingListRequest,
 } from './api';
 
-const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {
+export const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {
   return Array.from(byteArray, (byte: any) => ('0' + (byte & 0xff).toString(16)).slice(-2)).join(
     '',
   );
@@ -57,6 +58,10 @@ export const GenerateEd25519KeyPair = async () => {
     PrivateKey,
     PublicKey,
   };
+};
+
+export const sha256 = (data: string | Uint8Array): Uint8Array => {
+  return new Uint8Array(jssha256.sha256.digest(data));
 };
 
 export const DownloadKeyPair = (text: string, filename: string = 'KeyPairs') => {
@@ -162,6 +167,8 @@ export const sendDappBridgeCommand = async (options: any) => {
     messageId: '',
     nodeId,
     messageType: 'dapp_bridge',
+    validatePubKey: '',
+    extraData: {},
   };
 
   const bytes = Web3MQRequestMessage.toBinary(reqCmd);
@@ -176,7 +183,7 @@ export const sendMessageCommand = async (
   msg: string,
   nodeId: string,
 ): Promise<Uint8Array> => {
-  const { userid, PrivateKey } = keys;
+  const { userid, PrivateKey, PublicKey } = keys;
   const timestamp = Date.now();
   const cipherSuite = 'NONE';
   const byteData = new TextEncoder().encode(msg);
@@ -200,6 +207,8 @@ export const sendMessageCommand = async (
     timestamp: BigInt(timestamp),
     messageId: msgid,
     nodeId,
+    validatePubKey: PublicKey,
+    extraData: {},
   };
 
   const bytes = Web3MQRequestMessage.toBinary(msgReq);

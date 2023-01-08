@@ -15,6 +15,10 @@ message Web3MQRequestMessage {
     string messageId = 10;
     optional string messageType = 11;
     string nodeId = 12;
+    // user signing key <-> pubkey
+    string validatePubKey = 13;    // base64 encode
+
+    map<string, string> extraData = 14;
 }
 
 message Web3MQMessageStatusResp {
