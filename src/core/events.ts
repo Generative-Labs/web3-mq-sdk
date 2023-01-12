@@ -16,6 +16,8 @@ export const EVENT_MAP = {
   'contact.reviceList': true,
   //更新contactlist
   'contact.updateList': true,
+  // connect状态改变
+  'connect.changeReadyStatus': true,
   // 消息送达
   'message.delivered': true,
   // 消息已读
