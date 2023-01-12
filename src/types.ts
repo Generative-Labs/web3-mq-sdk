@@ -43,7 +43,7 @@ export type RegisterMetaMaskParams = {
   password: string;
   userid: string;
   did_value: string;
-  did_type?: string;
+  did_type?: WalletType;
   signContentURI?: string;
   nickname?: string;
   avatar_url?: string;
@@ -54,7 +54,7 @@ export type SignMetaMaskParams = {
   password: string;
   userid: string;
   did_value: string;
-  did_type?: string;
+  did_type?: WalletType;
   mainPrivateKey?: string;
   mainPublicKey?: string;
   pubkeyExpiredTimestamp?: number;
@@ -101,7 +101,7 @@ export type getUserInfoParams = {
 
 export type GetMainKeypairParams = {
   password: string;
-  did_type: string;
+  did_type: WalletType;
   did_value: string;
 };
 
@@ -128,6 +128,7 @@ export type RegisterParams = {
   avatar_base64?: string;
   avatar_url?: string;
   testnet_access_key?: string;
+  did_pubkey?: string;
 };
 
 export type LoginParams = {
@@ -333,3 +334,15 @@ export type SubscribeListType = {
 export interface TopicListType extends SubscribeListType {
   topic_name: string;
 }
+
+export type WalletType = 'eth' | 'starknet';
+
+export type WalletSignRes = {
+  sign: string;
+  publicKey?: string;
+};
+
+export const WalletNameMap = {
+  eth: 'Ethereum',
+  starknet: 'Argent X',
+};
