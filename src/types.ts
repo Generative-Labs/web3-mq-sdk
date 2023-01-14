@@ -156,10 +156,18 @@ export type NewBaseParams = {
   timestamp: number;
 };
 
+export type GroupPermissions = {
+  [key: string]: {
+    type: string;
+    value: 'ceator_invite_friends' | 'public' | 'nft_validation';
+  };
+};
 export interface CreateRoomParams extends BaseParams {
   group_name?: string;
+  groupid?: string;
   avatar_url?: string;
   avatar_base64?: string;
+  permissions?: GroupPermissions;
 }
 
 export interface CommonGetListPatams extends BaseParams, PageParams {}
@@ -188,6 +196,18 @@ export interface getGroupMemberListParams extends BaseParams, PageParams {
 export interface inviteGroupMemberParams extends BaseParams {
   groupid: string;
   members: string[];
+}
+
+export interface joinGroupParams extends NewBaseParams {
+  groupid: string;
+}
+
+export interface updateGroupPermissionsParams extends NewBaseParams {
+  groupid: string;
+  permissions: GroupPermissions;
+}
+export interface getGroupPermissionsParams extends NewBaseParams {
+  groupid: string;
 }
 
 export type MessageStatus = 'delivered' | 'read';

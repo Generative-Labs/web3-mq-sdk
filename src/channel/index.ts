@@ -4,6 +4,9 @@ import {
   getRoomListRequest,
   getGroupMemberListRequest,
   inviteGroupMemberRequest,
+  joinGroupRequest,
+  getGroupPermissionsRequest,
+  updateGroupPermissionsRequest,
   syncNewMessagesRequest,
 } from '../api';
 import { getDataSignature, getGroupId, getMessageUpdateDate } from '../utils';
@@ -12,6 +15,7 @@ import {
   ActiveChannelType,
   ClientKeyPaires,
   CreateRoomParams,
+  updateGroupPermissionsParams,
   Web3MQDBValue,
 } from '../types';
 import { Web3MQMessageStatusResp, Web3MQRequestMessage } from '../pb';
@@ -165,12 +169,17 @@ export class Channel {
     this._client.emit('channel.getList', { type: 'channel.getList' });
   }
 
-  async createRoom(params: Pick<CreateRoomParams, 'group_name' | 'avatar_url' | 'avatar_base64'>) {
+  async createRoom(
+    params: Pick<
+      CreateRoomParams,
+      'group_name' | 'groupid' | 'avatar_url' | 'avatar_base64' | 'permissions'
+    >,
+  ) {
+    const { groupid = '' } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
-    const signContent = userid + timestamp;
+    const signContent = userid + groupid + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
-
     const { data = { groupid: '', group_name: '', avatar_base64: '', avatar_url: '' } } =
       await createRoomRequest({
         web3mq_signature,
@@ -246,5 +255,66 @@ export class Channel {
       });
       return data;
     }
+  }
+
+  async joinGroup(groupid: string) {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + groupid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await joinGroupRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      groupid,
+    });
+    if (!this.channelList) {
+      return;
+    }
+    if (!this.channelList.find((item) => item.chatid !== groupid)) {
+      const { groupid: group_id = '', group_name = '', avatar_base64 = '', avatar_url = '' } = data;
+      this.channelList = [
+        {
+          chatid: group_id,
+          chat_type: 'group',
+          chat_name: group_name,
+          avatar_base64: avatar_base64,
+          avatar_url: avatar_url,
+        },
+        ...this.channelList,
+      ];
+      this._client.emit('channel.getList', { type: 'channel.getList' });
+    }
+  }
+
+  async getGroupPermissions(groupid: string) {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + groupid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await getGroupPermissionsRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      groupid,
+    });
+    return data;
+  }
+
+  async updateGroupPermissions(
+    params: Pick<updateGroupPermissionsParams, 'groupid' | 'permissions'>,
+  ) {
+    const { groupid } = params;
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + groupid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await updateGroupPermissionsRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      ...params,
+    });
+    return data;
   }
 }
