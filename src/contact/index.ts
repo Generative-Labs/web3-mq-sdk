@@ -66,7 +66,7 @@ export class Contact {
   async sendFriend(target_userid: string, content: string = '') {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
-    const signContent = userid + target_userid + timestamp;
+    const signContent = userid + target_userid + content + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
 
     const data = await sendFriendRequest({
