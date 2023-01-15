@@ -8,6 +8,9 @@ import {
   NewBaseParams,
   getGroupMemberListParams,
   inviteGroupMemberParams,
+  joinGroupParams,
+  getGroupPermissionsParams,
+  updateGroupPermissionsParams,
   changeMessageStatusParams,
   searchParams,
   profileParams,
@@ -67,6 +70,20 @@ export const getGroupMemberListRequest = async (payload: getGroupMemberListParam
 
 export const inviteGroupMemberRequest = async (payload: inviteGroupMemberParams) => {
   return await request.post('/api/group_invitation/', payload);
+};
+
+export const joinGroupRequest = async (payload: joinGroupParams) => {
+  return await request.post('/api/user_join_group/', payload);
+};
+
+export const updateGroupPermissionsRequest = async (payload: updateGroupPermissionsParams) => {
+  return await request.post('/api/update_group_permissions/', payload);
+};
+
+export const getGroupPermissionsRequest = async (payload: getGroupPermissionsParams) => {
+  return await request.get('/api/get_group_permissions/', {
+    params: payload,
+  });
 };
 
 /**
