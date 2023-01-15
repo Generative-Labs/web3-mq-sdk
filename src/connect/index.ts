@@ -34,11 +34,18 @@ export class Connect {
     const wsconn = new WebSocket(Client.wsUrl);
     wsconn.binaryType = 'arraybuffer';
 
+    if (this._client.listeners.events['connect.changeReadyStatus']) {
+      this._client.emit('connect.changeReadyStatus', { type: 'connect.changeReadyStatus' });
+    }
+
     wsconn.onopen = async () => {
       console.log('connection is successful');
       this.start();
       const concatArray = await sendConnectCommand(this._client.keys);
       wsconn.send(concatArray);
+      if (this._client.listeners.events['connect.changeReadyStatus']) {
+        this._client.emit('connect.changeReadyStatus', { type: 'connect.changeReadyStatus' });
+      }
     };
 
     wsconn.onmessage = (event) => {
@@ -47,6 +54,11 @@ export class Connect {
       const PbType = respData[1];
       const bytes = respData.slice(2, respData.length);
       this.onMessageCallback(PbType, bytes);
+    };
+    wsconn.onclose = () => {
+      if (this._client.listeners.events['connect.changeReadyStatus']) {
+        this._client.emit('connect.changeReadyStatus', { type: 'connect.changeReadyStatus' });
+      }
     };
     this.ws = wsconn;
   }
