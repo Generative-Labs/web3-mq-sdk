@@ -287,6 +287,10 @@ export interface PublishNotificationToFollowersParams extends NewBaseParams {
   title: string;
   content: string;
 }
+
+export interface GetTargetUserPermissionsParams extends NewBaseParams {
+  target_userid: string;
+};
 export interface UpdateUserPermissionsParams extends NewBaseParams {
   permissions: Record<string, { type: string; value: boolean }>;
 }

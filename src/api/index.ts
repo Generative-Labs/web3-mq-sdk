@@ -33,6 +33,7 @@ import {
   getUserPublicProfileParams,
   GetPublicFollowerListParams,
   PublishNotificationToFollowersParams,
+  GetTargetUserPermissionsParams,
   UpdateUserPermissionsParams,
 } from '../types';
 
@@ -187,6 +188,10 @@ export const publishNotificationToFollowersRequest = async (
   payload: PublishNotificationToFollowersParams,
 ) => {
   return await request.post('/api/publish_notification_to_followers/', payload);
+};
+
+export const getTargetUserPermissionsRequest = async (payload: GetTargetUserPermissionsParams) => {
+  return await request.post('/api/get_target_user_permissions/', payload);
 };
 
 export const getUserPermissionsRequest = async (payload: NewBaseParams) => {

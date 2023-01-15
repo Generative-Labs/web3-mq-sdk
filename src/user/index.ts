@@ -21,8 +21,9 @@ import {
   publishNotificationToFollowersRequest,
   getUserPermissionsRequest,
   updateUserPermissionsRequest,
+  getTargetUserPermissionsRequest,
 } from '../api';
-import { getDataSignature } from '../utils';
+import { getDataSignature, transformAddress } from '../utils';
 
 export class User {
   private readonly _client: Client;
@@ -169,6 +170,21 @@ export class User {
       web3mq_user_signature,
       userid,
       timestamp,
+    });
+    return data;
+  }
+
+  async getTargetUserPermissions(userId: string) {
+    const target_userid = await transformAddress(userId);
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + target_userid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await getTargetUserPermissionsRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      target_userid
     });
     return data;
   }
