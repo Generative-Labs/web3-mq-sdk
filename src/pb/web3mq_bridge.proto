@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+
+message Web3MQBridgeConnectCommand {
+    string NodeID = 1;
+    string DAppID = 2;
+    string TopicID = 3;
+    optional uint64 SignatureTimestamp = 4;
+    optional string DAppSignature = 5;
+}

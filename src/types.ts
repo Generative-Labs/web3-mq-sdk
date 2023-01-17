@@ -16,6 +16,8 @@ export type Web3MQDBValuePayload = {
   [key: string]: any;
 };
 
+export type SignatureParams = { signContent: string; didValue: string };
+
 export type Web3MQDBValue = {
   messageId: string;
   from: string;
@@ -69,7 +71,7 @@ export type initOptions = {
 };
 
 export type SignClientCallBackType = {
-  type: 'connect' | 'messageStatus' | 'keys';
+  type: 'createQrcode' | 'connect' | 'messageStatus' | 'keys';
   data: any;
 };
 
@@ -93,6 +95,14 @@ export type SendTempConnectOptions = {
   dAppSignature: string;
 };
 
+export type SendWeb3MQBridgeOptions = {
+  dAppID: string;
+  topicID: string;
+  nodeID: string;
+  signatureTimestamp?: number;
+  dAppSignature?: string;
+};
+
 export type getUserInfoParams = {
   did_type: string;
   did_value: string;
@@ -107,6 +117,11 @@ export type GetMainKeypairParams = {
 
 export interface SignConnectOptions extends SendTempConnectOptions {
   wsUrl: string;
+}
+export interface Web3MQBridgeOptions {
+  wsUrl: string;
+  dAppID: string;
+  nodeID?: string;
 }
 
 export type EnvTypes = 'dev' | 'test';
@@ -290,7 +305,7 @@ export interface PublishNotificationToFollowersParams extends NewBaseParams {
 
 export interface GetTargetUserPermissionsParams extends NewBaseParams {
   target_userid: string;
-};
+}
 export interface UpdateUserPermissionsParams extends NewBaseParams {
   permissions: Record<string, { type: string; value: boolean }>;
 }
@@ -359,7 +374,7 @@ export interface TopicListType extends SubscribeListType {
   topic_name: string;
 }
 
-export type WalletType = 'eth' | 'starknet';
+export type WalletType = 'eth' | 'starknet' | 'qrcode';
 
 export type WalletSignRes = {
   sign: string;
@@ -369,4 +384,5 @@ export type WalletSignRes = {
 export const WalletNameMap = {
   eth: 'Ethereum',
   starknet: 'Argent X',
+  qrcode: 'Qrcode',
 };

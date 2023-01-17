@@ -1,7 +1,8 @@
 export * from './signConnect';
+export * from './qrCode';
 
 import { Client } from '../client';
-import { sendConnectCommand, GetContactBytes } from '../utils';
+import { GetContactBytes } from '../utils';
 import {
   PbTypeConnectRespCommand,
   PbTypePingCommand,
@@ -9,6 +10,7 @@ import {
   PbTypeNotificationListResp,
 } from '../core/pbType';
 import { ConnectCommand, WebsocketPingCommand } from '../pb';
+import { sendConnectCommand } from './wsCommand';
 export class Connect {
   private _client: Client;
   private timeout: number;

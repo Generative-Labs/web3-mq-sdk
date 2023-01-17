@@ -1,6 +1,6 @@
 import { Register } from '../register';
 import { Channel } from '../channel';
-import { Connect, SignConnect } from '../connect';
+import { Connect, SignConnect, QrCode } from '../connect';
 import { Message } from '../message';
 import { User } from '../user';
 import { Contact } from '../contact';
@@ -18,12 +18,14 @@ import {
   initOptions,
   SendTempConnectOptions,
   SignClientCallBackType,
+  Web3MQBridgeOptions,
 } from '../types';
 export class Client {
   private static _instance: Client | null;
   static wsUrl: string;
   static register: Register;
   static signClient: SignConnect;
+  static qrCodeClient: QrCode;
   keys: ClientKeyPaires;
   channel: Channel;
   listeners: event;
@@ -80,6 +82,17 @@ export class Client {
       throw new Error('The options is required!');
     }
     Client.signClient = new SignConnect({ wsUrl: Client.wsUrl, ...options }, callback);
+  };
+
+  public static getQrCodeClient = (
+    options: Omit<Web3MQBridgeOptions, 'wsUrl'>,
+    // eslint-disable-next-line no-unused-vars
+    callback: (params: SignClientCallBackType) => void,
+  ) => {
+    if (!options) {
+      throw new Error('The options is required!');
+    }
+    Client.qrCodeClient = new QrCode({ wsUrl: Client.wsUrl, ...options }, callback);
   };
 
   on = (eventName: EventTypes, callback: any) => this.listeners.on(eventName, callback);

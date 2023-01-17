@@ -1,10 +1,5 @@
-import {
-  sendTempConnectCommand,
-  sendDappBridgeCommand,
-  GenerateEd25519KeyPair,
-  GenerateRandomSixCode,
-  GetContactBytes,
-} from '../utils';
+import { GenerateEd25519KeyPair, GenerateRandomSixCode, GetContactBytes } from '../utils';
+import { sendDappBridgeCommand, sendTempConnectCommand } from './wsCommand';
 import {
   PbTypeUserTempConnectResp,
   PbTypeMessageStatusResp,
@@ -154,6 +149,7 @@ export class SignConnect {
           this.AesIv,
           Base64StringToUint8(content),
         );
+        console.log(JSON.parse(new TextDecoder().decode(new Uint8Array(decode_data))));
         if (this.walletUserInfo) {
           const keys = JSON.parse(new TextDecoder().decode(new Uint8Array(decode_data)));
           this.callback({ type: 'keys', data: { ...keys, userid: this.walletUserInfo.userid } });
@@ -212,12 +208,14 @@ export class SignConnect {
 
     this.ws.send(concatArray);
   }
+
   reset() {
     if (this.timeoutObj !== null) {
       clearTimeout(this.timeoutObj);
       this.start();
     }
   }
+
   start() {
     this.timeoutObj = setTimeout(() => {
       this.sendPing();

@@ -1,7 +1,6 @@
 import { Client } from '../client';
 import { ClientKeyPaires, PageParams, MessageStatus, MessageListItem } from '../types';
 import {
-  sendMessageCommand,
   getDataSignature,
   renderMessagesList,
   renderMessage,
@@ -16,6 +15,7 @@ import {
   Web3MQChangeMessageStatus,
   Web3MQMessageStatusResp,
 } from '../pb/message';
+import { sendMessageCommand } from '../connect/wsCommand';
 
 export class Message {
   private readonly _client: Client;
@@ -87,6 +87,7 @@ export class Message {
       connect.send(concatArray);
     }
   }
+
   receive = async (pbType: number, bytes: Uint8Array) => {
     if (pbType === PbTypeMessage) {
       const resp = Web3MQRequestMessage.fromBinary(bytes);

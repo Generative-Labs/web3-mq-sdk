@@ -38,6 +38,10 @@ const PbTypeChatListRespCommand = 0b01000001;
 const PbTypePingCommand = 0b10000000;
 const PbTypePongCommand = 0b10000001;
 
+// qrCode
+const PbTypeWeb3MQBridgeConnectCommand = 0b1100100;
+const PbTypeWeb3MQBridgeConnectResp = 0b1100101;
+
 export {
   PbTypeChatReqCommand,
   PbTypeUserTempConnectReqCommand,
@@ -63,4 +67,6 @@ export {
   PbTypeGroupListRespCommand,
   PbTypePingCommand,
   PbTypePongCommand,
+  PbTypeWeb3MQBridgeConnectCommand,
+  PbTypeWeb3MQBridgeConnectResp
 };
