@@ -22,7 +22,7 @@ export class Connect {
     this._client = client;
     this.ws = null;
     this.nodeId = '';
-    this.timeout = 55000;
+    this.timeout = 40000;
     this.timeoutObj = null;
     this.init();
   }
