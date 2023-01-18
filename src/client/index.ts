@@ -1,4 +1,4 @@
-import { Register } from '../register';
+import { Register, QrCodeSign } from '../register';
 import { Channel } from '../channel';
 import { Connect, SignConnect, QrCode } from '../connect';
 import { Message } from '../message';
@@ -20,12 +20,14 @@ import {
   SignClientCallBackType,
   Web3MQBridgeOptions,
 } from '../types';
+
 export class Client {
   private static _instance: Client | null;
   static wsUrl: string;
   static register: Register;
   static signClient: SignConnect;
   static qrCodeClient: QrCode;
+  static qrCodeSign: QrCodeSign;
   keys: ClientKeyPaires;
   channel: Channel;
   listeners: event;
@@ -60,6 +62,7 @@ export class Client {
     Client.wsUrl = selectUrl(fastUrl, 'ws');
     new Request(selectUrl(fastUrl), tempPubkey, didKey);
     Client.register = new Register(app_key);
+    Client.qrCodeSign = new QrCodeSign(app_key);
     return fastUrl;
   };
 
