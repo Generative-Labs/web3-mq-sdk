@@ -155,29 +155,36 @@ export const sendWeb3mqBridgeCommand = async (
   return concatArray;
 };
 
-export const sendSignatureCommand = async (options: any) => {
-  const { nodeId, payload, contentTopic, comeFrom } = options;
+export const sendWeb3mqSignatureCommand = async (options: any) => {
+  const { nodeId, payload, contentTopic, comeFrom, validatePubKey, PrivateKey } = options;
 
   const timestamp = Date.now();
   const cipherSuite = 'NONE';
   const needStore = true;
+  const msgid = await GenerateMessageID(contentTopic, contentTopic, timestamp, payload);
+
+  const signContent = msgid + contentTopic + contentTopic + nodeId + timestamp.toString();
+
+  const fromSign = await getDataSignature(PrivateKey, signContent);
 
   const reqCmd: Web3MQRequestMessage = {
     payload,
     contentTopic,
     version: 1,
     comeFrom,
-    fromSign: '',
+    fromSign,
     payloadType: 'application/json',
     cipherSuite,
     needStore,
     timestamp: BigInt(timestamp),
-    messageId: '',
+    messageId: msgid,
     nodeId,
     messageType: 'Web3MQ/bridge',
-    validatePubKey: '',
+    validatePubKey,
     extraData: {},
   };
+
+  console.log(reqCmd);
 
   const bytes = Web3MQRequestMessage.toBinary(reqCmd);
   const concatArray = GetContactBytes(PbTypeMessage, bytes);
