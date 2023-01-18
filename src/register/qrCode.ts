@@ -159,6 +159,8 @@ Issued At: ${getCurrentDate()}`;
   qrCodeLogin = async (options: QrCodeLoginParams) => {
     const {
       userid,
+      did_type,
+      did_value,
       password = this._options.password,
       mainPrivateKey,
       mainPublicKey,
@@ -172,8 +174,6 @@ Issued At: ${getCurrentDate()}`;
     if (!mainPrivateKey || !mainPublicKey) {
       throw new Error('The MainKeypair does not exist');
     }
-
-    const { did_value, did_type } = this._options;
 
     const timestamp = Date.now();
 

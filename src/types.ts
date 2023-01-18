@@ -170,6 +170,8 @@ export type LoginParams = {
 
 export type QrCodeLoginParams = {
   userid: string;
+  did_type: string;
+  did_value: string;
   mainPrivateKey: string;
   mainPublicKey: string;
   password?: string;
