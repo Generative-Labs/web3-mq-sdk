@@ -2,6 +2,7 @@ import { sha3_224 } from 'js-sha3';
 import ed from '@noble/ed25519';
 
 import { Client } from '../client';
+import { request } from '../core/request';
 import { userLoginRequest, userRegisterRequest } from '../api';
 import {
   ByteArrayToHexString,
