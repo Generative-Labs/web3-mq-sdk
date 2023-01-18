@@ -146,6 +146,15 @@ export type RegisterParams = {
   did_pubkey?: string;
 };
 
+export type QrCodeRegisterParams = {
+  userid: string;
+  signature: string;
+  did_pubkey?: string;
+  nickname?: string;
+  avatar_url?: string;
+  avatar_base64?: string;
+};
+
 export type LoginParams = {
   userid: string;
   did_type: string;
@@ -157,6 +166,16 @@ export type LoginParams = {
   pubkey_type: string;
   timestamp: number;
   pubkey_expired_timestamp: number;
+};
+
+export type QrCodeLoginParams = {
+  userid: string;
+  did_type: string;
+  did_value: string;
+  mainPrivateKey: string;
+  mainPublicKey: string;
+  password?: string;
+  pubkeyExpiredTimestamp?: number;
 };
 
 export type BaseParams = {

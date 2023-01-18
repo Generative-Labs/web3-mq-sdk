@@ -36,6 +36,7 @@ import {
   WalletType,
 } from '../types';
 
+export * from './qrCode';
 export class Register {
   appKey: string;
 
