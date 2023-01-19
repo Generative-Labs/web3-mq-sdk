@@ -83,7 +83,20 @@ export class Message {
 
     if (topicId) {
       this.msg_text = msg;
-      const concatArray = await sendMessageCommand(keys, topicId, msg, connect.nodeId);
+      const { concatArray, msgid } = await sendMessageCommand(keys, topicId, msg, connect.nodeId);
+
+      const tempMessageData = {
+        messageId: msgid,
+        timestamp: BigInt(Date.now()),
+      };
+
+      const tempMessage = renderMessage(PbTypeMessageStatusResp, tempMessageData, this._client);
+      if (this.messageList) {
+        this.messageList = [...this.messageList, { ...tempMessage }];
+      }
+      // 需要改一下类型
+      // this._client.emit('message.delivered', { type: 'message.delivered', data: '' });
+
       connect.send(concatArray);
     }
   }
@@ -116,6 +129,9 @@ export class Message {
       saveMessageUpdateDate();
       const msg = renderMessage(pbType, resp, this._client);
       this._client.channel.handleUnread(resp, msg);
+      // 1,遍历找到messageid 对应的
+      // 2. msg.msgLoading = SendMsgLoadingEnum['success'];
+      // 3. emit
       if (this.messageList) {
         this.messageList = [...this.messageList, { ...msg }];
       }

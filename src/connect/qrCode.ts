@@ -21,12 +21,11 @@ import {
   aesGCMDecrypt,
   Base64StringToUint8,
 } from '../encryption';
-import { sendDappBridgeCommand, sendWeb3mqBridgeCommand } from './wsCommand';
+import { sendWeb3mqSignatureCommand, sendWeb3mqBridgeCommand } from './wsCommand';
 import { GenerateEd25519KeyPair, GetContactBytes, GenerateQrCode } from '../utils';
 import {
   SignClientCallBackType,
   KeyPairsType,
-  WalletUserInfoType,
   Web3MQBridgeOptions,
   SendWeb3MQBridgeOptions,
   SignatureParams,
@@ -40,11 +39,8 @@ export class QrCode {
   wsUrl: string;
   nodeId: string;
   topicID: string;
-  walletUserInfo: WalletUserInfoType | null;
+  publicKeyProps: string;
   tempKeys: Omit<KeyPairsType, 'userid'> | null;
-  shareKey: string;
-  AesKey: string;
-  AesIv: string;
   // eslint-disable-next-line no-unused-vars
   callback: (params: SignClientCallBackType) => void;
 
@@ -58,11 +54,8 @@ export class QrCode {
     this.ws = null;
     this.nodeId = '';
     this.topicID = '';
-    this.walletUserInfo = null;
     this.tempKeys = null;
-    this.shareKey = '';
-    this.AesKey = '';
-    this.AesIv = '';
+    this.publicKeyProps = '';
     this.init();
   }
 
@@ -81,17 +74,26 @@ export class QrCode {
   };
 
   private handleGetEncryptData = async (options: SignatureParams) => {
-    const { signContent, didValue } = options;
-    const publicKey = this.tempKeys?.PublicKey || '';
-    const { AesKey, AesIv } = await this.getAesKey(publicKey);
+    const { signContent, didValue, signType } = options;
+    const { AesKey, AesIv } = await this.getAesKey(this.publicKeyProps);
     const encrytData = await aesGCMEncrypt(
       AesKey,
       AesIv,
       new TextEncoder().encode(
         JSON.stringify({
+          requestId: `requestId:${new Date()}`,
+          action: 'signRequest',
           address: didValue,
           signRaw: signContent,
-          proposer: { name: '', description: '', url: '', iconUrl: '', redirect: '' },
+          proposer: {
+            dAppId: this._options.dAppID,
+            name: '',
+            description: '',
+            url: '',
+            iconUrl: '',
+            redirect: '',
+          },
+          userInfo: signType,
         }),
       ),
     );
@@ -101,9 +103,10 @@ export class QrCode {
   private handleCreateQrCode = async () => {
     const text = `web3mq://?action=connect&topicId=${this.topicID}&ed25519Pubkey=${
       this.tempKeys?.PublicKey
-    }&bridge=&iconUrl=&website=${encodeURIComponent('https://www.baidu.com')}&redirect=`;
+    }&bridge=${encodeURIComponent(this.wsUrl)}&iconUrl=&website=${encodeURIComponent(
+      'https://www.baidu.com',
+    )}&redirect=`;
     const qrCodeUrl = await GenerateQrCode(text);
-    console.log(qrCodeUrl);
     this.callback({ type: 'createQrcode', data: { status: 'success', qrCodeUrl } });
   };
 
@@ -144,7 +147,6 @@ export class QrCode {
   }
 
   async onMessageCallback(PbType: number, bytes: Uint8Array) {
-    console.log(PbType);
     switch (PbType) {
       case PbTypeWeb3MQBridgeConnectResp:
         const resp = Web3MQBridgeConnectCommand.fromBinary(bytes);
@@ -164,13 +166,11 @@ export class QrCode {
         const { content, publicKey } = JSON.parse(
           new TextDecoder().decode(msgRes.payload) || '{content:""}',
         );
+        this.publicKeyProps = publicKey;
         const { AesKey, AesIv } = await this.getAesKey(publicKey);
         const decode_data = await aesGCMDecrypt(AesKey, AesIv, Base64StringToUint8(content));
-        console.log(decode_data);
-        // if (this.walletUserInfo) {
-        //   const keys = JSON.parse(new TextDecoder().decode(new Uint8Array(decode_data)));
-        //   this.callback({ type: 'keys', data: { ...keys, userid: this.walletUserInfo.userid } });
-        // }
+        const data = JSON.parse(new TextDecoder().decode(new Uint8Array(decode_data)));
+        this.callback({ type: 'keys', data });
         break;
       default:
         throw new Error('This type is not supported');
@@ -190,44 +190,18 @@ export class QrCode {
       nodeId: this.nodeId,
       payload: new TextEncoder().encode(
         JSON.stringify({
-          action: 'signRequest',
+          publicKey: this.tempKeys?.PublicKey,
           content: Uint8ToBase64String(new Uint8Array(encrytData)),
         }),
       ),
       comeFrom: this.topicID,
       contentTopic: this.topicID,
+      validatePubKey: this.tempKeys?.PublicKey,
+      PrivateKey: this.tempKeys?.PrivateKey,
     };
-
-    const concatArray = await sendDappBridgeCommand(params);
+    const concatArray = await sendWeb3mqSignatureCommand(params);
     this.send(concatArray);
   };
-
-  // sendWeb3MQBridge = async (options: Omit<getUserInfoParams, 'timestamp'>) => {
-  //   const { did_type, did_value } = options;
-  //   const { dAppID } = this._options;
-  //   // const { PrivateKey, PublicKey } = await GenerateEd25519KeyPair();
-  //   // await this.getWalletUserInfo({ did_type, did_value });
-  //   // await this.handleExchangeKey();
-  //   const encrytData = await this.handleGetEncryptData();
-  //   if (!this.walletUserInfo) {
-  //     return;
-  //   }
-  //   const params = {
-  //     nodeId: this.nodeId,
-  //     payload: new TextEncoder().encode(
-  //       JSON.stringify({
-  //         action: 'sync_key_pairs_request',
-  //         pubkey: this.tempKeys?.PublicKey,
-  //         content: Uint8ToBase64String(new Uint8Array(encrytData)),
-  //       }),
-  //     ),
-  //     comeFrom: `${dAppID}@${did_type}:${did_value.toLowerCase()}`,
-  //     contentTopic: this.walletUserInfo.userid,
-  //   };
-
-  //   const concatArray = await sendDappBridgeCommand(params);
-  //   this.send(concatArray);
-  // };
 
   sendPing() {
     if (this.ws === null) {
