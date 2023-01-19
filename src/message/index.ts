@@ -132,7 +132,6 @@ export class Message {
       saveMessageUpdateDate();
       const msg = renderMessage(pbType, resp, this._client);
       this._client.channel.handleUnread(resp, msg);
-
       if (this.messageList) {
         const msgList = updateMessageLoadStatus(this.messageList, msg);
         this.messageList = [...msgList];

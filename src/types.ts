@@ -409,5 +409,5 @@ export const WalletNameMap = {
 export const SendMsgLoadingMap = {
   success: 'success',
   error: 'error',
-  loading: 'loading',
+  loading: 'laoding',
 };
