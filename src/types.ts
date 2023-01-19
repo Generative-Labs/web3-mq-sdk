@@ -16,7 +16,7 @@ export type Web3MQDBValuePayload = {
   [key: string]: any;
 };
 
-export type SignatureParams = { signContent: string; didValue: string };
+export type SignatureParams = { signContent: string; didValue: string; signType: string };
 
 export type Web3MQDBValue = {
   messageId: string;
@@ -146,6 +146,15 @@ export type RegisterParams = {
   did_pubkey?: string;
 };
 
+export type QrCodeRegisterParams = {
+  userid: string;
+  signature: string;
+  did_pubkey?: string;
+  nickname?: string;
+  avatar_url?: string;
+  avatar_base64?: string;
+};
+
 export type LoginParams = {
   userid: string;
   did_type: string;
@@ -157,6 +166,16 @@ export type LoginParams = {
   pubkey_type: string;
   timestamp: number;
   pubkey_expired_timestamp: number;
+};
+
+export type QrCodeLoginParams = {
+  userid: string;
+  did_type: string;
+  did_value: string;
+  mainPrivateKey: string;
+  mainPublicKey: string;
+  password?: string;
+  pubkeyExpiredTimestamp?: number;
 };
 
 export type BaseParams = {
@@ -385,4 +404,10 @@ export const WalletNameMap = {
   eth: 'Ethereum',
   starknet: 'Argent X',
   qrcode: 'Qrcode',
+};
+
+export const SendMsgLoadingMap = {
+  success: 'success',
+  error: 'error',
+  loading: 'laoding',
 };
