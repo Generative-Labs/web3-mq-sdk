@@ -289,3 +289,11 @@ export const saveMessageUpdateDate = () => {
 export const getMessageUpdateDate = () => {
   return Number(localStorage.getItem('MESSAGEUPDATEDATE'));
 };
+
+export const updateMessageLoadStatus = (msgList: Array<any>, msg: any, status = SendMsgLoadingMap['success']) => {
+  const message = msgList.find((item: any) => item.id === msg.id);
+  if (message) {
+    (message as any).msgLoading = status;
+  }
+  return msgList;
+};

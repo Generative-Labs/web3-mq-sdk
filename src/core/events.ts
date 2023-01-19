@@ -18,6 +18,8 @@ export const EVENT_MAP = {
   'contact.updateList': true,
   // connect状态改变
   'connect.changeReadyStatus': true,
+  // 消息发送
+  'message.send': true,
   // 消息送达
   'message.delivered': true,
   // 消息已读
