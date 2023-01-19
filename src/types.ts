@@ -16,7 +16,7 @@ export type Web3MQDBValuePayload = {
   [key: string]: any;
 };
 
-export type SignatureParams = { signContent: string; didValue: string };
+export type SignatureParams = { signContent: string; didValue: string; signType: string };
 
 export type Web3MQDBValue = {
   messageId: string;
@@ -404,4 +404,10 @@ export const WalletNameMap = {
   eth: 'Ethereum',
   starknet: 'Argent X',
   qrcode: 'Qrcode',
+};
+
+export const SendMsgLoadingMap = {
+  success: 'success',
+  error: 'error',
+  loading: 'laoding',
 };

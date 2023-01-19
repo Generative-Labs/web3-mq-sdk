@@ -101,7 +101,7 @@ export const sendMessageCommand = async (
   topic: string,
   msg: string,
   nodeId: string,
-): Promise<Uint8Array> => {
+): Promise<{ concatArray: Uint8Array; msgid: string }> => {
   const { userid, PrivateKey, PublicKey } = keys;
   const timestamp = Date.now();
   const cipherSuite = 'NONE';
@@ -133,7 +133,7 @@ export const sendMessageCommand = async (
   const bytes = Web3MQRequestMessage.toBinary(msgReq);
 
   const concatArray = GetContactBytes(PbTypeMessage, bytes);
-  return concatArray;
+  return { concatArray, msgid };
 };
 
 export const sendWeb3mqBridgeCommand = async (

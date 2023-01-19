@@ -30,12 +30,14 @@ import {
 export class QrCodeSign {
   private _options: GetMainKeypairParams;
   appKey: string;
-  registerSingContent: string;
+  registerSignContent: string;
+  registerSignTimestamp: number;
   mainKeypair: { publicKey: string; secretKey: string } | null;
 
   constructor(appKey?: string) {
     this.appKey = appKey || '';
-    this.registerSingContent = '';
+    this.registerSignContent = '';
+    this.registerSignTimestamp = 0;
     this._options = { did_value: '', did_type: 'eth', password: '' };
     this.mainKeypair = null;
   }
@@ -117,7 +119,8 @@ Version: 1
 Nonce: ${NonceContent}
 Issued At: ${getCurrentDate()}`;
 
-    this.registerSingContent = signContent;
+    this.registerSignContent = signContent;
+    this.registerSignTimestamp = timestamp;
     return { signContent };
   };
 
@@ -131,7 +134,6 @@ Issued At: ${getCurrentDate()}`;
     const { publicKey: pubkey_value } = this.mainKeypair;
     const { did_type, did_value } = this._options;
     const pubkey_type = 'ed25519';
-    const timestamp = Date.now();
 
     const payload: RegisterParams = {
       userid,
@@ -139,13 +141,13 @@ Issued At: ${getCurrentDate()}`;
       did_value,
       did_pubkey,
       did_signature: signature,
-      signature_content: this.registerSingContent,
+      signature_content: this.registerSignContent,
       pubkey_type,
       pubkey_value,
       nickname,
       avatar_url,
       avatar_base64,
-      timestamp: timestamp,
+      timestamp: this.registerSignTimestamp,
       testnet_access_key: this.appKey,
     };
 
@@ -171,7 +173,7 @@ Issued At: ${getCurrentDate()}`;
     if (!password) {
       throw new Error('The Password does not exist');
     }
-    
+
     if (!mainPrivateKey || !mainPublicKey) {
       throw new Error('The MainKeypair does not exist');
     }
@@ -220,7 +222,7 @@ Issued At: ${getCurrentDate()}`;
     }
   };
 
-  signWithQrCode = (signContent: string, didValue: string): void => {
-    Client.qrCodeClient.sendSignatureCommand({ signContent, didValue });
+  signWithQrCode = (signContent: string, didValue: string, signType: string): void => {
+    Client.qrCodeClient.sendSignatureCommand({ signContent, didValue, signType });
   };
 }

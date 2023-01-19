@@ -74,17 +74,26 @@ export class QrCode {
   };
 
   private handleGetEncryptData = async (options: SignatureParams) => {
-    const { signContent, didValue } = options;
+    const { signContent, didValue, signType } = options;
     const { AesKey, AesIv } = await this.getAesKey(this.publicKeyProps);
     const encrytData = await aesGCMEncrypt(
       AesKey,
       AesIv,
       new TextEncoder().encode(
         JSON.stringify({
+          requestId: `requestId:${new Date()}`,
           action: 'signRequest',
           address: didValue,
           signRaw: signContent,
-          proposer: { dAppId: this._options.dAppID, name: '', description: '', url: '', iconUrl: '', redirect: '' },
+          proposer: {
+            dAppId: this._options.dAppID,
+            name: '',
+            description: '',
+            url: '',
+            iconUrl: '',
+            redirect: '',
+          },
+          userInfo: signType,
         }),
       ),
     );
@@ -138,7 +147,6 @@ export class QrCode {
   }
 
   async onMessageCallback(PbType: number, bytes: Uint8Array) {
-    console.log(PbType);
     switch (PbType) {
       case PbTypeWeb3MQBridgeConnectResp:
         const resp = Web3MQBridgeConnectCommand.fromBinary(bytes);
@@ -150,8 +158,7 @@ export class QrCode {
         WebsocketPingCommand.fromBinary(bytes);
         break;
       case PbTypeMessageStatusResp:
-        const msgRess = Web3MQMessageStatusResp.fromBinary(bytes);
-        console.log(msgRess);
+        Web3MQMessageStatusResp.fromBinary(bytes);
         this.callback({ type: 'messageStatus', data: 'success' });
         break;
       case PbTypeMessage:

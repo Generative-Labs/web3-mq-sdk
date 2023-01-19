@@ -4,7 +4,7 @@ import axios from 'axios';
 import QRCode from 'qrcode';
 
 import type { Client } from './client';
-import { EnvTypes } from './types';
+import { EnvTypes, SendMsgLoadingMap } from './types';
 import { PbTypeMessage, PbTypeMessageStatusResp } from './core/pbType';
 import { domainUrlList } from './core/config';
 import { getUserInfoRequest } from './api';
@@ -215,7 +215,11 @@ export const getGroupId = (msg: any, client: Client): string => {
   return contentTopic;
 };
 
-export const renderMessage = (pbType: number, msg: any, client: Client) => {
+export const renderMessage = (
+  pbType: number,
+  msg: { messageId: string; timestamp: bigint; payload?: any },
+  client: Client,
+) => {
   const { messageId, timestamp, payload } = msg;
 
   let content = '';
@@ -242,6 +246,7 @@ export const renderMessage = (pbType: number, msg: any, client: Client) => {
     _id: messageId,
     id: messageId,
     indexId: messageId,
+    msgLoading: SendMsgLoadingMap['loading'],
     content,
     senderId,
     username: '',
