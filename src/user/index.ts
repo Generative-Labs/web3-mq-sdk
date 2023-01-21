@@ -1,3 +1,4 @@
+import { sha3_224 } from 'js-sha3';
 import { Client } from '../client';
 import {
   ClientKeyPaires,
@@ -23,7 +24,7 @@ import {
   updateUserPermissionsRequest,
   getTargetUserPermissionsRequest,
 } from '../api';
-import { getDataSignature, transformAddress } from '../utils';
+import { getDataSignature, transformAddress, newDateFormat } from '../utils';
 
 export class User {
   private readonly _client: Client;
@@ -100,17 +101,28 @@ export class User {
   }
 
   async followOperation(
-    params: Pick<FollowOperationParams, 'target_userid' | 'action'>,
+    params: Pick<FollowOperationParams, 'address' | 'target_userid' | 'action' | 'did_type'>,
   ): Promise<any> {
-    const { target_userid, action } = params;
-    const { userid, PrivateKey } = this._keys;
+    const { address, target_userid, action, did_type } = params;
+    const { userid, PublicKey } = this._keys;
+    const did_pubkey = did_type === 'starknet' ? PublicKey : undefined;
     const timestamp = Date.now();
-    const signContent = userid + target_userid + action + timestamp;
-    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    let nonce = sha3_224(userid + action + target_userid + timestamp);
+    const sign_content = `
+    Web3MQ wants you to sign in with your ${did_type} account:
+    ${address}
+    
+    For follow signature
+    
+    Nonce: ${nonce}
+    Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
+    const { sign: did_signature } = await Client.register.sign(sign_content, address, did_type);
     const data = await followOperationRequest({
-      web3mq_user_signature,
+      did_pubkey,
+      did_signature,
+      sign_content,
       userid,
-      timestamp,
+      timestamp, 
       ...params,
     });
     return data;
