@@ -15,7 +15,7 @@ import {
   KeyPairsType,
   ClientKeyPaires,
   EventTypes,
-  initOptions,
+  InitOptions,
   SendTempConnectOptions,
   SignClientCallBackType,
   Web3MQBridgeOptions,
@@ -53,7 +53,7 @@ export class Client {
   }
 
   public static init = async (
-    initOptions: initOptions = {
+    initOptions: InitOptions = {
       connectUrl: null,
     },
   ) => {

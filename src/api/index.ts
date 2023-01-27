@@ -3,34 +3,34 @@ import { request } from '../core/request';
 import {
   CreateRoomParams,
   CommonGetListPatams,
-  getMessageListParams,
+  GetMessageListParams,
   BaseParams,
   NewBaseParams,
-  getGroupMemberListParams,
-  inviteGroupMemberParams,
-  joinGroupParams,
-  getGroupPermissionsParams,
-  updateGroupPermissionsParams,
-  changeMessageStatusParams,
-  searchParams,
-  profileParams,
-  sendFriendParams,
-  operationFriendParams,
+  GetGroupMemberListParams,
+  InviteGroupMemberParams,
+  JoinGroupParams,
+  GetGroupPermissionsParams,
+  UpdateGroupPermissionsParams,
+  ChangeMessageStatusParams,
+  SearchParams,
+  ProfileParams,
+  SendFriendParams,
+  OperationFriendParams,
   UpdateMyProfileResponse,
   ChangeNotificationStatusParams,
-  syncNewMessagesParams,
+  SyncNewMessagesParams,
   CreateTopicParams,
   SubscribeTopicParams,
   PublishTopicMessageParams,
   GetTopicListParams,
-  getUserInfoParams,
+  GetUserInfoParams,
   RegisterParams,
   LoginParams,
   GetUserBindDidsParams,
   UserBindDidParams,
   FollowOperationParams,
   GetFollowerListParams,
-  getUserPublicProfileParams,
+  GetUserPublicProfileParams,
   GetPublicFollowerListParams,
   PublishNotificationToFollowersParams,
   GetTargetUserPermissionsParams,
@@ -63,25 +63,25 @@ export const getRoomListRequest = async (payload: CommonGetListPatams) => {
   });
 };
 
-export const getGroupMemberListRequest = async (payload: getGroupMemberListParams) => {
+export const getGroupMemberListRequest = async (payload: GetGroupMemberListParams) => {
   return await request.get('/api/group_members/', {
     params: payload,
   });
 };
 
-export const inviteGroupMemberRequest = async (payload: inviteGroupMemberParams) => {
+export const inviteGroupMemberRequest = async (payload: InviteGroupMemberParams) => {
   return await request.post('/api/group_invitation/', payload);
 };
 
-export const joinGroupRequest = async (payload: joinGroupParams) => {
+export const joinGroupRequest = async (payload: JoinGroupParams) => {
   return await request.post('/api/user_join_group/', payload);
 };
 
-export const updateGroupPermissionsRequest = async (payload: updateGroupPermissionsParams) => {
+export const updateGroupPermissionsRequest = async (payload: UpdateGroupPermissionsParams) => {
   return await request.post('/api/update_group_permissions/', payload);
 };
 
-export const getGroupPermissionsRequest = async (payload: getGroupPermissionsParams) => {
+export const getGroupPermissionsRequest = async (payload: GetGroupPermissionsParams) => {
   return await request.get('/api/get_group_permissions/', {
     params: payload,
   });
@@ -91,24 +91,24 @@ export const getGroupPermissionsRequest = async (payload: getGroupPermissionsPar
  * @API Message
  */
 
-export const getMessageListRequest = async (payload: getMessageListParams) => {
+export const getMessageListRequest = async (payload: GetMessageListParams) => {
   return await request.get('/api/messages/history/', {
     params: payload,
   });
 };
 
-export const changeMessageStatusRequest = async (payload: changeMessageStatusParams) => {
+export const changeMessageStatusRequest = async (payload: ChangeMessageStatusParams) => {
   return await request.post('/api/messages/status/', payload);
 };
 
-export const syncNewMessagesRequest = async (payload: syncNewMessagesParams) => {
+export const syncNewMessagesRequest = async (payload: SyncNewMessagesParams) => {
   return await request.post('/api/get_new_messages/', payload);
 };
 
 /**
  * @API User
  */
-export const searchUsersRequest = async (payload: searchParams) => {
+export const searchUsersRequest = async (payload: SearchParams) => {
   return await request.get('/api/users/search/', {
     params: payload,
   });
@@ -121,12 +121,12 @@ export const getMyProfileRequest = async (payload: BaseParams) => {
 };
 
 export const updateMyProfileRequest = async (
-  payload: profileParams,
+  payload: ProfileParams,
 ): Promise<UpdateMyProfileResponse> => {
   return await request.post('/api/my_profile/', payload);
 };
 
-export const getUserInfoRequest = async (payload: getUserInfoParams) => {
+export const getUserInfoRequest = async (payload: GetUserInfoParams) => {
   return await request.post('/api/get_user_info/', payload);
 };
 
@@ -166,7 +166,7 @@ export const getFollowingListRequest = async (payload: GetFollowerListParams) =>
   });
 };
 
-export const getUserPublicProfileRequest = async (payload: getUserPublicProfileParams) => {
+export const getUserPublicProfileRequest = async (payload: GetUserPublicProfileParams) => {
   return await request.get('/api/get_user_public_profile/', {
     params: payload,
   });
@@ -207,7 +207,7 @@ export const updateUserPermissionsRequest = async (payload: UpdateUserPermission
 /**
  * @API Contact
  */
-export const searchContactRequest = async (payload: searchParams) => {
+export const searchContactRequest = async (payload: SearchParams) => {
   return await request.get('/api/contacts/search/', {
     params: payload,
   });
@@ -219,7 +219,7 @@ export const getContactListRequest = async (payload: CommonGetListPatams) => {
   });
 };
 
-export const sendFriendRequest = async (payload: sendFriendParams) => {
+export const sendFriendRequest = async (payload: SendFriendParams) => {
   return await request.post('/api/contacts/add_friends/', payload);
 };
 
@@ -235,7 +235,7 @@ export const getRreceiveFriendListRequests = async (payload: CommonGetListPatams
   });
 };
 
-export const operationFriendRequest = async (payload: operationFriendParams) => {
+export const operationFriendRequest = async (payload: OperationFriendParams) => {
   return await request.post('/api/contacts/friend_requests/', payload);
 };
 

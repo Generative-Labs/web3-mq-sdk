@@ -15,7 +15,7 @@ import {
   ActiveChannelType,
   ClientKeyPaires,
   CreateRoomParams,
-  updateGroupPermissionsParams,
+  UpdateGroupPermissionsParams,
   Web3MQDBValue,
 } from '../types';
 import { Web3MQMessageStatusResp, Web3MQRequestMessage } from '../pb';
@@ -302,7 +302,7 @@ export class Channel {
   }
 
   async updateGroupPermissions(
-    params: Pick<updateGroupPermissionsParams, 'groupid' | 'permissions'>,
+    params: Pick<UpdateGroupPermissionsParams, 'groupid' | 'permissions'>,
   ) {
     const { groupid } = params;
     const { userid, PrivateKey } = this._keys;

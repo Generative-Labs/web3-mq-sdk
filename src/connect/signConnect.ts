@@ -23,7 +23,7 @@ import {
   Base64StringToUint8,
 } from '../encryption';
 import {
-  getUserInfoParams,
+  GetUserInfoParams,
   SignConnectOptions,
   SendTempConnectOptions,
   SignClientCallBackType,
@@ -65,7 +65,7 @@ export class SignConnect {
     this.init();
   }
 
-  private getWalletUserInfo = async (params: Omit<getUserInfoParams, 'timestamp'>) => {
+  private getWalletUserInfo = async (params: Omit<GetUserInfoParams, 'timestamp'>) => {
     const { did_type, did_value } = params;
     const timestamp = Date.now();
     try {
@@ -167,7 +167,7 @@ export class SignConnect {
     return this.ws.send(arr);
   }
 
-  sendDappBridge = async (options: Omit<getUserInfoParams, 'timestamp'>) => {
+  sendDappBridge = async (options: Omit<GetUserInfoParams, 'timestamp'>) => {
     const { did_type, did_value } = options;
     const { dAppID } = this._options;
     this.tempCode = GenerateRandomSixCode();
