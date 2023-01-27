@@ -26,22 +26,26 @@ import {
 import {
   EthAccountType,
   GetMainKeypairParams,
-  getUserInfoParams,
+  getUserInfoParams, LoginByKeysParams,
   LoginParams,
+  RegisterBySignParams,
   RegisterMetaMaskParams,
   RegisterParams,
-  SignMetaMaskParams,
   WalletNameMap,
   WalletSignRes,
   WalletType,
 } from '../types';
 
-export * from './qrCode';
 export class Register {
   appKey: string;
+  pubicKeyType= 'ed25519';
+  registerTime: number;
+  registerSignContent: string;
 
   constructor(appKey?: string) {
     this.appKey = appKey || '';
+    this.registerTime = 0;
+    this.registerSignContent = '';
   }
 
   getUserInfo = async (
@@ -73,126 +77,60 @@ export class Register {
     options: GetMainKeypairParams,
   ): Promise<{ publicKey: string; secretKey: string }> => {
     const { password, did_value, did_type } = options;
-    const keyIndex = 1;
-    const keyMSG = `${did_type}:${did_value}${keyIndex}${password}`;
-
-    const magicString = Uint8ToBase64String(
-      new TextEncoder().encode(sha3_224(`$web3mq${keyMSG}web3mq$`)),
-    );
-
-    const signContent = `Signing this message will allow this app to decrypt messages in the Web3MQ protocol for the following address: ${did_value}. This won’t cost you anything.
-
-If your Web3MQ wallet-associated password and this signature is exposed to any malicious app, this would result in exposure of Web3MQ account access and encryption keys, and the attacker would be able to read your messages.
-
-In the event of such an incident, don’t panic. You can call Web3MQ’s key revoke API and service to revoke access to the exposed encryption key and generate a new one!
-
-Nonce: ${magicString}`;
-
+    const { signContent } = await this.getMainKeypairSignContent(options);
     const { sign: signature } = await this.sign(signContent, did_value, did_type);
-
-    const secretKey = sha256(signature);
-
-    if (secretKey.length !== 32) {
-      throw new Error('Secret key must have 32 bytes');
-    }
-
-    const publicKey = await ed.getPublicKey(secretKey);
-    const AesKey = await GetAESBase64Key(password);
-    const AesIv = AesKey.slice(0, 16);
-    const encrytData = await aesGCMEncrypt(
-      AesKey,
-      AesIv,
-      new TextEncoder().encode(ByteArrayToHexString(secretKey)),
-    );
-    const encrytDataStr = Uint8ToBase64String(new Uint8Array(encrytData));
-
-    return {
-      publicKey: ByteArrayToHexString(publicKey),
-      secretKey: encrytDataStr,
-    };
+    return await this.getMainKeypairBySignature(signature, password);
   };
 
-  register = async (options: RegisterMetaMaskParams) => {
+  register = async (options: RegisterBySignParams) => {
     const {
-      password,
       userid,
-      did_value,
-      signContentURI = window.location.origin,
-      did_type = 'eth',
+      didValue,
+      mainPublicKey,
+      signature,
+      did_pubkey = '',
+      didType = 'eth',
       nickname = '',
       avatar_url = '',
       avatar_base64 = '',
     } = options;
-
-    const mainKeyPairStr = await this.getMainKeypair({ password, did_value, did_type });
-
-    const { publicKey: pubkey_value, secretKey } = mainKeyPairStr;
-
-    const wallet_type_name = WalletNameMap[did_type];
-    const pubkey_type = 'ed25519';
-    const timestamp = Date.now();
-    const NonceContent = sha3_224(
-      userid + pubkey_type + pubkey_value + did_type + did_value + timestamp,
-    );
-
-    const signContent = `Web3MQ wants you to sign in with your ${wallet_type_name} account:
-${did_value}
-For Web3MQ register
-URI: ${signContentURI}
-Version: 1
-
-Nonce: ${NonceContent}
-Issued At: ${getCurrentDate()}`;
-    const { sign: signature, publicKey: did_pubkey = '' } = await this.sign(
-      signContent,
-      did_value,
-      did_type,
-    );
+    if (!this.registerTime || !this.registerSignContent) {
+      throw new Error('Please create register sign content first!');
+    }
 
     const payload: RegisterParams = {
       userid,
-      did_type,
-      did_value,
+      did_type: didType,
+      did_value: didValue,
       did_pubkey,
       did_signature: signature,
-      signature_content: signContent,
-      pubkey_type,
-      pubkey_value,
+      signature_content: this.registerSignContent,
+      pubkey_type: this.pubicKeyType,
+      pubkey_value: mainPublicKey,
       nickname,
       avatar_url,
       avatar_base64,
-      timestamp: timestamp,
+      timestamp: this.registerTime,
       testnet_access_key: this.appKey,
     };
 
     try {
-      const data = await userRegisterRequest(payload);
-      return { mainPrivateKey: secretKey, mainPublicKey: pubkey_value, ...data };
+      return await userRegisterRequest(payload);
     } catch (error: any) {
       throw new Error(error.message);
     }
   };
 
-  login = async (options: SignMetaMaskParams) => {
+  login = async (options: LoginByKeysParams) => {
     const {
       password,
       userid,
-      did_value,
-      did_type = 'eth',
-      mainPrivateKey = '',
-      mainPublicKey = '',
+      didValue,
+      didType = 'eth',
+      mainPrivateKey,
+      mainPublicKey,
       pubkeyExpiredTimestamp = Date.now() + 86400 * 1000,
     } = options;
-
-    let secretKey = mainPrivateKey;
-    let publicKey = mainPublicKey;
-
-    if (!mainPrivateKey || !mainPublicKey) {
-      const mainKeyPair = await this.getMainKeypair({ password, did_type, did_value });
-      secretKey = mainKeyPair.secretKey;
-      publicKey = mainKeyPair.publicKey;
-    }
-
     const timestamp = Date.now();
 
     const { PublicKey, PrivateKey } = await GenerateEd25519KeyPair();
@@ -201,18 +139,18 @@ Issued At: ${getCurrentDate()}`;
 
     const AesKey = await GetAESBase64Key(password);
     const AesIv = AesKey.slice(0, 16);
-    const decode_data = await aesGCMDecrypt(AesKey, AesIv, Base64StringToUint8(secretKey));
+    const decode_data = await aesGCMDecrypt(AesKey, AesIv, Base64StringToUint8(mainPrivateKey));
     const decode_dataStr = new TextDecoder().decode(new Uint8Array(decode_data));
 
     const login_signature = await getDataSignature(decode_dataStr, signContent);
 
     const payload: LoginParams = {
       userid,
-      did_type,
-      did_value,
+      did_type: didType,
+      did_value: didValue,
       login_signature,
       signature_content: signContent,
-      main_pubkey: publicKey,
+      main_pubkey: mainPublicKey,
       pubkey_value: PublicKey,
       pubkey_type: 'ed25519',
       timestamp,
@@ -224,12 +162,12 @@ Issued At: ${getCurrentDate()}`;
       // @ts-ignore
       request.defaults.headers['web3mq-request-pubkey'] = PublicKey;
       // @ts-ignore
-      request.defaults.headers['didkey'] = `${did_type}:${did_value}`;
+      request.defaults.headers['didkey'] = `${didType}:${didValue}`;
       return {
-        TempPrivateKey: PrivateKey,
-        TempPublicKey: PublicKey,
-        mainPrivateKey: secretKey,
-        mainPublicKey: publicKey,
+        tempPrivateKey: PrivateKey,
+        tempPublicKey: PublicKey,
+        mainPrivateKey,
+        mainPublicKey,
         pubkeyExpiredTimestamp,
       };
     } catch (error: any) {
@@ -314,5 +252,86 @@ Issued At: ${getCurrentDate()}`;
       default:
         return await getEthAccount();
     }
+  };
+
+  getMainKeypairSignContent = async (
+    options: GetMainKeypairParams,
+  ): Promise<Record<string, string>> => {
+    const { password, did_value, did_type } = options;
+    const keyIndex = 1;
+    const keyMSG = `${did_type}:${did_value}${keyIndex}${password}`;
+
+    const magicString = Uint8ToBase64String(
+      new TextEncoder().encode(sha3_224(`$web3mq${keyMSG}web3mq$`)),
+    );
+
+    const signContent = `Signing this message will allow this app to decrypt messages in the Web3MQ protocol for the following address: ${did_value}. This won’t cost you anything.
+
+If your Web3MQ wallet-associated password and this signature is exposed to any malicious app, this would result in exposure of Web3MQ account access and encryption keys, and the attacker would be able to read your messages.
+
+In the event of such an incident, don’t panic. You can call Web3MQ’s key revoke API and service to revoke access to the exposed encryption key and generate a new one!
+
+Nonce: ${magicString}`;
+
+    return { signContent };
+  };
+
+  getMainKeypairBySignature = async (signature: string, password: string) => {
+    const secretKey = sha256(signature);
+
+    if (secretKey.length !== 32) {
+      throw new Error('Secret key must have 32 bytes');
+    }
+
+    const publicKey = await ed.getPublicKey(secretKey);
+    const AesKey = await GetAESBase64Key(password);
+    const AesIv = AesKey.slice(0, 16);
+    const encrytData = await aesGCMEncrypt(
+      AesKey,
+      AesIv,
+      new TextEncoder().encode(ByteArrayToHexString(secretKey)),
+    );
+    const encrytDataStr = Uint8ToBase64String(new Uint8Array(encrytData));
+
+    return {
+      publicKey: ByteArrayToHexString(publicKey),
+      secretKey: encrytDataStr,
+    };
+  };
+
+  getRegisterSignContent = async (options: {
+    userid: string;
+    mainPublicKey: string;
+    didType: WalletType;
+    didValue: string;
+    signContentURI?: string;
+  }): Promise<Record<string, string>> => {
+    const {
+      mainPublicKey,
+      didType,
+      didValue,
+      userid,
+      signContentURI = window.location.origin,
+    } = options;
+
+    const wallet_type_name = WalletNameMap[didType];
+    const pubkey_type = this.pubicKeyType;
+    const timestamp = Date.now();
+    const NonceContent = sha3_224(
+      userid + pubkey_type + mainPublicKey + didType + didValue + timestamp,
+    );
+
+    const signContent = `Web3MQ wants you to sign in with your ${wallet_type_name} account:
+${didValue}
+For Web3MQ register
+URI: ${signContentURI}
+Version: 1
+
+Nonce: ${NonceContent}
+Issued At: ${getCurrentDate()}`;
+
+    this.registerSignContent = signContent;
+    this.registerTime = timestamp;
+    return { signContent };
   };
 }

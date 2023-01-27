@@ -16,7 +16,7 @@ export type Web3MQDBValuePayload = {
   [key: string]: any;
 };
 
-export type SignatureParams = { signContent: string; didValue: string; signType: string };
+export type DappConnectSignParams = { signContent: string; didValue: string; signType: string };
 
 export type Web3MQDBValue = {
   messageId: string;
@@ -41,6 +41,29 @@ export type EthAccountType = {
   shortAddress: string;
 };
 
+export type RegisterBySignParams = {
+  userid: string;
+  didValue: string;
+  mainPublicKey: string,
+  signature: string
+  did_pubkey?: string
+  didType?: WalletType;
+  signContentURI?: string;
+  nickname?: string;
+  avatar_url?: string;
+  avatar_base64?: string;
+};
+
+export type LoginByKeysParams = {
+  mainPrivateKey: string
+  mainPublicKey: string
+  didType: WalletType
+  didValue: string
+  userid: string
+  password: string
+  pubkeyExpiredTimestamp?: number
+}
+
 export type RegisterMetaMaskParams = {
   password: string;
   userid: string;
@@ -52,7 +75,17 @@ export type RegisterMetaMaskParams = {
   avatar_base64?: string;
 };
 
+
 export type SignMetaMaskParams = {
+  password: string;
+  userid: string;
+  did_value: string;
+  did_type?: WalletType;
+  mainPrivateKey?: string;
+  mainPublicKey?: string;
+  pubkeyExpiredTimestamp?: number;
+};
+export type NewLoginParams = {
   password: string;
   userid: string;
   did_value: string;
@@ -71,7 +104,7 @@ export type initOptions = {
 };
 
 export type SignClientCallBackType = {
-  type: 'createQrcode' | 'connect' | 'messageStatus' | 'keys';
+  type: 'createQrcode' | 'connect' | 'messageStatus' | 'keys' | 'dapp-connect';
   data: any;
 };
 
@@ -145,6 +178,12 @@ export type RegisterParams = {
   testnet_access_key?: string;
   did_pubkey?: string;
 };
+
+export type RegisterApiResponse = {
+  did_type: string,
+  did_value: string,
+  userid: string
+}
 
 export type QrCodeRegisterParams = {
   userid: string;

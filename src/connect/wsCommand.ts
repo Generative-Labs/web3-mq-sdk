@@ -184,7 +184,6 @@ export const sendWeb3mqSignatureCommand = async (options: any) => {
     extraData: {},
   };
 
-  console.log(reqCmd);
 
   const bytes = Web3MQRequestMessage.toBinary(reqCmd);
   const concatArray = GetContactBytes(PbTypeMessage, bytes);

@@ -149,7 +149,6 @@ export class SignConnect {
           this.AesIv,
           Base64StringToUint8(content),
         );
-        console.log(JSON.parse(new TextDecoder().decode(new Uint8Array(decode_data))));
         if (this.walletUserInfo) {
           const keys = JSON.parse(new TextDecoder().decode(new Uint8Array(decode_data)));
           this.callback({ type: 'keys', data: { ...keys, userid: this.walletUserInfo.userid } });

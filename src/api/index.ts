@@ -34,7 +34,7 @@ import {
   GetPublicFollowerListParams,
   PublishNotificationToFollowersParams,
   GetTargetUserPermissionsParams,
-  UpdateUserPermissionsParams,
+  UpdateUserPermissionsParams, RegisterApiResponse,
 } from '../types';
 
 /**
@@ -130,7 +130,7 @@ export const getUserInfoRequest = async (payload: getUserInfoParams) => {
   return await request.post('/api/get_user_info/', payload);
 };
 
-export const userRegisterRequest = async (payload: RegisterParams) => {
+export const userRegisterRequest = async (payload: RegisterParams): Promise<RegisterApiResponse> => {
   return await request.post('/api/user_register_v2/', payload);
 };
 

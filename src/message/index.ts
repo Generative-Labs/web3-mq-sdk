@@ -107,7 +107,6 @@ export class Message {
   receive = async (pbType: number, bytes: Uint8Array) => {
     if (pbType === PbTypeMessage) {
       const resp = Web3MQRequestMessage.fromBinary(bytes);
-      console.log('msg:', resp);
       if (resp.messageType === 'dapp_bridge') {
         return;
       }
@@ -128,7 +127,6 @@ export class Message {
     }
     if (pbType === PbTypeMessageStatusResp) {
       const resp = Web3MQMessageStatusResp.fromBinary(bytes);
-      console.log('msgStatus:', resp);
       saveMessageUpdateDate();
       const msg = renderMessage(pbType, resp, this._client);
       this._client.channel.handleUnread(resp, msg);

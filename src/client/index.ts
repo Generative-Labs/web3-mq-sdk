@@ -1,6 +1,6 @@
-import { Register, QrCodeSign } from '../register';
+import { Register } from '../register';
 import { Channel } from '../channel';
-import { Connect, SignConnect, QrCode } from '../connect';
+import {Connect, SignConnect, DappConnect} from '../connect';
 import { Message } from '../message';
 import { User } from '../user';
 import { Contact } from '../contact';
@@ -26,8 +26,7 @@ export class Client {
   static wsUrl: string;
   static register: Register;
   static signClient: SignConnect;
-  static qrCodeClient: QrCode;
-  static qrCodeSign: QrCodeSign;
+  static dappConnectClient: DappConnect;
   keys: ClientKeyPaires;
   channel: Channel;
   listeners: event;
@@ -62,7 +61,6 @@ export class Client {
     Client.wsUrl = selectUrl(fastUrl, 'ws');
     new Request(selectUrl(fastUrl), tempPubkey, didKey);
     Client.register = new Register(app_key);
-    Client.qrCodeSign = new QrCodeSign(app_key);
     return fastUrl;
   };
 
@@ -87,7 +85,7 @@ export class Client {
     Client.signClient = new SignConnect({ wsUrl: Client.wsUrl, ...options }, callback);
   };
 
-  public static getQrCodeClient = (
+  public static initDappConnectClient = (
     options: Omit<Web3MQBridgeOptions, 'wsUrl'>,
     // eslint-disable-next-line no-unused-vars
     callback: (params: SignClientCallBackType) => void,
@@ -95,7 +93,7 @@ export class Client {
     if (!options) {
       throw new Error('The options is required!');
     }
-    Client.qrCodeClient = new QrCode({ wsUrl: Client.wsUrl, ...options }, callback);
+    Client.dappConnectClient = new DappConnect({ wsUrl: Client.wsUrl, ...options }, callback);
   };
 
   on = (eventName: EventTypes, callback: any) => this.listeners.on(eventName, callback);
