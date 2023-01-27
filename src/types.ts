@@ -189,6 +189,13 @@ export type NewBaseParams = {
   web3mq_user_signature: string;
   timestamp: number;
 };
+export type WalletBaseParams = {
+  userid: string;
+  did_pubkey?: string
+  did_signature: string;
+  sign_content: string;
+  timestamp: number;
+};
 
 export type GroupPermissions = {
   [key: string]: {
@@ -298,9 +305,11 @@ export interface UserBindDidParams extends BaseParams {
   did_content?: string;
 }
 
-export interface FollowOperationParams extends NewBaseParams {
+export interface FollowOperationParams extends WalletBaseParams {
+  address: string
   target_userid: string;
   action: 'follow' | 'cancel';
+  did_type: WalletType
 }
 
 export interface GetFollowerListParams extends NewBaseParams, PageParams {}
@@ -409,5 +418,5 @@ export const WalletNameMap = {
 export const SendMsgLoadingMap = {
   success: 'success',
   error: 'error',
-  loading: 'laoding',
+  loading: 'loading',
 };

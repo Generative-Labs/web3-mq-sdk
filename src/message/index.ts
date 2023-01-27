@@ -7,6 +7,7 @@ import {
   transformAddress,
   saveMessageUpdateDate,
   getGroupId,
+  updateMessageLoadStatus,
 } from '../utils';
 import { getMessageListRequest, changeMessageStatusRequest } from '../api';
 import { PbTypeMessage, PbTypeMessageStatusResp, PbTypeMessageChangeStatus } from '../core/pbType';
@@ -87,15 +88,17 @@ export class Message {
 
       const tempMessageData = {
         messageId: msgid,
-        timestamp: BigInt(Date.now()),
+        timestamp: BigInt(Math.round(Date.now() / 1000)),
       };
 
       const tempMessage = renderMessage(PbTypeMessageStatusResp, tempMessageData, this._client);
       if (this.messageList) {
         this.messageList = [...this.messageList, { ...tempMessage }];
       }
-      // 需要改一下类型
-      // this._client.emit('message.delivered', { type: 'message.delivered', data: '' });
+
+      if (this._client.listeners.events['message.send']) {
+        this._client.emit('message.send', { type: 'message.send' });
+      }
 
       connect.send(concatArray);
     }
@@ -129,11 +132,9 @@ export class Message {
       saveMessageUpdateDate();
       const msg = renderMessage(pbType, resp, this._client);
       this._client.channel.handleUnread(resp, msg);
-      // 1,遍历找到messageid 对应的
-      // 2. msg.msgLoading = SendMsgLoadingEnum['success'];
-      // 3. emit
       if (this.messageList) {
-        this.messageList = [...this.messageList, { ...msg }];
+        const msgList = updateMessageLoadStatus(this.messageList, msg);
+        this.messageList = [...msgList];
       }
       this._client.emit('message.delivered', { type: 'message.delivered', data: resp });
     }
