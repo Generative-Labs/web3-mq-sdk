@@ -8,14 +8,26 @@ export const EVENT_MAP = {
   'channel.updated': true,
   // 改变contact
   'contact.activeChange': true,
-  // 获取contactlist
+  // 获取contact模块所有list
   'contact.getList': true,
+  // 获取contactlist
+  'contact.getContactList': true,
+  // 获取followerList
+  'contact.getFollowerList': true,
+  // 获取followingList
+  'contact.getFollowingList': true,
   // 我发送的好友申请列表
   'contact.friendList': true,
   // 收到的好友申请列表
   'contact.reviceList': true,
-  //更新contactlist
+  //更新contact模块所有list
   'contact.updateList': true,
+  //更新contactlist
+  'contact.updateContactList': true,
+  //更新followerList
+  'contact.updateFollowerList': true,
+  //更新followingList
+  'contact.updateFollowingList': true,
   // connect状态改变
   'connect.changeReadyStatus': true,
   // 消息发送

@@ -211,7 +211,8 @@ export interface CreateRoomParams extends BaseParams {
   permissions?: GroupPermissions;
 }
 
-export interface CommonGetListPatams extends BaseParams, PageParams {}
+export interface CommonGetListParams extends BaseParams, PageParams {}
+export interface NewCommonGetListParams extends NewBaseParams, PageParams {}
 
 export type ActiveChannelType = {
   avatar_base64: string;
@@ -350,8 +351,16 @@ export interface OperationFriendParams extends BaseParams {
   action: ActionType;
 }
 
+export type FollowStatus = 'following' | 'follower' | 'follow_each';
+
 export type ContactListItemType = {
+  avatar_url: string;
+  follow_status: FollowStatus;
+  nickname: string;
+  permissions: UserPermissionsType;
   userid: string;
+  wallet_address: string;
+  wallet_type: WalletType;
 };
 
 export type SearchUsersResponse = {
