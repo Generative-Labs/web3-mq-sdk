@@ -26,7 +26,7 @@ import {
 import {
   EthAccountType,
   GetMainKeypairParams,
-  getUserInfoParams, LoginByKeysParams,
+  GetUserInfoParams, LoginByKeysParams,
   LoginParams,
   RegisterBySignParams,
   RegisterMetaMaskParams,
@@ -49,7 +49,7 @@ export class Register {
   }
 
   getUserInfo = async (
-    options: Omit<getUserInfoParams, 'timestamp'>,
+    options: Omit<GetUserInfoParams, 'timestamp'>,
   ): Promise<{ userid: string; userExist: boolean }> => {
     let userid: string = '';
     let userExist: boolean = false;

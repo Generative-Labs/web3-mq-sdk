@@ -95,7 +95,7 @@ export type NewLoginParams = {
   pubkeyExpiredTimestamp?: number;
 };
 
-export type initOptions = {
+export type InitOptions = {
   connectUrl?: string | null;
   app_key?: string;
   env?: EnvTypes;
@@ -136,7 +136,7 @@ export type SendWeb3MQBridgeOptions = {
   dAppSignature?: string;
 };
 
-export type getUserInfoParams = {
+export type GetUserInfoParams = {
   did_type: string;
   did_value: string;
   timestamp: number;
@@ -250,7 +250,8 @@ export interface CreateRoomParams extends BaseParams {
   permissions?: GroupPermissions;
 }
 
-export interface CommonGetListPatams extends BaseParams, PageParams {}
+export interface CommonGetListParams extends BaseParams, PageParams {}
+export interface NewCommonGetListParams extends NewBaseParams, PageParams {}
 
 export type ActiveChannelType = {
   avatar_base64: string;
@@ -265,40 +266,40 @@ export type ActiveChannelType = {
   // topic_type: string;
 };
 
-export interface getMessageListParams extends BaseParams, PageParams {
+export interface GetMessageListParams extends BaseParams, PageParams {
   topic: string;
 }
 
-export interface getGroupMemberListParams extends BaseParams, PageParams {
+export interface GetGroupMemberListParams extends BaseParams, PageParams {
   groupid: string;
 }
 
-export interface inviteGroupMemberParams extends BaseParams {
+export interface InviteGroupMemberParams extends BaseParams {
   groupid: string;
   members: string[];
 }
 
-export interface joinGroupParams extends NewBaseParams {
+export interface JoinGroupParams extends NewBaseParams {
   groupid: string;
 }
 
-export interface updateGroupPermissionsParams extends NewBaseParams {
+export interface UpdateGroupPermissionsParams extends NewBaseParams {
   groupid: string;
   permissions: GroupPermissions;
 }
-export interface getGroupPermissionsParams extends NewBaseParams {
+export interface GetGroupPermissionsParams extends NewBaseParams {
   groupid: string;
 }
 
 export type MessageStatus = 'delivered' | 'read';
 
-export interface changeMessageStatusParams extends BaseParams {
+export interface ChangeMessageStatusParams extends BaseParams {
   topic: string;
   messages: string[];
   status: MessageStatus;
 }
 
-export interface syncNewMessagesParams {
+export interface SyncNewMessagesParams {
   sync_timestamp: number;
   timestamp: number;
   userid: string;
@@ -321,16 +322,16 @@ export type MessageListItem = {
   version: number;
 };
 
-export interface searchParams extends BaseParams {
+export interface SearchParams extends BaseParams {
   keyword: string;
 }
 
-export interface profileParams extends BaseParams {
+export interface ProfileParams extends BaseParams {
   nickname: string;
   avatar_url: string;
 }
 
-export interface sendFriendParams extends BaseParams {
+export interface SendFriendParams extends BaseParams {
   content: string;
   target_userid: string;
 }
@@ -343,6 +344,9 @@ export interface UserBindDidParams extends BaseParams {
   did_action?: string;
   did_content?: string;
 }
+export type UserBindDidIdsResponse = Pick<UserBindDidParams, 'did_type' | 'did_value' | 'provider_id'> & {
+  metadata: any;
+}
 
 export interface FollowOperationParams extends WalletBaseParams {
   address: string
@@ -353,7 +357,7 @@ export interface FollowOperationParams extends WalletBaseParams {
 
 export interface GetFollowerListParams extends NewBaseParams, PageParams {}
 
-export interface getUserPublicProfileParams {
+export interface GetUserPublicProfileParams {
   did_type: string;
   did_value: string;
   timestamp: number;
@@ -373,19 +377,29 @@ export interface PublishNotificationToFollowersParams extends NewBaseParams {
 export interface GetTargetUserPermissionsParams extends NewBaseParams {
   target_userid: string;
 }
+
+export type UserPermissionsType = Record<string, { type: string; value: boolean }>;
 export interface UpdateUserPermissionsParams extends NewBaseParams {
-  permissions: Record<string, { type: string; value: boolean }>;
+  permissions: UserPermissionsType;
 }
 
 export type ActionType = 'agree';
 
-export interface operationFriendParams extends BaseParams {
+export interface OperationFriendParams extends BaseParams {
   target_userid: string;
   action: ActionType;
 }
 
+export type FollowStatus = 'following' | 'follower' | 'follow_each';
+
 export type ContactListItemType = {
+  avatar_url: string;
+  follow_status: FollowStatus;
+  nickname: string;
+  permissions: UserPermissionsType;
   userid: string;
+  wallet_address: string;
+  wallet_type: WalletType;
 };
 
 export type SearchUsersResponse = {

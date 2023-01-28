@@ -1,19 +1,34 @@
+import { sha3_224 } from 'js-sha3';
 import { Client } from '../client';
-import { ActionType, ClientKeyPaires, PageParams, ContactListItemType } from '../types';
-import { getDataSignature } from '../utils';
+import { 
+  ActionType,
+  ClientKeyPaires,
+  ContactListItemType,
+  FollowOperationParams,
+  PageParams, 
+  PublishNotificationToFollowersParams,
+  ServiceResponse
+} from '../types';
+import { getDataSignature, newDateFormat } from '../utils';
 import {
-  searchContactRequest,
+  followOperationRequest,
   getContactListRequest,
-  sendFriendRequest,
+  getFollowerListRequest,
+  getFollowingListRequest,
   getMyFriendListRequset,
   getRreceiveFriendListRequests,
   operationFriendRequest,
+  publishNotificationToFollowersRequest,
+  searchContactRequest,
+  sendFriendRequest,
 } from '../api';
 
 export class Contact {
   private readonly _client: Client;
   private readonly _keys: ClientKeyPaires;
   contactList: ContactListItemType[] | null;
+  followerList: ContactListItemType[] | null;
+  followingList: ContactListItemType[] | null;
   myFriendRequestList: ContactListItemType[] | null;
   receiveFriendRequestList: ContactListItemType[] | null;
 
@@ -21,10 +36,15 @@ export class Contact {
     this._client = client;
     this._keys = client.keys;
     this.contactList = null;
+    this.followerList = null;
+    this.followingList = null;
     this.myFriendRequestList = null;
     this.receiveFriendRequestList = null;
   }
 
+  /**
+   * @deprecated
+   */
   async searchContact(walletAddress: string) {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
@@ -40,30 +60,75 @@ export class Contact {
     return data;
   }
 
-  async getContactList(option: PageParams) {
+  async getContactList(option: PageParams): Promise<ContactListItemType[]> {
     const { emit } = this._client;
 
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
-    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
 
     const { data } = await getContactListRequest({
-      web3mq_signature,
+      userid,
+      web3mq_user_signature,
+      timestamp,
+      ...option,
+    });
+    const newContacts = data.user_list.filter((item: ContactListItemType) => item.follow_status === 'follow_each');
+    if (this.contactList && option.page !== 1) {
+      this.contactList = [...this.contactList, ...newContacts];
+    } else {
+      this.contactList = newContacts;
+    }
+    emit('contact.getContactList', { type: 'contact.getContactList' });
+    return newContacts;
+  }
+
+  async getFollowerList(option: PageParams): Promise<ContactListItemType[]> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await getFollowerListRequest({
+      web3mq_user_signature,
       userid,
       timestamp,
       ...option,
     });
-
-    if (this.contactList && option.page !== 1) {
-      this.contactList = [...this.contactList, ...data.result];
+    if (this.followerList && option.page !== 1) {
+      this.followerList = [...this.followerList, ...data.user_list];
     } else {
-      this.contactList = data.result;
-    }
-    emit('contact.getList', { type: 'contact.getList' });
+      this.followerList = data.user_list;
+    };
+    if (this._client.listeners.events['contact.getFollowerList']) {
+      this._client.emit('contact.getFollowerList', { type: 'contact.getFollowerList' });
+    };
+    return data.user_list;
   }
 
-  async sendFriend(target_userid: string, content: string = '') {
+  async getFollowingList(option: PageParams): Promise<ContactListItemType[]> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await getFollowingListRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      ...option,
+    });
+    if (this.followingList && option.page !== 1) {
+      this.followingList = [...this.followingList, ...data.user_list];
+    } else {
+      this.followingList = data.user_list;
+    };
+    if (this._client.listeners.events['contact.getFollowingList']) {
+      this._client.emit('contact.getFollowingList', { type: 'contact.getFollowingList' });
+    };
+    return data.user_list;
+  }
+
+  async sendFriend(target_userid: string, content: string = ''): Promise<ServiceResponse> {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + target_userid + content + timestamp;
@@ -76,9 +141,59 @@ export class Contact {
       timestamp,
       target_userid,
     });
-    return data;
+    return data as any;
   }
 
+  async followOperation(
+    params: Pick<FollowOperationParams, 'address' | 'target_userid' | 'action' | 'did_type'>,
+  ): Promise<ServiceResponse> {
+    const { address, target_userid, action, did_type } = params;
+    const { userid, PublicKey } = this._keys;
+    const did_pubkey = did_type === 'starknet' ? PublicKey : undefined;
+    const timestamp = Date.now();
+    let nonce = sha3_224(userid + action + target_userid + timestamp);
+    const sign_content = `
+    Web3MQ wants you to sign in with your ${did_type} account:
+    ${address}
+    
+    For follow signature
+    
+    Nonce: ${nonce}
+    Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
+    const { sign: did_signature } = await Client.register.sign(sign_content, address, did_type);
+    const data = await followOperationRequest({
+      did_pubkey,
+      did_signature,
+      sign_content,
+      userid,
+      timestamp, 
+      ...params,
+    });
+    if (this._client.listeners.events['contact.updateList']) {
+      this._client.emit('contact.updateList', { type: 'contact.updateList' });
+    };
+    return data as any;
+  }
+
+  async publishNotificationToFollowers(
+    params: Pick<PublishNotificationToFollowersParams, 'title' | 'content'>,
+  ): Promise<ServiceResponse> {
+    const { title } = params;
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + title + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await publishNotificationToFollowersRequest({
+      web3mq_user_signature,
+      userid,
+      timestamp,
+      ...params,
+    });
+    return data as any;
+  }
+  /**
+  * @deprecated
+  */
   async getMyFriendRequestList(option: PageParams) {
     const { emit } = this._client;
     const { userid, PrivateKey } = this._keys;
@@ -96,7 +211,9 @@ export class Contact {
     emit('contact.friendList', { type: 'contact.friendList' });
     // return data;
   }
-
+  /**
+  * @deprecated
+  */
   async getReceiveFriendRequestList(option: PageParams) {
     const { emit } = this._client;
 
@@ -115,7 +232,9 @@ export class Contact {
     emit('contact.reviceList', { type: 'contact.reviceList' });
     // return data;
   }
-
+  /**
+  * @deprecated
+  */
   async operationFriend(target_userid: string, action: ActionType = 'agree') {
     const { userid, PrivateKey } = this._keys;
     const { emit } = this._client;
