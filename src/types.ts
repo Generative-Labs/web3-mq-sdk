@@ -211,7 +211,8 @@ export interface CreateRoomParams extends BaseParams {
   permissions?: GroupPermissions;
 }
 
-export interface CommonGetListPatams extends BaseParams, PageParams {}
+export interface CommonGetListParams extends BaseParams, PageParams {}
+export interface NewCommonGetListParams extends NewBaseParams, PageParams {}
 
 export type ActiveChannelType = {
   avatar_base64: string;
@@ -312,8 +313,6 @@ export interface FollowOperationParams extends WalletBaseParams {
   did_type: WalletType
 }
 
-export interface GetFollowerListParams extends NewBaseParams, PageParams {}
-
 export interface getUserPublicProfileParams {
   did_type: string;
   did_value: string;
@@ -334,19 +333,29 @@ export interface PublishNotificationToFollowersParams extends NewBaseParams {
 export interface GetTargetUserPermissionsParams extends NewBaseParams {
   target_userid: string;
 }
+
+export type UserPermissionsType = Record<string, { type: string; value: boolean }>;
 export interface UpdateUserPermissionsParams extends NewBaseParams {
-  permissions: Record<string, { type: string; value: boolean }>;
+  permissions: UserPermissionsType;
 }
 
 export type ActionType = 'agree';
 
-export interface operationFriendParams extends BaseParams {
+export interface OperationFriendParams extends BaseParams {
   target_userid: string;
   action: ActionType;
 }
 
+export type FollowStatus = 'following' | 'follower' | 'follow_each';
+
 export type ContactListItemType = {
+  avatar_url: string;
+  follow_status: FollowStatus;
+  nickname: string;
+  permissions: UserPermissionsType;
   userid: string;
+  wallet_address: string;
+  wallet_type: WalletType;
 };
 
 export type SearchUsersResponse = {
