@@ -2,8 +2,11 @@ import { Client } from '../client';
 import {
   ClientKeyPaires,
   SearchUsersResponse,
-  UpdateMyProfileResponse,
+  ServiceResponse,
   UserBindDidParams,
+  UserBindDidIdsResponse,
+  UserPermissionsType,
+  UpdateMyProfileResponse,
   UpdateUserPermissionsParams,
 } from '../types';
 import {
@@ -71,7 +74,7 @@ export class User {
     return data;
   }
 
-  async getUserBindDids(): Promise<any> {
+  async getUserBindDids(): Promise<UserBindDidIdsResponse> {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
@@ -82,17 +85,17 @@ export class User {
 
   async userBindDid(
     params: Omit<UserBindDidParams, 'userid' | 'web3mq_signature' | 'timestamp'>,
-  ): Promise<any> {
+  ): Promise<ServiceResponse> {
     const { did_type, did_value } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + did_type + did_value + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
     const data = await userBindDidRequest({ web3mq_signature, userid, timestamp, ...params });
-    return data;
+    return data as any;
   }
 
-  async getUserPermissions(): Promise<any> {
+  async getUserPermissions(): Promise<UserPermissionsType> {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
