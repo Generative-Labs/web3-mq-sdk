@@ -19,7 +19,7 @@ import {
   aesGCMEncrypt,
   Uint8ToBase64String,
   aesGCMDecrypt,
-  Base64StringToUint8,
+  Base64StringToUint8, fromHexString,
 } from '../encryption';
 import { sendWeb3mqSignatureCommand, sendWeb3mqBridgeCommand } from './wsCommand';
 import { GenerateEd25519KeyPair, GetContactBytes } from '../utils';
@@ -208,7 +208,7 @@ export class DappConnect {
       ),
       comeFrom: this.topicID,
       contentTopic: this.otherTopicID,
-      validatePubKey: this.tempKeys?.PublicKey,
+      validatePubKey: Uint8ToBase64String(fromHexString(this.tempKeys?.PublicKey)),
       PrivateKey: this.tempKeys?.PrivateKey,
     };
     const concatArray = await sendWeb3mqSignatureCommand(params);
