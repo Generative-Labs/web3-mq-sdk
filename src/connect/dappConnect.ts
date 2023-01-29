@@ -146,26 +146,21 @@ export class DappConnect {
   }
 
   private async onMessageCallback(PbType: number, bytes: Uint8Array) {
-    console.log(PbType, 'PbType');
     switch (PbType) {
       case PbTypeWeb3MQBridgeConnectResp:
         const resp = Web3MQBridgeConnectCommand.fromBinary(bytes);
-        console.log(resp, 'resp1');
         this.nodeId = resp.nodeID;
         this.callback({ type: 'connect', data: 'success' });
         break;
       case PbTypePongCommand:
-        const resp2 = WebsocketPingCommand.fromBinary(bytes);
-        console.log(resp2, 'resp2');
+        WebsocketPingCommand.fromBinary(bytes);
         break;
       case PbTypeMessageStatusResp:
-        const resp3 = Web3MQMessageStatusResp.fromBinary(bytes);
-        console.log(resp3, 'resp3');
+        Web3MQMessageStatusResp.fromBinary(bytes);
         this.callback({ type: 'messageStatus', data: 'success' });
         break;
       case PbTypeMessage:
         const msgRes = Web3MQRequestMessage.fromBinary(bytes);
-        console.log(msgRes, 'msgRes');
         this.otherTopicID = msgRes.comeFrom;
         const { content, publicKey } = JSON.parse(
           new TextDecoder().decode(msgRes.payload) || '{content:""}',
