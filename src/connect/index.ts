@@ -1,5 +1,5 @@
 export * from './signConnect';
-export * from './qrCode';
+export * from './dappConnect';
 
 import { Client } from '../client';
 import { GetContactBytes } from '../utils';

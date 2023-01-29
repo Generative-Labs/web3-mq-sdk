@@ -26,7 +26,7 @@ import {
   GetTopicListParams,
   GetUserInfoParams,
   RegisterParams,
-  LoginParams,
+  LoginApiParams,
   GetUserBindDidsParams,
   UserBindDidParams,
   FollowOperationParams,
@@ -34,7 +34,7 @@ import {
   GetPublicFollowerListParams,
   PublishNotificationToFollowersParams,
   GetTargetUserPermissionsParams,
-  UpdateUserPermissionsParams,
+  UpdateUserPermissionsParams, RegisterApiResponse,
 } from '../types';
 
 /**
@@ -130,7 +130,7 @@ export const getUserInfoRequest = async (payload: GetUserInfoParams) => {
   return await request.post('/api/get_user_info/', payload);
 };
 
-export const userRegisterRequest = async (payload: RegisterParams) => {
+export const userRegisterRequest = async (payload: RegisterParams): Promise<RegisterApiResponse> => {
   return await request.post('/api/user_register_v2/', payload);
 };
 
@@ -138,7 +138,7 @@ export const resetPasswordRequest = async (payload: RegisterParams) => {
   return await request.post('/api/user_reset_password_v2/', payload);
 };
 
-export const userLoginRequest = async (payload: LoginParams) => {
+export const userLoginRequest = async (payload: LoginApiParams) => {
   return await request.post('/api/user_login_v2/', payload);
 };
 

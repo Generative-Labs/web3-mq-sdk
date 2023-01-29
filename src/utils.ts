@@ -1,7 +1,6 @@
 import ed from '@noble/ed25519';
 import jssha256 from 'js-sha256';
 import axios from 'axios';
-import QRCode from 'qrcode';
 
 import type { Client } from './client';
 import { EnvTypes, SendMsgLoadingMap } from './types';
@@ -45,13 +44,13 @@ export const GenerateEd25519KeyPair = async () => {
   };
 };
 
-export const GenerateQrCode = async (text: string) => {
-  try {
-    return await QRCode.toDataURL(text);
-  } catch (err: any) {
-    throw new Error(err.message);
-  }
-};
+// export const GenerateQrCode = async (text: string) => {
+//   try {
+//     return await QRCode.toDataURL(text);
+//   } catch (err: any) {
+//     throw new Error(err.message);
+//   }
+// };
 
 export const sha256 = (data: string | Uint8Array): Uint8Array => {
   return new Uint8Array(jssha256.sha256.digest(data));
@@ -290,7 +289,11 @@ export const getMessageUpdateDate = () => {
   return Number(localStorage.getItem('MESSAGEUPDATEDATE'));
 };
 
-export const updateMessageLoadStatus = (msgList: Array<any>, msg: any, status = SendMsgLoadingMap['success']) => {
+export const updateMessageLoadStatus = (
+  msgList: Array<any>,
+  msg: any,
+  status = SendMsgLoadingMap['success'],
+) => {
   const message = msgList.find((item: any) => item.id === msg.id);
   if (message) {
     (message as any).msgLoading = status;

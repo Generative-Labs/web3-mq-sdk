@@ -1,9 +1,9 @@
 {
-  "name": "web3-mq",
-  "version": "1.2.60",
+  "name": "@web3mq/client",
+  "version": "1.0.2",
   "main": "dist/index.js",
   "repository": "git@github.com:Generative-Labs/web3-mq-sdk.git",
-  "author": "<fanxiangyu66@163.com>",
+  "author": "zhaowei",
   "files": [
     "dist",
     "readme.md"
@@ -39,7 +39,6 @@
     "@babel/preset-env": "^7.18.9",
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "@types/qrcode": "^1.5.0",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.12.0",
     "eslint": "^8.30.0",
@@ -60,7 +59,6 @@
     "idb": "^7.1.1",
     "js-sha256": "^0.9.0",
     "js-sha3": "^0.8.0",
-    "qrcode": "^1.5.1",
     "starknet": "^4.17.1"
   }
 }

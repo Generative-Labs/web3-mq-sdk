@@ -19,19 +19,19 @@ import {
   aesGCMEncrypt,
   Uint8ToBase64String,
   aesGCMDecrypt,
-  Base64StringToUint8,
+  Base64StringToUint8, fromHexString,
 } from '../encryption';
 import { sendWeb3mqSignatureCommand, sendWeb3mqBridgeCommand } from './wsCommand';
-import { GenerateEd25519KeyPair, GetContactBytes, GenerateQrCode } from '../utils';
+import { GenerateEd25519KeyPair, GetContactBytes } from '../utils';
 import {
   SignClientCallBackType,
   KeyPairsType,
   Web3MQBridgeOptions,
   SendWeb3MQBridgeOptions,
-  SignatureParams,
+  DappConnectSignParams,
 } from '../types';
 
-export class QrCode {
+export class DappConnect {
   private _options: Pick<SendWeb3MQBridgeOptions, 'dAppID'>;
   private timeout: number;
   private timeoutObj: null | NodeJS.Timeout;
@@ -39,6 +39,8 @@ export class QrCode {
   wsUrl: string;
   nodeId: string;
   topicID: string;
+  otherTopicID: string;
+
   publicKeyProps: string;
   tempKeys: Omit<KeyPairsType, 'userid'> | null;
   // eslint-disable-next-line no-unused-vars
@@ -54,6 +56,7 @@ export class QrCode {
     this.ws = null;
     this.nodeId = '';
     this.topicID = '';
+    this.otherTopicID = '';
     this.tempKeys = null;
     this.publicKeyProps = '';
     this.init();
@@ -73,7 +76,7 @@ export class QrCode {
     return { AesKey, AesIv };
   };
 
-  private handleGetEncryptData = async (options: SignatureParams) => {
+  private handleGetEncryptData = async (options: DappConnectSignParams) => {
     const { signContent, didValue, signType } = options;
     const { AesKey, AesIv } = await this.getAesKey(this.publicKeyProps);
     const encrytData = await aesGCMEncrypt(
@@ -100,17 +103,7 @@ export class QrCode {
     return encrytData;
   };
 
-  private handleCreateQrCode = async () => {
-    const text = `web3mq://?action=connect&topicId=${this.topicID}&ed25519Pubkey=${
-      this.tempKeys?.PublicKey
-    }&bridge=${encodeURIComponent(this.wsUrl)}&iconUrl=&website=${encodeURIComponent(
-      'https://www.baidu.com',
-    )}&redirect=`;
-    const qrCodeUrl = await GenerateQrCode(text);
-    this.callback({ type: 'createQrcode', data: { status: 'success', qrCodeUrl } });
-  };
-
-  init() {
+  private init() {
     if (!('WebSocket' in window)) {
       throw new Error('Browser not supported WebSocket');
     }
@@ -135,6 +128,12 @@ export class QrCode {
       const concatArray = await sendWeb3mqBridgeCommand(payload);
       wsconn.send(concatArray);
     };
+    wsconn.onerror = () => {
+      this.callback({ type: 'connect', data: 'error' });
+    };
+    wsconn.onclose = () => {
+      this.callback({ type: 'connect', data: 'close' });
+    };
 
     wsconn.onmessage = (event) => {
       this.reset();
@@ -146,13 +145,12 @@ export class QrCode {
     this.ws = wsconn;
   }
 
-  async onMessageCallback(PbType: number, bytes: Uint8Array) {
+  private async onMessageCallback(PbType: number, bytes: Uint8Array) {
     switch (PbType) {
       case PbTypeWeb3MQBridgeConnectResp:
         const resp = Web3MQBridgeConnectCommand.fromBinary(bytes);
         this.nodeId = resp.nodeID;
         this.callback({ type: 'connect', data: 'success' });
-        this.handleCreateQrCode();
         break;
       case PbTypePongCommand:
         WebsocketPingCommand.fromBinary(bytes);
@@ -163,6 +161,7 @@ export class QrCode {
         break;
       case PbTypeMessage:
         const msgRes = Web3MQRequestMessage.fromBinary(bytes);
+        this.otherTopicID = msgRes.comeFrom;
         const { content, publicKey } = JSON.parse(
           new TextDecoder().decode(msgRes.payload) || '{content:""}',
         );
@@ -170,21 +169,29 @@ export class QrCode {
         const { AesKey, AesIv } = await this.getAesKey(publicKey);
         const decode_data = await aesGCMDecrypt(AesKey, AesIv, Base64StringToUint8(content));
         const data = JSON.parse(new TextDecoder().decode(new Uint8Array(decode_data)));
-        this.callback({ type: 'keys', data });
+        this.callback({ type: 'dapp-connect', data });
         break;
       default:
         throw new Error('This type is not supported');
     }
   }
 
-  send(arr: Uint8Array) {
+  private send(arr: Uint8Array) {
     if (!this.ws) {
       throw new Error('websocket Initialization failed');
     }
     return this.ws.send(arr);
   }
 
-  sendSignatureCommand = async (options: SignatureParams) => {
+  getConnectLink = (): string => {
+    return `web3mq://?action=connect&topicId=${this.topicID}&ed25519Pubkey=${
+      this.tempKeys?.PublicKey
+    }&bridge=${encodeURIComponent(this.wsUrl)}&iconUrl=&website=${encodeURIComponent(
+      'https://www.baidu.com',
+    )}&redirect=`;
+  };
+
+  sendSign = async (options: DappConnectSignParams) => {
     const encrytData = await this.handleGetEncryptData(options);
     const params = {
       nodeId: this.nodeId,
@@ -195,8 +202,8 @@ export class QrCode {
         }),
       ),
       comeFrom: this.topicID,
-      contentTopic: this.topicID,
-      validatePubKey: this.tempKeys?.PublicKey,
+      contentTopic: this.otherTopicID,
+      validatePubKey: Uint8ToBase64String(fromHexString(this.tempKeys?.PublicKey)),
       PrivateKey: this.tempKeys?.PrivateKey,
     };
     const concatArray = await sendWeb3mqSignatureCommand(params);
