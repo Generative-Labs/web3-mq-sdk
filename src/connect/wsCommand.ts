@@ -163,7 +163,7 @@ export const sendWeb3mqSignatureCommand = async (options: any) => {
   const needStore = true;
   const msgid = await GenerateMessageID(contentTopic, contentTopic, timestamp, payload);
 
-  const signContent = msgid + contentTopic + contentTopic + nodeId + timestamp.toString();
+  const signContent = msgid + comeFrom + contentTopic + nodeId + timestamp.toString();
 
   const fromSign = await getDataSignature(PrivateKey, signContent);
 

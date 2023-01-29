@@ -44,9 +44,9 @@ export type EthAccountType = {
 export type RegisterBySignParams = {
   userid: string;
   didValue: string;
-  mainPublicKey: string,
-  signature: string
-  did_pubkey?: string
+  mainPublicKey: string;
+  signature: string;
+  did_pubkey?: string;
   didType?: WalletType;
   signContentURI?: string;
   nickname?: string;
@@ -55,14 +55,14 @@ export type RegisterBySignParams = {
 };
 
 export type LoginByKeysParams = {
-  mainPrivateKey: string
-  mainPublicKey: string
-  didType: WalletType
-  didValue: string
-  userid: string
-  password: string
-  pubkeyExpiredTimestamp?: number
-}
+  mainPrivateKey: string;
+  mainPublicKey: string;
+  didType: WalletType;
+  didValue: string;
+  userid: string;
+  password: string;
+  pubkeyExpiredTimestamp?: number;
+};
 
 export type RegisterMetaMaskParams = {
   password: string;
@@ -75,7 +75,6 @@ export type RegisterMetaMaskParams = {
   avatar_base64?: string;
 };
 
-
 export type SignMetaMaskParams = {
   password: string;
   userid: string;
@@ -85,7 +84,7 @@ export type SignMetaMaskParams = {
   mainPublicKey?: string;
   pubkeyExpiredTimestamp?: number;
 };
-export type NewLoginParams = {
+export type NewLoginApiParams = {
   password: string;
   userid: string;
   did_value: string;
@@ -142,6 +141,8 @@ export type GetUserInfoParams = {
   timestamp: number;
 };
 
+export type GetUserInfoResponse = { userid: string; userExist: boolean };
+
 export type GetMainKeypairParams = {
   password: string;
   did_type: WalletType;
@@ -151,6 +152,7 @@ export type GetMainKeypairParams = {
 export interface SignConnectOptions extends SendTempConnectOptions {
   wsUrl: string;
 }
+
 export interface Web3MQBridgeOptions {
   wsUrl: string;
   dAppID: string;
@@ -180,10 +182,18 @@ export type RegisterParams = {
 };
 
 export type RegisterApiResponse = {
-  did_type: string,
-  did_value: string,
-  userid: string
-}
+  did_type: string;
+  did_value: string;
+  userid: string;
+};
+
+export type LoginResponse = {
+  tempPrivateKey: string;
+  tempPublicKey: string;
+  mainPrivateKey: string;
+  mainPublicKey: string;
+  pubkeyExpiredTimestamp: number;
+};
 
 export type QrCodeRegisterParams = {
   userid: string;
@@ -194,7 +204,7 @@ export type QrCodeRegisterParams = {
   avatar_base64?: string;
 };
 
-export type LoginParams = {
+export type LoginApiParams = {
   userid: string;
   did_type: string;
   did_value: string;
@@ -207,7 +217,7 @@ export type LoginParams = {
   pubkey_expired_timestamp: number;
 };
 
-export type QrCodeLoginParams = {
+export type QrCodeLoginApiParams = {
   userid: string;
   did_type: string;
   did_value: string;
@@ -230,7 +240,7 @@ export type NewBaseParams = {
 };
 export type WalletBaseParams = {
   userid: string;
-  did_pubkey?: string
+  did_pubkey?: string;
   did_signature: string;
   sign_content: string;
   timestamp: number;
@@ -242,6 +252,7 @@ export type GroupPermissions = {
     value: 'ceator_invite_friends' | 'public' | 'nft_validation';
   };
 };
+
 export interface CreateRoomParams extends BaseParams {
   group_name?: string;
   groupid?: string;
@@ -251,6 +262,7 @@ export interface CreateRoomParams extends BaseParams {
 }
 
 export interface CommonGetListParams extends BaseParams, PageParams {}
+
 export interface NewCommonGetListParams extends NewBaseParams, PageParams {}
 
 export type ActiveChannelType = {
@@ -287,6 +299,7 @@ export interface UpdateGroupPermissionsParams extends NewBaseParams {
   groupid: string;
   permissions: GroupPermissions;
 }
+
 export interface GetGroupPermissionsParams extends NewBaseParams {
   groupid: string;
 }
@@ -337,6 +350,7 @@ export interface SendFriendParams extends BaseParams {
 }
 
 export interface GetUserBindDidsParams extends BaseParams {}
+
 export interface UserBindDidParams extends BaseParams {
   provider_id: string;
   did_type: string;
@@ -344,15 +358,19 @@ export interface UserBindDidParams extends BaseParams {
   did_action?: string;
   did_content?: string;
 }
-export type UserBindDidIdsResponse = Pick<UserBindDidParams, 'did_type' | 'did_value' | 'provider_id'> & {
+
+export type UserBindDidIdsResponse = Pick<
+  UserBindDidParams,
+  'did_type' | 'did_value' | 'provider_id'
+> & {
   metadata: any;
-}
+};
 
 export interface FollowOperationParams extends WalletBaseParams {
-  address: string
+  address: string;
   target_userid: string;
   action: 'follow' | 'cancel';
-  did_type: WalletType
+  did_type: WalletType;
 }
 
 export interface GetFollowerListParams extends NewBaseParams, PageParams {}
@@ -379,6 +397,7 @@ export interface GetTargetUserPermissionsParams extends NewBaseParams {
 }
 
 export type UserPermissionsType = Record<string, { type: string; value: boolean }>;
+
 export interface UpdateUserPermissionsParams extends NewBaseParams {
   permissions: UserPermissionsType;
 }
@@ -461,6 +480,39 @@ export type WalletSignRes = {
   sign: string;
   publicKey?: string;
 };
+
+export type GetSignContentResponse = {
+  signContent: string
+}
+
+export type GetRegisterSignContentParams = {
+  userid: string;
+  mainPublicKey: string;
+  didType: WalletType;
+  didValue: string;
+  signContentURI?: string;
+}
+
+export type MainKeypairType = {
+  publicKey: string
+  secretKey: string
+}
+
+export type ResetPasswordParams = {
+  password: string;
+  userid: string;
+  did_value: string;
+  did_type?: WalletType;
+  signContentURI?: string;
+  nickname?: string;
+  avatar_url?: string;
+  avatar_base64?: string;
+};
+
+export type ResetPasswordResponse = {
+  mainPrivateKey: string;
+  mainPublicKey: string
+}
 
 export const WalletNameMap = {
   eth: 'Ethereum',

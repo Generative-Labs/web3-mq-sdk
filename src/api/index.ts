@@ -26,7 +26,7 @@ import {
   GetTopicListParams,
   GetUserInfoParams,
   RegisterParams,
-  LoginParams,
+  LoginApiParams,
   GetUserBindDidsParams,
   UserBindDidParams,
   FollowOperationParams,
@@ -138,7 +138,7 @@ export const resetPasswordRequest = async (payload: RegisterParams) => {
   return await request.post('/api/user_reset_password_v2/', payload);
 };
 
-export const userLoginRequest = async (payload: LoginParams) => {
+export const userLoginRequest = async (payload: LoginApiParams) => {
   return await request.post('/api/user_login_v2/', payload);
 };
 

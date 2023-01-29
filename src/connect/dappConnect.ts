@@ -39,6 +39,8 @@ export class DappConnect {
   wsUrl: string;
   nodeId: string;
   topicID: string;
+  otherTopicID: string;
+
   publicKeyProps: string;
   tempKeys: Omit<KeyPairsType, 'userid'> | null;
   // eslint-disable-next-line no-unused-vars
@@ -54,6 +56,7 @@ export class DappConnect {
     this.ws = null;
     this.nodeId = '';
     this.topicID = '';
+    this.otherTopicID = '';
     this.tempKeys = null;
     this.publicKeyProps = '';
     this.init();
@@ -143,22 +146,27 @@ export class DappConnect {
   }
 
   private async onMessageCallback(PbType: number, bytes: Uint8Array) {
+    console.log(PbType, 'PbType');
     switch (PbType) {
       case PbTypeWeb3MQBridgeConnectResp:
         const resp = Web3MQBridgeConnectCommand.fromBinary(bytes);
+        console.log(resp, 'resp1');
         this.nodeId = resp.nodeID;
         this.callback({ type: 'connect', data: 'success' });
         break;
       case PbTypePongCommand:
-        WebsocketPingCommand.fromBinary(bytes);
+        const resp2 = WebsocketPingCommand.fromBinary(bytes);
+        console.log(resp2, 'resp2');
         break;
       case PbTypeMessageStatusResp:
-        Web3MQMessageStatusResp.fromBinary(bytes);
+        const resp3 = Web3MQMessageStatusResp.fromBinary(bytes);
+        console.log(resp3, 'resp3');
         this.callback({ type: 'messageStatus', data: 'success' });
         break;
       case PbTypeMessage:
         const msgRes = Web3MQRequestMessage.fromBinary(bytes);
-        console.log(msgRes.payload, 'msgRes.payload');
+        console.log(msgRes, 'msgRes');
+        this.otherTopicID = msgRes.comeFrom;
         const { content, publicKey } = JSON.parse(
           new TextDecoder().decode(msgRes.payload) || '{content:""}',
         );
@@ -199,7 +207,7 @@ export class DappConnect {
         }),
       ),
       comeFrom: this.topicID,
-      contentTopic: this.topicID,
+      contentTopic: this.otherTopicID,
       validatePubKey: this.tempKeys?.PublicKey,
       PrivateKey: this.tempKeys?.PrivateKey,
     };

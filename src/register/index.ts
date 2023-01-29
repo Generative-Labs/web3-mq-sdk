@@ -26,19 +26,26 @@ import {
 import {
   EthAccountType,
   GetMainKeypairParams,
-  GetUserInfoParams, LoginByKeysParams,
-  LoginParams,
+  GetUserInfoParams,
+  LoginByKeysParams,
+  LoginApiParams,
   RegisterBySignParams,
-  RegisterMetaMaskParams,
   RegisterParams,
   WalletNameMap,
   WalletSignRes,
   WalletType,
+  LoginResponse,
+  GetUserInfoResponse,
+  GetSignContentResponse,
+  GetRegisterSignContentParams,
+  MainKeypairType,
+  ResetPasswordParams,
+  ResetPasswordResponse,
 } from '../types';
 
 export class Register {
   appKey: string;
-  pubicKeyType= 'ed25519';
+  pubicKeyType = 'ed25519';
   registerTime: number;
   registerSignContent: string;
 
@@ -50,7 +57,7 @@ export class Register {
 
   getUserInfo = async (
     options: Omit<GetUserInfoParams, 'timestamp'>,
-  ): Promise<{ userid: string; userExist: boolean }> => {
+  ): Promise<GetUserInfoResponse> => {
     let userid: string = '';
     let userExist: boolean = false;
 
@@ -121,7 +128,7 @@ export class Register {
     }
   };
 
-  login = async (options: LoginByKeysParams) => {
+  login = async (options: LoginByKeysParams): Promise<LoginResponse> => {
     const {
       password,
       userid,
@@ -144,7 +151,7 @@ export class Register {
 
     const login_signature = await getDataSignature(decode_dataStr, signContent);
 
-    const payload: LoginParams = {
+    const payload: LoginApiParams = {
       userid,
       did_type: didType,
       did_value: didValue,
@@ -175,7 +182,7 @@ export class Register {
     }
   };
 
-  resetPassword = async (options: RegisterMetaMaskParams) => {
+  resetPassword = async (options: ResetPasswordParams): Promise<ResetPasswordResponse> => {
     const {
       password,
       userid,
@@ -256,7 +263,7 @@ Issued At: ${getCurrentDate()}`;
 
   getMainKeypairSignContent = async (
     options: GetMainKeypairParams,
-  ): Promise<Record<string, string>> => {
+  ): Promise<GetSignContentResponse> => {
     const { password, did_value, did_type } = options;
     const keyIndex = 1;
     const keyMSG = `${did_type}:${did_value}${keyIndex}${password}`;
@@ -276,7 +283,10 @@ Nonce: ${magicString}`;
     return { signContent };
   };
 
-  getMainKeypairBySignature = async (signature: string, password: string) => {
+  getMainKeypairBySignature = async (
+    signature: string,
+    password: string,
+  ): Promise<MainKeypairType> => {
     const secretKey = sha256(signature);
 
     if (secretKey.length !== 32) {
@@ -299,13 +309,9 @@ Nonce: ${magicString}`;
     };
   };
 
-  getRegisterSignContent = async (options: {
-    userid: string;
-    mainPublicKey: string;
-    didType: WalletType;
-    didValue: string;
-    signContentURI?: string;
-  }): Promise<Record<string, string>> => {
+  getRegisterSignContent = async (
+    options: GetRegisterSignContentParams,
+  ): Promise<GetSignContentResponse> => {
     const {
       mainPublicKey,
       didType,
