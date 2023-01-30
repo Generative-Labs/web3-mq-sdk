@@ -278,6 +278,13 @@ export type ActiveChannelType = {
   // topic_type: string;
 };
 
+export interface UpdateRoomListParams extends BaseParams {
+  chatid: string,
+  chat_type: string
+  topic: string,
+  topic_type: string,
+}
+
 export interface GetMessageListParams extends BaseParams, PageParams {
   topic: string;
 }
@@ -443,6 +450,7 @@ export interface ChangeNotificationStatusParams extends BaseParams {
 }
 
 export type NotifyResponse = {
+  come_from?: string;
   title: string;
   content: string;
   type: string;
