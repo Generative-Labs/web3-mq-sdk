@@ -245,7 +245,8 @@ export const renderMessage = (
     _id: messageId,
     id: messageId,
     indexId: messageId,
-    msgLoading: SendMsgLoadingMap['loading'],
+    // 只有receive时为success
+    msgLoading: pbType === PbTypeMessage ? SendMsgLoadingMap['success'] : SendMsgLoadingMap['loading'],
     content,
     senderId,
     username: '',
