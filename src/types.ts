@@ -507,15 +507,16 @@ export type MainKeypairType = {
 }
 
 export type ResetPasswordParams = {
-  password: string;
   userid: string;
-  did_value: string;
-  did_type?: WalletType;
+  didValue: string;
+  mainPublicKey: string;
+  signature: string;
+  did_pubkey?: string;
+  didType?: WalletType;
   signContentURI?: string;
   nickname?: string;
   avatar_url?: string;
-  avatar_base64?: string;
-};
+}
 
 export type ResetPasswordResponse = {
   mainPrivateKey: string;

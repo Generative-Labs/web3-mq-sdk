@@ -18,7 +18,7 @@ const importSecretKey = async (rawKey: any, aesName: string) => {
   return await window.crypto.subtle.importKey('raw', rawKey, aesName, true, ['encrypt', 'decrypt']);
 };
 
-const fromHexString = (hexString: any) =>
+export const fromHexString = (hexString: any) =>
   Uint8Array.from(hexString.match(/.{1,2}/g).map((byte: string) => parseInt(byte, 16)));
 
 const aesDecrypt = async (
