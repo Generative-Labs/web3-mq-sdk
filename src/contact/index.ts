@@ -9,7 +9,7 @@ import {
   PublishNotificationToFollowersParams,
   ServiceResponse
 } from '../types';
-import { getDataSignature, newDateFormat } from '../utils';
+import { getDataSignature, newDateFormat, transformAddress } from '../utils';
 import {
   followOperationRequest,
   getContactListRequest,
@@ -128,8 +128,9 @@ export class Contact {
     return data.user_list;
   }
 
-  async sendFriend(target_userid: string, content: string = ''): Promise<ServiceResponse> {
+  async sendFriend(target_id: string, content: string = ''): Promise<ServiceResponse> {
     const { userid, PrivateKey } = this._keys;
+    const target_userid = await transformAddress(target_id);
     const timestamp = Date.now();
     const signContent = userid + target_userid + content + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
