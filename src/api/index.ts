@@ -34,7 +34,9 @@ import {
   GetPublicFollowerListParams,
   PublishNotificationToFollowersParams,
   GetTargetUserPermissionsParams,
-  UpdateUserPermissionsParams, RegisterApiResponse,
+  UpdateRoomListParams,
+  UpdateUserPermissionsParams, 
+  RegisterApiResponse,
 } from '../types';
 
 /**
@@ -61,6 +63,9 @@ export const getRoomListRequest = async (payload: CommonGetListParams) => {
   return await request.get('/api/chats/', {
     params: payload,
   });
+};
+export const updateRoomListRequest = async (payload: UpdateRoomListParams) => {
+  return await request.post('/api/chats/', payload);
 };
 
 export const getGroupMemberListRequest = async (payload: GetGroupMemberListParams) => {

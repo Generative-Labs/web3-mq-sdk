@@ -6,6 +6,7 @@ import {
   inviteGroupMemberRequest,
   joinGroupRequest,
   getGroupPermissionsRequest,
+  updateRoomListRequest,
   updateGroupPermissionsRequest,
   syncNewMessagesRequest,
 } from '../api';
@@ -15,6 +16,8 @@ import {
   ActiveChannelType,
   ClientKeyPaires,
   CreateRoomParams,
+  ServiceResponse,
+  UpdateRoomListParams,
   UpdateGroupPermissionsParams,
   Web3MQDBValue,
 } from '../types';
@@ -167,6 +170,26 @@ export class Channel {
     }
 
     this._client.emit('channel.getList', { type: 'channel.getList' });
+  }
+
+  async updateChannels(
+    params: Pick<
+      UpdateRoomListParams,
+      'chatid' | 'chat_type' | 'topic' | 'topic_type'
+    >
+  ): Promise<ServiceResponse> {
+    const { topic, topic_type } = params;
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + topic + topic_type + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+    const data = await updateRoomListRequest({
+      userid,
+      web3mq_signature,
+      timestamp,
+      ...params
+    });
+    return data as any;
   }
 
   async createRoom(
