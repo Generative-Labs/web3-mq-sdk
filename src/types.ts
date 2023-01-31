@@ -252,12 +252,18 @@ export type GroupPermissions = {
     value: 'ceator_invite_friends' | 'public' | 'nft_validation';
   };
 };
-
-export interface CreateRoomParams extends BaseParams {
+export interface CreateRoomApiParams extends BaseParams {
   group_name?: string;
   groupid?: string;
   avatar_url?: string;
   avatar_base64?: string;
+  permissions?: GroupPermissions;
+};
+export interface CreateRoomParams {
+  groupName?: string;
+  groupid?: string;
+  avatarUrl?: string;
+  avatarBase64?: string;
   permissions?: GroupPermissions;
 }
 
@@ -265,7 +271,7 @@ export interface CommonGetListParams extends BaseParams, PageParams {}
 
 export interface NewCommonGetListParams extends NewBaseParams, PageParams {}
 
-export type ActiveChannelType = {
+export type ChannelItemType = {
   avatar_base64: string;
   avatar_url: string;
   chat_name: string;
@@ -278,7 +284,13 @@ export type ActiveChannelType = {
   // topic_type: string;
 };
 
-export interface UpdateRoomListParams extends BaseParams {
+export interface UpdateRoomListParams {
+  chatid: string,
+  chatType: string
+  topic: string,
+  topicType: string,
+}
+export interface UpdateRoomListApiParams extends BaseParams {
   chatid: string,
   chat_type: string
   topic: string,
@@ -301,8 +313,8 @@ export interface InviteGroupMemberParams extends BaseParams {
 export interface JoinGroupParams extends NewBaseParams {
   groupid: string;
 }
-
-export interface UpdateGroupPermissionsParams extends NewBaseParams {
+export interface UpdateGroupPermissionsApiParams extends NewBaseParams, UpdateGroupPermissionsParams {}
+export interface UpdateGroupPermissionsParams {
   groupid: string;
   permissions: GroupPermissions;
 }
@@ -358,26 +370,38 @@ export interface SendFriendParams extends BaseParams {
 
 export interface GetUserBindDidsParams extends BaseParams {}
 
-export interface UserBindDidParams extends BaseParams {
+export interface UserBindDidApiParams extends BaseParams {
   provider_id: string;
   did_type: string;
   did_value: string;
   did_action?: string;
   did_content?: string;
 }
+export interface UserBindDidParams {
+  providerId: string;
+  didType: string;
+  didValue: string;
+  didAction?: string;
+  didContent?: string;
+}
 
-export type UserBindDidIdsResponse = Pick<
-  UserBindDidParams,
-  'did_type' | 'did_value' | 'provider_id'
-> & {
+export interface UserBindDidIdsResponse {
+  did_type: string;
+  did_value: string;
+  provider_id: string;
   metadata: any;
-};
-
-export interface FollowOperationParams extends WalletBaseParams {
+}
+export interface FollowOperationApiParams extends WalletBaseParams {
   address: string;
   target_userid: string;
   action: 'follow' | 'cancel';
   did_type: WalletType;
+}
+export interface FollowOperationParams {
+  address: string;
+  targetUserid: string;
+  action: 'follow' | 'cancel';
+  didType: WalletType;
 }
 
 export interface GetFollowerListParams extends NewBaseParams, PageParams {}
@@ -394,7 +418,8 @@ export interface GetPublicFollowerListParams extends PageParams {
   timestamp: number;
 }
 
-export interface PublishNotificationToFollowersParams extends NewBaseParams {
+export interface PublishNotificationToFollowersApiParams extends NewBaseParams, PublishNotificationToFollowersParams {}
+export interface PublishNotificationToFollowersParams {
   title: string;
   content: string;
 }
@@ -405,7 +430,8 @@ export interface GetTargetUserPermissionsParams extends NewBaseParams {
 
 export type UserPermissionsType = Record<string, { type: string; value: boolean }>;
 
-export interface UpdateUserPermissionsParams extends NewBaseParams {
+export interface UpdateUserPermissionsApiParams extends NewBaseParams, UpdateUserPermissionsParams {}
+export interface UpdateUserPermissionsParams {
   permissions: UserPermissionsType;
 }
 
