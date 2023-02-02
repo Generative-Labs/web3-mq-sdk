@@ -74,7 +74,7 @@ export class User {
     return data;
   }
 
-  async getUserBindDids(): Promise<UserBindDidIdsResponse> {
+  async getUserBindDids(): Promise<UserBindDidIdsResponse[]> {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
