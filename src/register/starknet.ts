@@ -13,13 +13,27 @@ export const getStarkNetAccount = async () => {
   return res;
 };
 
-export const signWithStarkNet = async (signContent: string, address: string): Promise<WalletSignRes> => {
+const networkId = (baseUrl: string) => {
+  try {
+    if (baseUrl.includes('alpha-mainnet.starknet.io')) {
+      return 'mainnet-alpha';
+    } else if (baseUrl.includes('alpha4.starknet.io')) {
+      return 'goerli-alpha';
+    }
+  } catch {}
+};
+
+export const signWithStarkNet = async (
+  signContent: string,
+  address: string,
+): Promise<WalletSignRes> => {
   const provider = await ((await getStarknetAccount()) as any)?.provider;
   const message = hash.starknetKeccak(signContent).toString('hex').substring(0, 31);
+  const chainId = networkId(provider.provider.baseUrl) === 'mainnet-alpha' ? 'SN_MAIN' : 'SN_GOERLI';
   const typedMessage = {
     domain: {
       name: 'Example DApp',
-      chainId: 'SN_GOERLI',
+      chainId,
       version: '0.0.1',
     },
     types: {
@@ -37,10 +51,11 @@ export const signWithStarkNet = async (signContent: string, address: string): Pr
   };
   const result = await provider.account.signMessage(typedMessage);
   let messageText = typedData.getMessageHash(typedMessage, address);
+  const network = networkId(provider.provider.baseUrl) || 'goerli-alpha';
   // get argent public key
   const contractProvider = new Provider({
     sequencer: {
-      network: 'goerli-alpha', // or 'goerli-alpha'
+      network, // or 'goerli-alpha'
     },
   });
   const contact = new Contract(testNet, address, contractProvider);
