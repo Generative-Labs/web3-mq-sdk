@@ -24,7 +24,6 @@ import {
   userRegisterRequest,
 } from '../api';
 import {
-  EthAccountType,
   GetMainKeypairParams,
   GetUserInfoParams,
   LoginByKeysParams,
@@ -228,7 +227,7 @@ export class Register {
     }
   };
 
-  getAccount = async (walletType: WalletType): Promise<EthAccountType> => {
+  connectWallet = async (walletType: WalletType): Promise<string> => {
     switch (walletType) {
       case 'starknet':
         return await getStarkNetAccount();
