@@ -39,6 +39,7 @@ import {
   GetRegisterSignContentParams,
   MainKeypairType,
   ResetPasswordParams,
+  AccountType,
 } from '../types';
 
 export class Register {
@@ -227,7 +228,16 @@ export class Register {
     }
   };
 
-  connectWallet = async (walletType: WalletType): Promise<string> => {
+  getAccount = async (walletType: WalletType): Promise<AccountType> => {
+    switch (walletType) {
+      case 'starknet':
+        return await getStarkNetAccount();
+      default:
+        return await getEthAccount();
+    }
+  };
+
+  connectWallet = async (walletType: WalletType): Promise<AccountType> => {
     switch (walletType) {
       case 'starknet':
         return await getStarkNetAccount();

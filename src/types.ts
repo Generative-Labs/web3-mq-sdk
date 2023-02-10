@@ -35,10 +35,8 @@ export type KeyPairsType = {
   userid: string;
 };
 
-export type EthAccountType = {
+export type AccountType = {
   address: string;
-  balance: number;
-  shortAddress: string;
 };
 
 export type RegisterBySignParams = {

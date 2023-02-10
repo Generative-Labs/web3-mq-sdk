@@ -12,7 +12,7 @@ export const getEthAccount = async () => {
   });
 
   if (!requestPermissionsRes) {
-    return address;
+    return { address };
   }
 
   try {
@@ -26,7 +26,7 @@ export const getEthAccount = async () => {
   } catch (err) {
     console.log(err);
   }
-  return address;
+  return { address };
 };
 
 export const signWithEth = async (

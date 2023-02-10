@@ -4,7 +4,11 @@ import { connect } from 'get-starknet';
 import { WalletSignRes } from '../types';
 
 export const getStarkNetAccount = async () => {
-  return await ((await getStarknetAccount()) as any).address;
+  let res: any = {
+    address: '',
+  };
+  res.address = await ((await getStarknetAccount()) as any).address;
+  return res;
 };
 
 const networkId = (baseUrl: string) => {
