@@ -13,7 +13,7 @@ import {
 import { getDataSignature, getGroupId, getMessageUpdateDate } from '../utils';
 import {
   PageParams,
-  ActiveChannelType,
+  ChannelItemType,
   ClientKeyPaires,
   CreateRoomParams,
   ServiceResponse,
@@ -26,8 +26,8 @@ import { Web3MQMessageStatusResp, Web3MQRequestMessage } from '../pb';
 export class Channel {
   private readonly _client: Client;
   private readonly _keys: ClientKeyPaires;
-  channelList: ActiveChannelType[] | null;
-  activeChannel: ActiveChannelType | null;
+  channelList: ChannelItemType[] | null;
+  activeChannel: ChannelItemType | null;
 
   constructor(client: Client) {
     this._client = client;
@@ -100,10 +100,10 @@ export class Channel {
     this.handleUpdateChannel(indexeddbData, comeFrom);
   }
 
-  async setActiveChannel(channel: ActiveChannelType | null) {
+  async setActiveChannel(channel: ChannelItemType | null) {
     this.activeChannel = channel;
     if (channel) {
-      (this.activeChannel as ActiveChannelType).unread = 0;
+      (this.activeChannel as ChannelItemType).unread = 0;
       const data = await this._client.storage.getData(channel.chatid);
       if (data && data.unread !== 0) {
         data.unread = 0;
@@ -114,7 +114,7 @@ export class Channel {
     // if (data && data.unread !== 0) {
     //   data.unread = 0;
     //   await this._client.storage.setData(channel?.chatid as string, data);
-    //   this.channelList = (this.channelList as Array<ActiveChannelType>).map((item) => {
+    //   this.channelList = (this.channelList as Array<ChannelItemType>).map((item) => {
     //     if (item.chatid === channel?.chatid) {
     //       item.unread = 0;
     //     }
@@ -137,7 +137,7 @@ export class Channel {
     const allNewMessageData = await this.syncNewMessages();
 
     const list = await Promise.all(
-      result.map(async (item: ActiveChannelType) => {
+      result.map(async (item: ChannelItemType) => {
         const data = await this._client.storage.getData(item.chatid);
         const currentNewMsgObj = allNewMessageData[item.chatid];
         let newMessageUnread = 0;
@@ -172,33 +172,26 @@ export class Channel {
     this._client.emit('channel.getList', { type: 'channel.getList' });
   }
 
-  async updateChannels(
-    params: Pick<
-      UpdateRoomListParams,
-      'chatid' | 'chat_type' | 'topic' | 'topic_type'
-    >
-  ): Promise<ServiceResponse> {
-    const { topic, topic_type } = params;
+  async updateChannels(params: UpdateRoomListParams): Promise<ServiceResponse> {
+    const { chatid, chatType, topic, topicType } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
-    const signContent = userid + topic + topic_type + timestamp;
+    const signContent = userid + topic + topicType + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
     const data = await updateRoomListRequest({
       userid,
       web3mq_signature,
       timestamp,
-      ...params
+      chatid,
+      chat_type: chatType,
+      topic,
+      topic_type: topicType
     });
     return data as any;
   }
 
-  async createRoom(
-    params: Pick<
-      CreateRoomParams,
-      'group_name' | 'groupid' | 'avatar_url' | 'avatar_base64' | 'permissions'
-    >,
-  ) {
-    const { groupid = '' } = params;
+  async createRoom(params:  CreateRoomParams) {
+    const { avatarUrl, avatarBase64, groupid = '', groupName } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + groupid + timestamp;
@@ -208,6 +201,9 @@ export class Channel {
         web3mq_signature,
         userid,
         timestamp,
+        avatar_base64: avatarBase64,
+        avatar_url: avatarUrl,
+        group_name: groupName,
         ...params,
       });
     if (!this.channelList) {
@@ -324,9 +320,7 @@ export class Channel {
     return data;
   }
 
-  async updateGroupPermissions(
-    params: Pick<UpdateGroupPermissionsParams, 'groupid' | 'permissions'>,
-  ) {
+  async updateGroupPermissions(params: UpdateGroupPermissionsParams) {
     const { groupid } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();

@@ -6,8 +6,6 @@ import { WalletSignRes } from '../types';
 export const getStarkNetAccount = async () => {
   let res: any = {
     address: '',
-    balance: 0,
-    shortAddress: '',
   };
   res.address = await ((await getStarknetAccount()) as any).address;
   return res;
@@ -29,7 +27,8 @@ export const signWithStarkNet = async (
 ): Promise<WalletSignRes> => {
   const provider = await ((await getStarknetAccount()) as any)?.provider;
   const message = hash.starknetKeccak(signContent).toString('hex').substring(0, 31);
-  const chainId = networkId(provider.provider.baseUrl) === 'mainnet-alpha' ? 'SN_MAIN' : 'SN_GOERLI';
+  const chainId =
+    networkId(provider.provider.baseUrl) === 'mainnet-alpha' ? 'SN_MAIN' : 'SN_GOERLI';
   const typedMessage = {
     domain: {
       name: 'Example DApp',

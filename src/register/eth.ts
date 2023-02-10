@@ -1,11 +1,7 @@
-import { EthAccountType, WalletSignRes } from '../types';
+import { WalletSignRes } from '../types';
 
 export const getEthAccount = async () => {
-  let res: EthAccountType = {
-    address: '',
-    balance: 0,
-    shortAddress: '',
-  };
+  let address = '';
   let reqParams = {
     method: 'wallet_requestPermissions',
     params: [{ eth_accounts: {} }],
@@ -16,34 +12,21 @@ export const getEthAccount = async () => {
   });
 
   if (!requestPermissionsRes) {
-    return res;
+    return { address };
   }
 
   try {
     //@ts-ignore
-    let address = await window.ethereum.request({
+    let addresses = await window.ethereum.request({
       method: 'eth_accounts',
     });
-    if (address && address.length > 0) {
-      res.address = address[0];
-      const strLength = address[0].length;
-      res.shortAddress =
-        address[0].substring(0, 5) + '...' + address[0].substring(strLength - 4, strLength);
-
-      //@ts-ignore
-      let balance = await window.ethereum.request({
-        method: 'eth_getBalance',
-        params: [address[0], 'latest'],
-      });
-      if (balance) {
-        let realMoney = balance.toString(10);
-        res.balance = realMoney / 1000000000000000000;
-      }
+    if (addresses && addresses.length > 0) {
+      address = addresses[0];
     }
   } catch (err) {
     console.log(err);
   }
-  return res;
+  return { address };
 };
 
 export const signWithEth = async (

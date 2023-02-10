@@ -145,30 +145,31 @@ export class Contact {
     return data as any;
   }
 
-  async followOperation(
-    params: Pick<FollowOperationParams, 'address' | 'target_userid' | 'action' | 'did_type'>,
-  ): Promise<ServiceResponse> {
-    const { address, target_userid, action, did_type } = params;
+  async followOperation(params: FollowOperationParams): Promise<ServiceResponse> {
+    const { address, targetUserid, action, didType } = params;
     const { userid, PublicKey } = this._keys;
-    const did_pubkey = did_type === 'starknet' ? PublicKey : undefined;
+    const did_pubkey = didType === 'starknet' ? PublicKey : undefined;
     const timestamp = Date.now();
-    let nonce = sha3_224(userid + action + target_userid + timestamp);
+    let nonce = sha3_224(userid + action + targetUserid + timestamp);
     const sign_content = `
-    Web3MQ wants you to sign in with your ${did_type} account:
+    Web3MQ wants you to sign in with your ${didType} account:
     ${address}
     
     For follow signature
     
     Nonce: ${nonce}
     Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
-    const { sign: did_signature } = await Client.register.sign(sign_content, address, did_type);
+    const { sign: did_signature } = await Client.register.sign(sign_content, address, didType);
     const data = await followOperationRequest({
       did_pubkey,
       did_signature,
       sign_content,
       userid,
       timestamp, 
-      ...params,
+      address,
+      action,
+      did_type: didType,
+      target_userid: targetUserid
     });
     if (this._client.listeners.events['contact.updateList']) {
       this._client.emit('contact.updateList', { type: 'contact.updateList' });
@@ -177,7 +178,7 @@ export class Contact {
   }
 
   async publishNotificationToFollowers(
-    params: Pick<PublishNotificationToFollowersParams, 'title' | 'content'>,
+    params: PublishNotificationToFollowersParams
   ): Promise<ServiceResponse> {
     const { title } = params;
     const { userid, PrivateKey } = this._keys;

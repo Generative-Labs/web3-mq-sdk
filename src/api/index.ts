@@ -1,7 +1,7 @@
 import { request } from '../core/request';
 
 import {
-  CreateRoomParams,
+  CreateRoomApiParams,
   CommonGetListParams,
   GetMessageListParams,
   BaseParams,
@@ -10,7 +10,6 @@ import {
   InviteGroupMemberParams,
   JoinGroupParams,
   GetGroupPermissionsParams,
-  UpdateGroupPermissionsParams,
   ChangeMessageStatusParams,
   SearchParams,
   ProfileParams,
@@ -28,14 +27,15 @@ import {
   RegisterParams,
   LoginApiParams,
   GetUserBindDidsParams,
-  UserBindDidParams,
-  FollowOperationParams,
+  FollowOperationApiParams,
   GetUserPublicProfileParams,
   GetPublicFollowerListParams,
-  PublishNotificationToFollowersParams,
+  PublishNotificationToFollowersApiParams,
   GetTargetUserPermissionsParams,
-  UpdateRoomListParams,
-  UpdateUserPermissionsParams, 
+  UpdateGroupPermissionsApiParams,
+  UpdateRoomListApiParams,
+  UpdateUserPermissionsApiParams,
+  UserBindDidApiParams,
   RegisterApiResponse,
 } from '../types';
 
@@ -49,7 +49,7 @@ export const savePublicKeyRequest = async (payload: any) => {
 /**
  * @API Channel
  */
-export const createRoomRequest = async (payload: CreateRoomParams) => {
+export const createRoomRequest = async (payload: CreateRoomApiParams) => {
   return await request.post('/api/groups/', payload);
 };
 
@@ -64,7 +64,7 @@ export const getRoomListRequest = async (payload: CommonGetListParams) => {
     params: payload,
   });
 };
-export const updateRoomListRequest = async (payload: UpdateRoomListParams) => {
+export const updateRoomListRequest = async (payload: UpdateRoomListApiParams) => {
   return await request.post('/api/chats/', payload);
 };
 
@@ -82,7 +82,7 @@ export const joinGroupRequest = async (payload: JoinGroupParams) => {
   return await request.post('/api/user_join_group/', payload);
 };
 
-export const updateGroupPermissionsRequest = async (payload: UpdateGroupPermissionsParams) => {
+export const updateGroupPermissionsRequest = async (payload: UpdateGroupPermissionsApiParams) => {
   return await request.post('/api/update_group_permissions/', payload);
 };
 
@@ -151,11 +151,11 @@ export const getUserBindDidsRequest = async (payload: GetUserBindDidsParams) => 
   return await request.post('/api/get_user_binddids/', payload);
 };
 
-export const userBindDidRequest = async (payload: UserBindDidParams) => {
+export const userBindDidRequest = async (payload: UserBindDidApiParams) => {
   return await request.post('/api/user_binddid/', payload);
 };
 
-export const followOperationRequest = async (payload: FollowOperationParams) => {
+export const followOperationRequest = async (payload: FollowOperationApiParams) => {
   return await request.post('/api/following/', payload);
 };
 
@@ -190,7 +190,7 @@ export const getPublicFollowingListRequest = async (payload: GetPublicFollowerLi
 };
 
 export const publishNotificationToFollowersRequest = async (
-  payload: PublishNotificationToFollowersParams,
+  payload: PublishNotificationToFollowersApiParams,
 ) => {
   return await request.post('/api/publish_notification_to_followers/', payload);
 };
@@ -205,7 +205,7 @@ export const getUserPermissionsRequest = async (payload: NewBaseParams) => {
   });
 };
 
-export const updateUserPermissionsRequest = async (payload: UpdateUserPermissionsParams) => {
+export const updateUserPermissionsRequest = async (payload: UpdateUserPermissionsApiParams) => {
   return await request.post('/api/update_user_permissions/', payload);
 };
 

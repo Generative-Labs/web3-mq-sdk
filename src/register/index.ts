@@ -24,7 +24,6 @@ import {
   userRegisterRequest,
 } from '../api';
 import {
-  EthAccountType,
   GetMainKeypairParams,
   GetUserInfoParams,
   LoginByKeysParams,
@@ -40,6 +39,7 @@ import {
   GetRegisterSignContentParams,
   MainKeypairType,
   ResetPasswordParams,
+  AccountType,
 } from '../types';
 
 export class Register {
@@ -228,7 +228,16 @@ export class Register {
     }
   };
 
-  getAccount = async (walletType: WalletType): Promise<EthAccountType> => {
+  getAccount = async (walletType: WalletType): Promise<AccountType> => {
+    switch (walletType) {
+      case 'starknet':
+        return await getStarkNetAccount();
+      default:
+        return await getEthAccount();
+    }
+  };
+
+  connectWallet = async (walletType: WalletType): Promise<AccountType> => {
     switch (walletType) {
       case 'starknet':
         return await getStarkNetAccount();

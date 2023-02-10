@@ -74,7 +74,7 @@ export class User {
     return data;
   }
 
-  async getUserBindDids(): Promise<UserBindDidIdsResponse> {
+  async getUserBindDids(): Promise<UserBindDidIdsResponse[]> {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
@@ -83,15 +83,22 @@ export class User {
     return data;
   }
 
-  async userBindDid(
-    params: Omit<UserBindDidParams, 'userid' | 'web3mq_signature' | 'timestamp'>,
-  ): Promise<ServiceResponse> {
-    const { did_type, did_value } = params;
+  async userBindDid(params: UserBindDidParams): Promise<ServiceResponse> {
+    const { didAction, didContent, didType, didValue, providerId } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
-    const signContent = userid + did_type + did_value + timestamp;
+    const signContent = userid + didType + didValue + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
-    const data = await userBindDidRequest({ web3mq_signature, userid, timestamp, ...params });
+    const data = await userBindDidRequest({ 
+      web3mq_signature, 
+      userid, 
+      timestamp, 
+      did_action: didAction,
+      did_content: didContent,
+      did_type: didType,
+      did_value: didValue,
+      provider_id: providerId
+    });
     return data as any;
   }
 
@@ -123,7 +130,7 @@ export class User {
     return data;
   }
 
-  async updateUserPermissions(params: Pick<UpdateUserPermissionsParams, 'permissions'>) {
+  async updateUserPermissions(params: UpdateUserPermissionsParams) {
     const { permissions } = params;
     const permissionsStr = JSON.stringify(permissions);
     const { userid, PrivateKey } = this._keys;
