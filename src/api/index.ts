@@ -6,6 +6,7 @@ import {
   GetMessageListParams,
   BaseParams,
   NewBaseParams,
+  GetFollowAndContactListApiParams,
   GetGroupMemberListParams,
   InviteGroupMemberParams,
   JoinGroupParams,
@@ -218,7 +219,7 @@ export const searchContactRequest = async (payload: SearchParams) => {
   });
 };
 
-export const getContactListRequest = async (payload: NewCommonGetListParams) => {
+export const getFollowAndContactListRequest = async (payload: GetFollowAndContactListApiParams) => {
   return await request.get('/api/user_follow_contacts/', {
     params: payload,
   });
