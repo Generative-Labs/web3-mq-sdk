@@ -151,14 +151,14 @@ export class Contact {
     const did_pubkey = didType === 'starknet' ? PublicKey : undefined;
     const timestamp = Date.now();
     let nonce = sha3_224(userid + action + targetUserid + timestamp);
-    const sign_content = `
-    Web3MQ wants you to sign in with your ${didType} account:
-    ${address}
-    
-    For follow signature
-    
-    Nonce: ${nonce}
-    Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
+    console.log('nonce', nonce);
+    const sign_content = `Web3MQ wants you to sign in with your ${didType} account:
+${address}
+
+For follow signature
+
+Nonce: ${nonce}
+Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
     const { sign: did_signature } = await Client.register.sign(sign_content, address, didType);
     const data = await followOperationRequest({
       did_pubkey,
