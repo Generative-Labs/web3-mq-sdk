@@ -361,6 +361,10 @@ export interface ProfileParams extends BaseParams {
   avatar_url: string;
 }
 
+export interface GetFollowAndContactListApiParams extends NewCommonGetListParams {
+  follow_status?: 'follow_each'; 
+}
+
 export interface SendFriendParams extends BaseParams {
   content: string;
   target_userid: string;
