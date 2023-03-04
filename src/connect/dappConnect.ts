@@ -1,4 +1,6 @@
 import { sha3_224 } from 'js-sha3';
+import { sendWeb3mqSignatureCommand, sendWeb3mqBridgeCommand } from './wsCommand';
+import { GenerateEd25519KeyPair, GetContactBytes } from '../utils';
 
 import {
   PbTypeMessageStatusResp,
@@ -21,8 +23,6 @@ import {
   aesGCMDecrypt,
   Base64StringToUint8, fromHexString,
 } from '../encryption';
-import { sendWeb3mqSignatureCommand, sendWeb3mqBridgeCommand } from './wsCommand';
-import { GenerateEd25519KeyPair, GetContactBytes } from '../utils';
 import {
   SignClientCallBackType,
   KeyPairsType,

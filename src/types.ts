@@ -558,3 +558,27 @@ export const SendMsgLoadingMap = {
   error: 'error',
   loading: 'loading',
 };
+
+
+
+export interface CreateDappApiParams {
+  creator_id: string
+  dapp_id: string
+  dapp_name: string
+  dapp_description: string
+  dapp_type: string
+  dapp_pubkey: string
+  domain?: string
+  timestamp: number
+  web3mq_user_signature: string
+}
+
+
+export interface CreateDappParams {
+  dapp_id: string
+  dapp_name: string
+  dapp_description: string
+  dapp_type: string
+  dapp_pubkey: string
+  domain?: string
+}
