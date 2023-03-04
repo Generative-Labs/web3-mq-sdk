@@ -36,7 +36,7 @@ import {
   UpdateRoomListApiParams,
   UpdateUserPermissionsApiParams,
   UserBindDidApiParams,
-  RegisterApiResponse,
+  RegisterApiResponse, CreateDappApiParams,
 } from '../types';
 
 /**
@@ -269,4 +269,12 @@ export const myCreateTopicListRequest = async (payload: GetTopicListParams) => {
 
 export const mySubscribeTopicListRequest = async (payload: GetTopicListParams) => {
   return await request.get('/api/my_subscribe_topic_list/', { params: payload });
+};
+
+
+export const createDappRequest = async (payload: CreateDappApiParams) => {
+  return await request.post('/api/create_dapp/', payload);
+};
+export const updateDappRequest = async (payload: CreateDappApiParams) => {
+  return await request.post('/api/update_dapp/', payload);
 };

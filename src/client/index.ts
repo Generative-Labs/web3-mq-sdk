@@ -1,6 +1,6 @@
 import { Register } from '../register';
 import { Channel } from '../channel';
-import {Connect, SignConnect, DappConnect} from '../connect';
+import { Connect, SignConnect, DappConnect } from '../connect';
 import { Message } from '../message';
 import { User } from '../user';
 import { Contact } from '../contact';
@@ -20,6 +20,7 @@ import {
   SignClientCallBackType,
   Web3MQBridgeOptions,
 } from '../types';
+import { Dapp } from '../dapp';
 
 export class Client {
   private static _instance: Client | null;
@@ -37,6 +38,7 @@ export class Client {
   notify: Notify;
   topic: Topic;
   storage: Storage;
+  dapp: Dapp;
 
   constructor(keys: KeyPairsType) {
     this.keys = keys;
@@ -49,6 +51,7 @@ export class Client {
     this.notify = new Notify(this);
     this.topic = new Topic(this);
     this.storage = new Storage(this);
+    this.dapp = new Dapp(this);
   }
 
   public static init = async (
