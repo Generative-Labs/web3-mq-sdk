@@ -147,8 +147,7 @@ export class Contact {
 
   async followOperation(params: FollowOperationParams): Promise<ServiceResponse> {
     const { address, targetUserid, action, didType } = params;
-    const { userid, PublicKey } = this._keys;
-    const did_pubkey = didType === 'starknet' ? PublicKey : undefined;
+    const { userid } = this._keys;
     const timestamp = Date.now();
     let nonce = sha3_224(userid + action + targetUserid + timestamp);
     const sign_content = `
@@ -159,7 +158,7 @@ export class Contact {
     
     Nonce: ${nonce}
     Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
-    const { sign: did_signature } = await Client.register.sign(sign_content, address, didType);
+    const { sign: did_signature, publicKey: did_pubkey = '' } = await Client.register.sign(sign_content, address, didType);
     const data = await followOperationRequest({
       did_pubkey,
       did_signature,
