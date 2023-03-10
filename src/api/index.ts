@@ -9,6 +9,7 @@ import {
   GetGroupMemberListParams,
   InviteGroupMemberParams,
   JoinGroupParams,
+  GetMyCreateDappListApiParmas,
   GetGroupPermissionsParams,
   ChangeMessageStatusParams,
   SearchParams,
@@ -271,10 +272,16 @@ export const mySubscribeTopicListRequest = async (payload: GetTopicListParams) =
   return await request.get('/api/my_subscribe_topic_list/', { params: payload });
 };
 
+export const getMyCreateDappListRequest = async (payload: GetMyCreateDappListApiParmas) => {
+  return await request.get('/api/my_create_dapps/', {
+    params: payload
+  });
+};
 
 export const createDappRequest = async (payload: CreateDappApiParams) => {
   return await request.post('/api/create_dapp/', payload);
 };
+
 export const updateDappRequest = async (payload: CreateDappApiParams) => {
   return await request.post('/api/update_dapp/', payload);
 };

@@ -560,6 +560,11 @@ export const SendMsgLoadingMap = {
 };
 
 
+export interface GetMyCreateDappListApiParmas {
+  creator_id: string
+  timestamp: number
+  web3mq_user_signature: string
+}
 
 export interface CreateDappApiParams {
   creator_id: string
