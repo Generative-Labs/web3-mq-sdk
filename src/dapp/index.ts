@@ -1,6 +1,6 @@
 import { Client } from '../client';
-import { ClientKeyPaires, CreateDappParams, ServiceResponse } from '../types';
-import { createDappRequest, updateDappRequest } from '../api';
+import {ClientKeyPaires, CreateDappListResponse, CreateDappParams, ServiceResponse} from '../types';
+import { createDappRequest, getMyCreateDappListRequest, updateDappRequest } from '../api';
 import { getDataSignature } from '../utils';
 
 export class Dapp {
@@ -10,6 +10,19 @@ export class Dapp {
   constructor(client: Client) {
     this._client = client;
     this._keys = client.keys;
+  }
+
+  async getMyCreateDappList(): Promise<CreateDappListResponse> {
+    const { userid, PrivateKey } = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + timestamp;
+    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+    const { data } = await getMyCreateDappListRequest({
+      creator_id: userid,
+      timestamp,
+      web3mq_user_signature,
+    });
+    return data;
   }
 
   async createDapp(params: CreateDappParams): Promise<ServiceResponse> {
