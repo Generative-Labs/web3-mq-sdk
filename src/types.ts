@@ -587,3 +587,8 @@ export interface CreateDappParams {
   dapp_pubkey: string
   domain?: string
 }
+
+export interface CreateDappListResponse {
+  data_list: any[];
+  total_count: number;
+}

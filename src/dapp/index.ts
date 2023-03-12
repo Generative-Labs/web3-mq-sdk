@@ -1,5 +1,5 @@
 import { Client } from '../client';
-import { ClientKeyPaires, CreateDappParams, ServiceResponse } from '../types';
+import {ClientKeyPaires, CreateDappListResponse, CreateDappParams, ServiceResponse} from '../types';
 import { createDappRequest, getMyCreateDappListRequest, updateDappRequest } from '../api';
 import { getDataSignature } from '../utils';
 
@@ -12,7 +12,7 @@ export class Dapp {
     this._keys = client.keys;
   }
 
-  async getMyCreateDappList(): Promise<ServiceResponse> {
+  async getMyCreateDappList(): Promise<CreateDappListResponse> {
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
     const signContent = userid + timestamp;
