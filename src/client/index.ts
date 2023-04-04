@@ -74,6 +74,9 @@ export class Client {
     if (!Client._instance) {
       Client._instance = new Client(keys);
     }
+    if (Client._instance && Client._instance.keys.PrivateKey !== keys.PrivateKey) {
+      Client._instance = new Client(keys);
+    }
     return Client._instance as Client;
   };
 
