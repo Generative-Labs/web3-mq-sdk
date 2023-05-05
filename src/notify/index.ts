@@ -1,6 +1,6 @@
 import { Client } from '../client';
-import { ClientKeyPaires, MessageStatus, NotifyResponse } from '../types';
-import { changeNotificationStatusRequest } from '../api';
+import { ClientKeyPaires, MessageStatus, NotifyResponse, QueryNotificationsParams } from '../types';
+import { changeNotificationStatusRequest, queryNotificationsRequest } from '../api';
 import { getDataSignature } from '../utils';
 import { Web3MQMessageListResponse } from '../pb';
 
@@ -44,4 +44,27 @@ export class Notify {
       this._client.emit('notification.getList', { type: 'notification.getList' });
     }
   };
+
+  async queryNotifications(option: QueryNotificationsParams) {
+    const { userid, PrivateKey } = this._keys;
+    const { topic = '', notice_type = '' } = option;
+    const timestamp = Date.now();
+    const msg = userid + topic + notice_type + timestamp;
+    const web3mq_signature = await getDataSignature(PrivateKey, msg);
+    const {
+      data: { result = [] },
+    } = await queryNotificationsRequest({ userid, timestamp, web3mq_signature, ...option });
+    const list = result.map((item: any) => {
+      return item.payload;
+    });
+    if (this.notificationList && option.page !== 1) {
+      this.notificationList = [...list, ...this.notificationList];
+    } else {
+      this.notificationList = list;
+    }
+    if (this._client.listeners.events['notification.getList']) {
+      this._client.emit('notification.getList', { type: 'notification.getList' });
+    }
+    // return data;
+  }
 }
