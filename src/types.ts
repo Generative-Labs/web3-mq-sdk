@@ -592,3 +592,17 @@ export interface CreateDappListResponse {
   data_list: any[];
   total_count: number;
 }
+
+export interface QueryNotificationsApiParams extends BaseParams{
+  topic?: string
+  notice_type?: string
+  size: number
+  page: number
+}
+
+export type QueryNotificationsParams ={
+  topic?: string
+  notice_type?: string
+  size: number
+  page: number
+}

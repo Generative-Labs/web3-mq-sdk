@@ -37,7 +37,7 @@ import {
   UpdateRoomListApiParams,
   UpdateUserPermissionsApiParams,
   UserBindDidApiParams,
-  RegisterApiResponse, CreateDappApiParams,
+  RegisterApiResponse, CreateDappApiParams, QueryNotificationsApiParams,
 } from '../types';
 
 /**
@@ -250,6 +250,11 @@ export const operationFriendRequest = async (payload: OperationFriendParams) => 
  */
 export const changeNotificationStatusRequest = async (payload: ChangeNotificationStatusParams) => {
   return await request.post('/api/notification/status/', payload);
+};
+export const queryNotificationsRequest = async (payload: QueryNotificationsApiParams) => {
+  return await request.get('/api/notification/history/', {
+    params: payload,
+  });
 };
 
 export const createTopicRequest = async (payload: CreateTopicParams) => {
