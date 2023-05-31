@@ -185,12 +185,12 @@ export class Channel {
       chatid,
       chat_type: chatType,
       topic,
-      topic_type: topicType
+      topic_type: topicType,
     });
     return data as any;
   }
 
-  async createRoom(params:  CreateRoomParams) {
+  async createRoom(params: CreateRoomParams) {
     const { avatarUrl, avatarBase64, groupid = '', groupName } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
