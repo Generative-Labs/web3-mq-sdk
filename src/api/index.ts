@@ -1,4 +1,4 @@
-import { request } from '../core/request';
+import {request} from '../core/request';
 
 import {
   CreateRoomApiParams,
@@ -37,7 +37,7 @@ import {
   UpdateRoomListApiParams,
   UpdateUserPermissionsApiParams,
   UserBindDidApiParams,
-  RegisterApiResponse, CreateDappApiParams, QueryNotificationsApiParams,
+  RegisterApiResponse, CreateDappApiParams, QueryNotificationsApiParams, GetMyAuthInfoParams, GetMyAuthInfoResponse,
 } from '../types';
 
 /**
@@ -229,6 +229,12 @@ export const sendFriendRequest = async (payload: SendFriendParams) => {
   return await request.post('/api/contacts/add_friends/', payload);
 };
 
+export const getMyAuthInfoRequest = async (
+  payload: GetMyAuthInfoParams
+): Promise<GetMyAuthInfoResponse> => {
+  return await request.post('/api/dapp/user_auth_info/', payload);
+};
+
 export const getMyFriendListRequset = async (payload: CommonGetListParams) => {
   return await request.get('/api/contacts/add_friends/', {
     params: payload,
@@ -270,11 +276,11 @@ export const publishTopicMessageRequest = async (payload: PublishTopicMessagePar
 };
 
 export const myCreateTopicListRequest = async (payload: GetTopicListParams) => {
-  return await request.get('/api/my_create_topic_list/', { params: payload });
+  return await request.get('/api/my_create_topic_list/', {params: payload});
 };
 
 export const mySubscribeTopicListRequest = async (payload: GetTopicListParams) => {
-  return await request.get('/api/my_subscribe_topic_list/', { params: payload });
+  return await request.get('/api/my_subscribe_topic_list/', {params: payload});
 };
 
 export const getMyCreateDappListRequest = async (payload: GetMyCreateDappListApiParmas) => {

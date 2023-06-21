@@ -17,7 +17,7 @@ import {
   userBindDidRequest,
   getUserPermissionsRequest,
   updateUserPermissionsRequest,
-  getTargetUserPermissionsRequest,
+  getTargetUserPermissionsRequest, getMyAuthInfoRequest,
 } from '../api';
 import { getDataSignature, transformAddress } from '../utils';
 
@@ -144,5 +144,22 @@ export class User {
       ...params,
     });
     return data;
+  }
+
+
+  async getMyAuthInfo(dappId: string) {
+    const {PrivateKey, userid} = this._keys;
+    const timestamp = Date.now();
+    const signContent = userid + dappId + timestamp;
+    const web3mq_user_signature = await getDataSignature(
+      PrivateKey,
+      signContent
+    );
+    return await getMyAuthInfoRequest({
+      userid,
+      web3mq_user_signature,
+      timestamp,
+      dapp_id: dappId,
+    });
   }
 }
