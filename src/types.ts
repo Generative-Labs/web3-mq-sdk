@@ -606,3 +606,18 @@ export type QueryNotificationsParams ={
   size: number
   page: number
 }
+
+export type GetMyAuthInfoParams = {
+  userid: string
+  dapp_id: string
+  timestamp: number;
+  web3mq_user_signature: string;
+}
+
+export type GetMyAuthInfoResponse = {
+  auth_status: number
+  create_at: number
+  dapp_id: string
+  scopes: any
+  userid: string
+}
