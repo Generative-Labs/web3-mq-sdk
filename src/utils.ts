@@ -3,7 +3,7 @@ import jssha256 from 'js-sha256';
 import axios from 'axios';
 
 import type { Client } from './client';
-import { EnvTypes, SendMsgLoadingMap } from './types';
+import {EnvTypes, SendMsgLoadingMap, WalletType} from './types';
 import { PbTypeMessage, PbTypeMessageStatusResp } from './core/pbType';
 import { domainUrlList } from './core/config';
 import { getUserInfoRequest } from './api';
@@ -264,14 +264,14 @@ export const renderMessage = (
   return message;
 };
 
-export const transformAddress = async (walletAddress: string) => {
+export const transformAddress = async (walletAddress: string, didType: WalletType = 'eth') => {
   if (walletAddress.toLowerCase().startsWith('0x')) {
     const cacheUserId = localStorage.getItem(walletAddress);
     if (cacheUserId) {
       return cacheUserId;
     }
     const { data } = await getUserInfoRequest({
-      did_type: 'eth',
+      did_type: didType || 'eth' ,
       did_value: walletAddress,
       timestamp: Date.now(),
     });

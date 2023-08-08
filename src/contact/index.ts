@@ -1,13 +1,13 @@
 import { sha3_224 } from 'js-sha3';
 import { Client } from '../client';
-import { 
+import {
   ActionType,
   ClientKeyPaires,
   ContactListItemType,
   FollowOperationParams,
-  PageParams, 
+  PageParams,
   PublishNotificationToFollowersParams,
-  ServiceResponse
+  ServiceResponse, WalletType
 } from '../types';
 import { getDataSignature, newDateFormat, transformAddress } from '../utils';
 import {
@@ -128,9 +128,9 @@ export class Contact {
     return data.user_list;
   }
 
-  async sendFriend(target_id: string, content: string = ''): Promise<ServiceResponse> {
+  async sendFriend(target_id: string, content: string = '', didType: WalletType = 'eth'): Promise<ServiceResponse> {
     const { userid, PrivateKey } = this._keys;
-    const target_userid = await transformAddress(target_id);
+    const target_userid = await transformAddress(target_id, didType);
     const timestamp = Date.now();
     const signContent = userid + target_userid + content + timestamp;
     const web3mq_signature = await getDataSignature(PrivateKey, signContent);
