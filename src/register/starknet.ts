@@ -1,4 +1,4 @@
-import { Contract, hash, number, Provider, typedData } from 'starknet';
+import { cairo, constants, Contract, hash, num, Provider, typedData } from 'starknet';
 import { testNet } from '../abi';
 import { connect } from 'get-starknet';
 import { WalletSignRes } from '../types';
@@ -12,13 +12,22 @@ export const getStarkNetAccount = async () => {
 };
 
 const networkId = (baseUrl: string) => {
-  try {
-    if (baseUrl.includes('alpha-mainnet.starknet.io')) {
-      return 'mainnet-alpha';
-    } else if (baseUrl.includes('alpha4.starknet.io')) {
-      return 'goerli-alpha';
-    }
-  } catch {}
+  if (baseUrl.includes('alpha-mainnet.starknet.io')) {
+    return {
+      chainId: 'SN_MAIN',
+      network: constants.NetworkName.SN_MAIN,
+    };
+  } else if (baseUrl.includes('alpha4-2.starknet.io')) {
+    return {
+      chainId: 'SN_GOERLI2',
+      network: constants.NetworkName.SN_GOERLI2,
+    };
+  } else {
+    return {
+      chainId: 'SN_GOERLI',
+      network: constants.NetworkName.SN_GOERLI,
+    };
+  }
 };
 
 export const signWithStarkNet = async (
@@ -26,9 +35,8 @@ export const signWithStarkNet = async (
   address: string,
 ): Promise<WalletSignRes> => {
   const provider = await ((await getStarknetAccount()) as any)?.provider;
-  const message = hash.starknetKeccak(signContent).toString('hex').substring(0, 31);
-  const chainId =
-    networkId(provider.provider.baseUrl) === 'mainnet-alpha' ? 'SN_MAIN' : 'SN_GOERLI';
+  const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
+  const { chainId, network } = networkId(provider.provider.baseUrl);
   const typedMessage = {
     domain: {
       name: 'Example DApp',
@@ -50,18 +58,14 @@ export const signWithStarkNet = async (
   };
   const result = await provider.account.signMessage(typedMessage);
   let messageText = typedData.getMessageHash(typedMessage, address);
-  const network = networkId(provider.provider.baseUrl) || 'goerli-alpha';
-  // get argent public key
   const contractProvider = new Provider({
-    sequencer: {
-      network, // or 'goerli-alpha'
-    },
+    sequencer: { network },
   });
   const contact = new Contract(testNet, address, contractProvider);
-  const [pubKey] = await contact.call('getSigner');
+  const { publicKey } = await contact.getPublicKey();
   return {
-    publicKey: number.toHex(pubKey),
-    sign: number.toFelt(messageText) + ',' + result.join(','),
+    publicKey: num.toHex(publicKey),
+    sign: cairo.felt(messageText) + ',' + result.join(','),
   };
 };
 
