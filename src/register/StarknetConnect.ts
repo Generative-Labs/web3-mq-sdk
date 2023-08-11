@@ -14,7 +14,14 @@ export class StarknetConnect {
     this.walletId = walletId;
     this.starknet = await connect({
       include: [walletId],
+      modalMode: 'neverAsk',
     });
+    if (!this.starknet) {
+      this.starknet = await connect({
+        include: [walletId],
+        modalMode: 'canAsk',
+      });
+    }
     if (this.starknet) {
       const [address] = await this.starknet.enable();
       return { address };
@@ -29,23 +36,20 @@ export class StarknetConnect {
     address: string,
     walletType?: WalletType,
   ): Promise<WalletSignRes> {
-    if (!this.starknet || this.starknet.isConnected) {
+    if (!this.starknet || !this.starknet.isConnected) {
       await this.connect((walletType as WalletId) || 'braavos');
     }
-    if (!this.starknet || this.starknet.isConnected) {
+    if (!this.starknet || !this.starknet.isConnected) {
       return {
         publicKey: '',
         sign: '',
       };
     }
-    const [add] = await this.starknet.enable();
-    console.log(add, 'add');
-    console.log(address, 'address');
     const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
     const { chainId, network } = networkId(this.starknet.provider?.baseUrl);
     const typedMessage = {
       domain: {
-        name: 'Web3MQ APP',
+        name: 'Example DApp',
         chainId,
         version: '0.0.1',
       },
