@@ -1,7 +1,6 @@
 import { sha3_224 } from 'js-sha3';
 import ed from '@noble/ed25519';
 import { request } from '../core/request';
-import { getStarkNetAccount, signWithStarkNet } from './starknet';
 import { getEthAccount, signWithEth } from './eth';
 import {
   ByteArrayToHexString,
@@ -29,7 +28,7 @@ import {
   LoginByKeysParams,
   LoginApiParams,
   RegisterBySignParams,
-  RegisterParams,
+  RegisterApiParams,
   WalletNameMap,
   WalletSignRes,
   WalletType,
@@ -39,14 +38,16 @@ import {
   GetRegisterSignContentParams,
   MainKeypairType,
   ResetPasswordParams,
-  AccountType,
+  AccountType, BlockChainMap,
 } from '../types';
+import { StarknetConnect, WalletId } from './StarknetConnect';
 
 export class Register {
   appKey: string;
   pubicKeyType = 'ed25519';
   registerTime: number;
   registerSignContent: string;
+  starknetConnect: StarknetConnect = new StarknetConnect();
 
   constructor(appKey?: string) {
     this.appKey = appKey || '';
@@ -95,7 +96,7 @@ export class Register {
       mainPublicKey,
       signature,
       did_pubkey = '',
-      didType = 'eth',
+      didType = 'metamask',
       nickname = '',
       avatar_url = '',
       avatar_base64 = '',
@@ -104,9 +105,9 @@ export class Register {
       throw new Error('Please create register sign content first!');
     }
 
-    const payload: RegisterParams = {
+    const payload: RegisterApiParams = {
       userid,
-      did_type: didType,
+      did_type: BlockChainMap[didType],
       did_value: didValue,
       did_pubkey,
       did_signature: signature,
@@ -132,7 +133,7 @@ export class Register {
       password,
       userid,
       didValue,
-      didType = 'eth',
+      didType = 'metamask',
       mainPrivateKey,
       mainPublicKey,
       pubkeyExpiredTimestamp = Date.now() + 86400 * 1000,
@@ -151,7 +152,7 @@ export class Register {
 
       const payload: LoginApiParams = {
         userid,
-        did_type: didType,
+        did_type: BlockChainMap[didType],
         did_value: didValue,
         login_signature,
         signature_content: signContent,
@@ -185,7 +186,7 @@ export class Register {
       mainPublicKey,
       signature,
       did_pubkey = '',
-      didType = 'eth',
+      didType = 'metamask',
       nickname = '',
       avatar_url = '',
     } = options;
@@ -193,9 +194,9 @@ export class Register {
     if (!this.registerTime || !this.registerSignContent) {
       throw new Error('Please create register sign content first!');
     }
-    const payload: RegisterParams = {
+    const payload: RegisterApiParams = {
       userid,
-      did_type: didType,
+      did_type: BlockChainMap[didType],
       did_value: didValue,
       did_pubkey,
       did_signature: signature,
@@ -221,8 +222,9 @@ export class Register {
     walletType: WalletType,
   ): Promise<WalletSignRes> => {
     switch (walletType) {
-      case 'starknet':
-        return signWithStarkNet(signContent, address);
+      case 'argent':
+      case 'braavos':
+        return this.starknetConnect.sign(signContent, address, walletType);
       default:
         return signWithEth(signContent, address);
     }
@@ -230,8 +232,9 @@ export class Register {
 
   getAccount = async (walletType: WalletType): Promise<AccountType> => {
     switch (walletType) {
-      case 'starknet':
-        return await getStarkNetAccount();
+      case 'argent':
+      case 'braavos':
+        return await this.starknetConnect.connect(walletType as WalletId);
       default:
         return await getEthAccount();
     }
@@ -239,8 +242,9 @@ export class Register {
 
   connectWallet = async (walletType: WalletType): Promise<AccountType> => {
     switch (walletType) {
-      case 'starknet':
-        return await getStarkNetAccount();
+      case 'argent':
+      case 'braavos':
+        return await this.starknetConnect.connect(walletType as WalletId);
       default:
         return await getEthAccount();
     }
@@ -250,8 +254,9 @@ export class Register {
     options: GetMainKeypairParams,
   ): Promise<GetSignContentResponse> => {
     const { password, did_value, did_type } = options;
+    const didType = BlockChainMap[did_type];
     const keyIndex = 1;
-    const keyMSG = `${did_type}:${did_value}${keyIndex}${password}`;
+    const keyMSG = `${didType}:${did_value}${keyIndex}${password}`;
 
     const magicString = Uint8ToBase64String(
       new TextEncoder().encode(sha3_224(`$web3mq${keyMSG}web3mq$`)),
@@ -305,14 +310,13 @@ Nonce: ${magicString}`;
       signContentURI = window.location.origin,
     } = options;
 
-    const wallet_type_name = WalletNameMap[didType];
     const pubkey_type = this.pubicKeyType;
     const timestamp = Date.now();
     const NonceContent = sha3_224(
-      userid + pubkey_type + mainPublicKey + didType + didValue + timestamp,
+      userid + pubkey_type + mainPublicKey + BlockChainMap[didType] + didValue + timestamp,
     );
 
-    const signContent = `Web3MQ wants you to sign in with your ${wallet_type_name} account:
+    const signContent = `Web3MQ wants you to sign in with your ${WalletNameMap[didType]} account:
 ${didValue}
 For Web3MQ register
 URI: ${signContentURI}

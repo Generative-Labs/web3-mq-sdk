@@ -1,13 +1,13 @@
 import { sha3_224 } from 'js-sha3';
 import { Client } from '../client';
 import {
-  ActionType,
+  ActionType, BlockChainMap, BlockChainType,
   ClientKeyPaires,
   ContactListItemType,
   FollowOperationParams,
   PageParams,
   PublishNotificationToFollowersParams,
-  ServiceResponse, WalletType
+  ServiceResponse, WalletNameMap
 } from '../types';
 import { getDataSignature, newDateFormat, transformAddress } from '../utils';
 import {
@@ -128,7 +128,7 @@ export class Contact {
     return data.user_list;
   }
 
-  async sendFriend(target_id: string, content: string = '', didType: WalletType = 'eth'): Promise<ServiceResponse> {
+  async sendFriend(target_id: string, content: string = '', didType: BlockChainType = 'eth'): Promise<ServiceResponse> {
     const { userid, PrivateKey } = this._keys;
     const target_userid = await transformAddress(target_id, didType);
     const timestamp = Date.now();
@@ -151,7 +151,7 @@ export class Contact {
     const timestamp = Date.now();
     let nonce = sha3_224(userid + action + targetUserid + timestamp);
     const sign_content = `
-    Web3MQ wants you to sign in with your ${didType} account:
+    Web3MQ wants you to sign in with your ${WalletNameMap[didType]} account:
     ${address}
     
     For follow signature
@@ -167,7 +167,7 @@ export class Contact {
       timestamp, 
       address,
       action,
-      did_type: didType,
+      did_type: BlockChainMap[didType],
       target_userid: targetUserid
     });
     if (this._client.listeners.events['contact.updateList']) {
