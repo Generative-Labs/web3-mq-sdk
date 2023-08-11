@@ -31,6 +31,22 @@ export class StarknetConnect {
     };
   }
 
+  async starknetSign(signContent: string, address: string): Promise<WalletSignRes> {
+    if (!this.starknet || !this.starknet.isConnected) {
+      this.starknet = await connect({
+        modalMode: 'alwaysAsk',
+        include: ['braavos', 'argentX'],
+      });
+    }
+    if (this.starknet && this.starknet.isConnected) {
+      return await this.sign(signContent, address);
+    }
+    return {
+      publicKey: '',
+      sign: '',
+    };
+  }
+
   async sign(
     signContent: string,
     address: string,
@@ -46,7 +62,7 @@ export class StarknetConnect {
       };
     }
     const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
-    const { chainId, network } = networkId(this.starknet.provider?.baseUrl);
+    const { chainId, network } = networkId(this.starknet.provider?.baseUrl || this.starknet.provider?.provider?.baseUrl || '');
     const typedMessage = {
       domain: {
         name: 'Example DApp',

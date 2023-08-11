@@ -38,7 +38,9 @@ import {
   GetRegisterSignContentParams,
   MainKeypairType,
   ResetPasswordParams,
-  AccountType, BlockChainMap,
+  AccountType,
+  BlockChainMap,
+  BlockChainType,
 } from '../types';
 import { StarknetConnect, WalletId } from './StarknetConnect';
 
@@ -219,12 +221,14 @@ export class Register {
   sign = async (
     signContent: string,
     address: string,
-    walletType: WalletType,
+    walletType: WalletType | BlockChainType,
   ): Promise<WalletSignRes> => {
     switch (walletType) {
       case 'argentX':
       case 'braavos':
         return this.starknetConnect.sign(signContent, address, walletType);
+      case 'starknet':
+        return this.starknetConnect.starknetSign(signContent, address);
       default:
         return signWithEth(signContent, address);
     }

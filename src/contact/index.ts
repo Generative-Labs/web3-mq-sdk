@@ -1,13 +1,14 @@
 import { sha3_224 } from 'js-sha3';
 import { Client } from '../client';
 import {
-  ActionType, BlockChainMap, BlockChainType,
+  ActionType,
+  BlockChainType,
   ClientKeyPaires,
   ContactListItemType,
   FollowOperationParams,
   PageParams,
   PublishNotificationToFollowersParams,
-  ServiceResponse, WalletNameMap
+  ServiceResponse,
 } from '../types';
 import { getDataSignature, newDateFormat, transformAddress } from '../utils';
 import {
@@ -74,7 +75,9 @@ export class Contact {
       timestamp,
       ...option,
     });
-    const newContacts = data.user_list.filter((item: ContactListItemType) => item.follow_status === 'follow_each');
+    const newContacts = data.user_list.filter(
+      (item: ContactListItemType) => item.follow_status === 'follow_each',
+    );
     if (this.contactList && option.page !== 1) {
       this.contactList = [...this.contactList, ...newContacts];
     } else {
@@ -99,10 +102,10 @@ export class Contact {
       this.followerList = [...this.followerList, ...data.user_list];
     } else {
       this.followerList = data.user_list;
-    };
+    }
     if (this._client.listeners.events['contact.getFollowerList']) {
       this._client.emit('contact.getFollowerList', { type: 'contact.getFollowerList' });
-    };
+    }
     return data.user_list;
   }
 
@@ -121,14 +124,18 @@ export class Contact {
       this.followingList = [...this.followingList, ...data.user_list];
     } else {
       this.followingList = data.user_list;
-    };
+    }
     if (this._client.listeners.events['contact.getFollowingList']) {
       this._client.emit('contact.getFollowingList', { type: 'contact.getFollowingList' });
-    };
+    }
     return data.user_list;
   }
 
-  async sendFriend(target_id: string, content: string = '', didType: BlockChainType = 'eth'): Promise<ServiceResponse> {
+  async sendFriend(
+    target_id: string,
+    content: string = '',
+    didType: BlockChainType = 'eth',
+  ): Promise<ServiceResponse> {
     const { userid, PrivateKey } = this._keys;
     const target_userid = await transformAddress(target_id, didType);
     const timestamp = Date.now();
@@ -151,33 +158,37 @@ export class Contact {
     const timestamp = Date.now();
     let nonce = sha3_224(userid + action + targetUserid + timestamp);
     const sign_content = `
-    Web3MQ wants you to sign in with your ${WalletNameMap[didType]} account:
+    Web3MQ wants you to sign in with your ${didType} account:
     ${address}
     
     For follow signature
     
     Nonce: ${nonce}
     Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
-    const { sign: did_signature, publicKey: did_pubkey = '' } = await Client.register.sign(sign_content, address, didType);
+    const { sign: did_signature, publicKey: did_pubkey = '' } = await Client.register.sign(
+      sign_content,
+      address,
+      didType,
+    );
     const data = await followOperationRequest({
       did_pubkey,
       did_signature,
       sign_content,
       userid,
-      timestamp, 
+      timestamp,
       address,
       action,
-      did_type: BlockChainMap[didType],
-      target_userid: targetUserid
+      did_type: didType,
+      target_userid: targetUserid,
     });
     if (this._client.listeners.events['contact.updateList']) {
       this._client.emit('contact.updateList', { type: 'contact.updateList' });
-    };
+    }
     return data as any;
   }
 
   async publishNotificationToFollowers(
-    params: PublishNotificationToFollowersParams
+    params: PublishNotificationToFollowersParams,
   ): Promise<ServiceResponse> {
     const { title } = params;
     const { userid, PrivateKey } = this._keys;
@@ -192,9 +203,10 @@ export class Contact {
     });
     return data as any;
   }
+
   /**
-  * @deprecated
-  */
+   * @deprecated
+   */
   async getMyFriendRequestList(option: PageParams) {
     const { emit } = this._client;
     const { userid, PrivateKey } = this._keys;
@@ -212,9 +224,10 @@ export class Contact {
     emit('contact.friendList', { type: 'contact.friendList' });
     // return data;
   }
+
   /**
-  * @deprecated
-  */
+   * @deprecated
+   */
   async getReceiveFriendRequestList(option: PageParams) {
     const { emit } = this._client;
 
@@ -233,9 +246,10 @@ export class Contact {
     emit('contact.reviceList', { type: 'contact.reviceList' });
     // return data;
   }
+
   /**
-  * @deprecated
-  */
+   * @deprecated
+   */
   async operationFriend(target_userid: string, action: ActionType = 'agree') {
     const { userid, PrivateKey } = this._keys;
     const { emit } = this._client;

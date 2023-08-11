@@ -360,7 +360,7 @@ export interface FollowOperationParams {
   address: string;
   targetUserid: string;
   action: 'follow' | 'cancel';
-  didType: WalletType;
+  didType: BlockChainType;
 }
 
 export interface GetUserPublicProfileParams {
