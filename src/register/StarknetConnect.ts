@@ -4,7 +4,7 @@ import { networkId } from './starknet';
 import { ArgentAbi, BraavosAbi } from '../abi';
 import { WalletSignRes, WalletType } from '../types';
 
-export type WalletId = 'argent' | 'braavos';
+export type WalletId = 'argentX' | 'braavos';
 
 export class StarknetConnect {
   starknet: StarknetWindowObject | null = null;

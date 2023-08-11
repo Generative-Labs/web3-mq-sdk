@@ -505,7 +505,7 @@ export type ResetPasswordParams = {
   avatar_url?: string;
 };
 
-export type WalletType = 'metamask' | 'qrcode' | 'argent' | 'braavos';
+export type WalletType = 'metamask' | 'qrcode' | 'argentX' | 'braavos';
 
 export type WalletNameType = 'MetaMask' | 'Argent X' | 'Braavos' | 'Web3MQ';
 
@@ -515,7 +515,7 @@ export type DidType = 'web3mq' | BlockChainType;
 
 export const WalletNameMap: Record<WalletType, WalletNameType> = {
   metamask: 'MetaMask',
-  argent: 'Argent X',
+  argentX: 'Argent X',
   braavos: 'Braavos',
   qrcode: 'Web3MQ',
 };
@@ -523,7 +523,7 @@ export const WalletNameMap: Record<WalletType, WalletNameType> = {
 export const BlockChainMap: Record<WalletType, BlockChainType> = {
   metamask: 'eth',
   braavos: 'starknet',
-  argent: 'starknet',
+  argentX: 'starknet',
   qrcode: 'eth',
 };
 

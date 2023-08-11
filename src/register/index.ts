@@ -222,7 +222,7 @@ export class Register {
     walletType: WalletType,
   ): Promise<WalletSignRes> => {
     switch (walletType) {
-      case 'argent':
+      case 'argentX':
       case 'braavos':
         return this.starknetConnect.sign(signContent, address, walletType);
       default:
@@ -232,7 +232,7 @@ export class Register {
 
   getAccount = async (walletType: WalletType): Promise<AccountType> => {
     switch (walletType) {
-      case 'argent':
+      case 'argentX':
       case 'braavos':
         return await this.starknetConnect.connect(walletType as WalletId);
       default:
@@ -242,7 +242,7 @@ export class Register {
 
   connectWallet = async (walletType: WalletType): Promise<AccountType> => {
     switch (walletType) {
-      case 'argent':
+      case 'argentX':
       case 'braavos':
         return await this.starknetConnect.connect(walletType as WalletId);
       default:
