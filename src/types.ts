@@ -62,36 +62,6 @@ export type LoginByKeysParams = {
   pubkeyExpiredTimestamp?: number;
 };
 
-export type RegisterMetaMaskParams = {
-  password: string;
-  userid: string;
-  did_value: string;
-  did_type?: WalletType;
-  signContentURI?: string;
-  nickname?: string;
-  avatar_url?: string;
-  avatar_base64?: string;
-};
-
-export type SignMetaMaskParams = {
-  password: string;
-  userid: string;
-  did_value: string;
-  did_type?: WalletType;
-  mainPrivateKey?: string;
-  mainPublicKey?: string;
-  pubkeyExpiredTimestamp?: number;
-};
-export type NewLoginApiParams = {
-  password: string;
-  userid: string;
-  did_value: string;
-  did_type?: WalletType;
-  mainPrivateKey?: string;
-  mainPublicKey?: string;
-  pubkeyExpiredTimestamp?: number;
-};
-
 export type InitOptions = {
   connectUrl?: string | null;
   app_key?: string;
@@ -134,7 +104,7 @@ export type SendWeb3MQBridgeOptions = {
 };
 
 export type GetUserInfoParams = {
-  did_type: string;
+  did_type: DidType;
   did_value: string;
   timestamp: number;
 };
@@ -163,9 +133,9 @@ export interface ClientKeyPaires extends KeyPairsType {
   userid: string;
 }
 
-export type RegisterParams = {
+export type RegisterApiParams = {
   userid: string;
-  did_type: string;
+  did_type: BlockChainType;
   did_value: string;
   did_signature: string;
   pubkey_type: string;
@@ -193,18 +163,9 @@ export type LoginResponse = {
   pubkeyExpiredTimestamp: number;
 };
 
-export type QrCodeRegisterParams = {
-  userid: string;
-  signature: string;
-  did_pubkey?: string;
-  nickname?: string;
-  avatar_url?: string;
-  avatar_base64?: string;
-};
-
 export type LoginApiParams = {
   userid: string;
-  did_type: string;
+  did_type: BlockChainType;
   did_value: string;
   login_signature: string;
   signature_content: string;
@@ -213,16 +174,6 @@ export type LoginApiParams = {
   pubkey_type: string;
   timestamp: number;
   pubkey_expired_timestamp: number;
-};
-
-export type QrCodeLoginApiParams = {
-  userid: string;
-  did_type: string;
-  did_value: string;
-  mainPrivateKey: string;
-  mainPublicKey: string;
-  password?: string;
-  pubkeyExpiredTimestamp?: number;
 };
 
 export type BaseParams = {
@@ -250,13 +201,15 @@ export type GroupPermissions = {
     value: 'ceator_invite_friends' | 'public' | 'nft_validation';
   };
 };
+
 export interface CreateRoomApiParams extends BaseParams {
   group_name?: string;
   groupid?: string;
   avatar_url?: string;
   avatar_base64?: string;
   permissions?: GroupPermissions;
-};
+}
+
 export interface CreateRoomParams {
   groupName?: string;
   groupid?: string;
@@ -283,16 +236,17 @@ export type ChannelItemType = {
 };
 
 export interface UpdateRoomListParams {
-  chatid: string,
-  chatType: string
-  topic: string,
-  topicType: string,
+  chatid: string;
+  chatType: string;
+  topic: string;
+  topicType: string;
 }
+
 export interface UpdateRoomListApiParams extends BaseParams {
-  chatid: string,
-  chat_type: string
-  topic: string,
-  topic_type: string,
+  chatid: string;
+  chat_type: string;
+  topic: string;
+  topic_type: string;
 }
 
 export interface GetMessageListParams extends BaseParams, PageParams {
@@ -311,7 +265,11 @@ export interface InviteGroupMemberParams extends BaseParams {
 export interface JoinGroupParams extends NewBaseParams {
   groupid: string;
 }
-export interface UpdateGroupPermissionsApiParams extends NewBaseParams, UpdateGroupPermissionsParams {}
+
+export interface UpdateGroupPermissionsApiParams
+  extends NewBaseParams,
+    UpdateGroupPermissionsParams {}
+
 export interface UpdateGroupPermissionsParams {
   groupid: string;
   permissions: GroupPermissions;
@@ -375,6 +333,7 @@ export interface UserBindDidApiParams extends BaseParams {
   did_action?: string;
   did_content?: string;
 }
+
 export interface UserBindDidParams {
   providerId: string;
   didType: string;
@@ -389,20 +348,20 @@ export interface UserBindDidIdsResponse {
   provider_id: string;
   metadata: any;
 }
+
 export interface FollowOperationApiParams extends WalletBaseParams {
   address: string;
   target_userid: string;
   action: 'follow' | 'cancel';
-  did_type: WalletType;
+  did_type: BlockChainType;
 }
+
 export interface FollowOperationParams {
   address: string;
   targetUserid: string;
   action: 'follow' | 'cancel';
   didType: WalletType;
 }
-
-export interface GetFollowerListParams extends NewBaseParams, PageParams {}
 
 export interface GetUserPublicProfileParams {
   did_type: string;
@@ -416,7 +375,10 @@ export interface GetPublicFollowerListParams extends PageParams {
   timestamp: number;
 }
 
-export interface PublishNotificationToFollowersApiParams extends NewBaseParams, PublishNotificationToFollowersParams {}
+export interface PublishNotificationToFollowersApiParams
+  extends NewBaseParams,
+    PublishNotificationToFollowersParams {}
+
 export interface PublishNotificationToFollowersParams {
   title: string;
   content: string;
@@ -428,7 +390,10 @@ export interface GetTargetUserPermissionsParams extends NewBaseParams {
 
 export type UserPermissionsType = Record<string, { type: string; value: boolean }>;
 
-export interface UpdateUserPermissionsApiParams extends NewBaseParams, UpdateUserPermissionsParams {}
+export interface UpdateUserPermissionsApiParams
+  extends NewBaseParams,
+    UpdateUserPermissionsParams {}
+
 export interface UpdateUserPermissionsParams {
   permissions: UserPermissionsType;
 }
@@ -449,7 +414,7 @@ export type ContactListItemType = {
   permissions: UserPermissionsType;
   userid: string;
   wallet_address: string;
-  wallet_type: WalletType;
+  wallet_type: BlockChainType;
 };
 
 export type SearchUsersResponse = {
@@ -506,16 +471,14 @@ export interface TopicListType extends SubscribeListType {
   topic_name: string;
 }
 
-export type WalletType = 'eth' | 'starknet' | 'qrcode';
-
 export type WalletSignRes = {
   sign: string;
   publicKey?: string;
 };
 
 export type GetSignContentResponse = {
-  signContent: string
-}
+  signContent: string;
+};
 
 export type GetRegisterSignContentParams = {
   userid: string;
@@ -523,12 +486,12 @@ export type GetRegisterSignContentParams = {
   didType: WalletType;
   didValue: string;
   signContentURI?: string;
-}
+};
 
 export type MainKeypairType = {
-  publicKey: string
-  secretKey: string
-}
+  publicKey: string;
+  secretKey: string;
+};
 
 export type ResetPasswordParams = {
   userid: string;
@@ -540,17 +503,28 @@ export type ResetPasswordParams = {
   signContentURI?: string;
   nickname?: string;
   avatar_url?: string;
-}
+};
 
-export type ResetPasswordResponse = {
-  mainPrivateKey: string;
-  mainPublicKey: string
-}
+export type WalletType = 'metamask' | 'dappConnect' | 'argentX' | 'braavos';
 
-export const WalletNameMap = {
-  eth: 'Ethereum',
-  starknet: 'Argent X',
-  qrcode: 'Qrcode',
+export type WalletNameType = 'MetaMask' | 'Argent X' | 'Braavos' | 'Web3MQ';
+
+export type BlockChainType = 'eth' | 'starknet';
+
+export type DidType = 'web3mq' | BlockChainType;
+
+export const WalletNameMap: Record<WalletType, WalletNameType> = {
+  metamask: 'MetaMask',
+  argentX: 'Argent X',
+  braavos: 'Braavos',
+  dappConnect: 'Web3MQ',
+};
+
+export const BlockChainMap: Record<WalletType, BlockChainType> = {
+  metamask: 'eth',
+  braavos: 'starknet',
+  argentX: 'starknet',
+  dappConnect: 'eth',
 };
 
 export const SendMsgLoadingMap = {
@@ -559,33 +533,31 @@ export const SendMsgLoadingMap = {
   loading: 'loading',
 };
 
-
 export interface GetMyCreateDappListApiParmas {
-  creator_id: string
-  timestamp: number
-  web3mq_user_signature: string
+  creator_id: string;
+  timestamp: number;
+  web3mq_user_signature: string;
 }
 
 export interface CreateDappApiParams {
-  creator_id: string
-  dapp_id: string
-  dapp_name: string
-  dapp_description: string
-  dapp_type: string
-  dapp_pubkey: string
-  domain?: string
-  timestamp: number
-  web3mq_user_signature: string
+  creator_id: string;
+  dapp_id: string;
+  dapp_name: string;
+  dapp_description: string;
+  dapp_type: string;
+  dapp_pubkey: string;
+  domain?: string;
+  timestamp: number;
+  web3mq_user_signature: string;
 }
 
-
 export interface CreateDappParams {
-  dapp_id: string
-  dapp_name: string
-  dapp_description: string
-  dapp_type: string
-  dapp_pubkey: string
-  domain?: string
+  dapp_id: string;
+  dapp_name: string;
+  dapp_description: string;
+  dapp_type: string;
+  dapp_pubkey: string;
+  domain?: string;
 }
 
 export interface CreateDappListResponse {
@@ -593,31 +565,31 @@ export interface CreateDappListResponse {
   total_count: number;
 }
 
-export interface QueryNotificationsApiParams extends BaseParams{
-  topic?: string
-  notice_type?: string
-  size: number
-  page: number
+export interface QueryNotificationsApiParams extends BaseParams {
+  topic?: string;
+  notice_type?: string;
+  size: number;
+  page: number;
 }
 
-export type QueryNotificationsParams ={
-  topic?: string
-  notice_type?: string
-  size: number
-  page: number
-}
+export type QueryNotificationsParams = {
+  topic?: string;
+  notice_type?: string;
+  size: number;
+  page: number;
+};
 
 export type GetMyAuthInfoParams = {
-  userid: string
-  dapp_id: string
+  userid: string;
+  dapp_id: string;
   timestamp: number;
   web3mq_user_signature: string;
-}
+};
 
 export type GetMyAuthInfoResponse = {
-  auth_status: number
-  create_at: number
-  dapp_id: string
-  scopes: any
-  userid: string
-}
+  auth_status: number;
+  create_at: number;
+  dapp_id: string;
+  scopes: any;
+  userid: string;
+};
