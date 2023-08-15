@@ -363,6 +363,21 @@ export interface FollowOperationParams {
   didType: BlockChainType;
 }
 
+export type GetFollowSignContentParams = {
+  targetDidType: DidType;
+  targetId: string;
+  action: 'follow' | 'cancel';
+};
+export type FollowOperationBySignParams = {
+  didPubkey?: string;
+  signature: string;
+  signContent: string;
+  followTimestamp: number;
+  action: 'follow' | 'cancel';
+  targetId: string;
+  targetDidType: DidType;
+};
+
 export interface GetUserPublicProfileParams {
   did_type: string;
   did_value: string;
@@ -566,30 +581,30 @@ export interface CreateDappListResponse {
 }
 
 export interface QueryNotificationsApiParams extends BaseParams {
-  topic?: string;
-  notice_type?: string;
-  size: number;
-  page: number;
+    topic?: string;
+    notice_type?: string;
+    size: number;
+    page: number;
 }
 
 export type QueryNotificationsParams = {
-  topic?: string;
-  notice_type?: string;
-  size: number;
-  page: number;
+    topic?: string;
+    notice_type?: string;
+    size: number;
+    page: number;
 };
 
 export type GetMyAuthInfoParams = {
-  userid: string;
-  dapp_id: string;
-  timestamp: number;
-  web3mq_user_signature: string;
+    userid: string;
+    dapp_id: string;
+    timestamp: number;
+    web3mq_user_signature: string;
 };
 
 export type GetMyAuthInfoResponse = {
-  auth_status: number;
-  create_at: number;
-  dapp_id: string;
-  scopes: any;
-  userid: string;
+    auth_status: number;
+    create_at: number;
+    dapp_id: string;
+    scopes: any;
+    userid: string;
 };

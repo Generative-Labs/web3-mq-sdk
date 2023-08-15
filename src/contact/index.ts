@@ -5,7 +5,9 @@ import {
   BlockChainType,
   ClientKeyPaires,
   ContactListItemType,
+  FollowOperationBySignParams,
   FollowOperationParams,
+  GetFollowSignContentParams,
   PageParams,
   PublishNotificationToFollowersParams,
   ServiceResponse,
@@ -187,17 +189,20 @@ export class Contact {
     return data as any;
   }
 
-  async getFollowOperationSignContent(params: FollowOperationParams): Promise<{
+  async getFollowOperationSignContent(params: GetFollowSignContentParams): Promise<{
     signContent: string;
     timestamp: number;
   }> {
-    const { address, targetUserid, action, didType } = params;
+    const { targetId, action, targetDidType } = params;
     const { userid } = this._keys;
+    const { user } = this._client;
     const timestamp = Date.now();
+    const { wallet_type, wallet_address } = await user.getMyProfile();
+    const targetUserid = await transformAddress(targetId, targetDidType);
     let nonce = sha3_224(userid + action + targetUserid + timestamp);
     const signContent = `
-    Web3MQ wants you to sign in with your ${didType} account:
-    ${address}
+    Web3MQ wants you to sign in with your ${wallet_type} account:
+    ${wallet_address}
     
     For follow signature
     
@@ -207,37 +212,31 @@ export class Contact {
     return { signContent, timestamp };
   }
 
-  async followOperationBySignature(params: {
-    didPubkey?: string;
-    signature: string;
-    signContent: string;
-    followTimestamp: number;
-    address: string;
-    action: 'follow' | 'cancel';
-    didType: BlockChainType;
-    targetId: string;
-  }): Promise<ServiceResponse> {
+  async followOperationBySignature(params: FollowOperationBySignParams): Promise<ServiceResponse> {
     const { userid } = this._keys;
+    const { user } = this._client;
     const {
       didPubkey = '',
       signature,
       signContent,
       followTimestamp,
-      address,
       action,
-      didType,
       targetId,
+      targetDidType,
     } = params;
+    const { wallet_type, wallet_address } = await user.getMyProfile();
+    const targetUserid = await transformAddress(targetId, targetDidType);
+
     const data = await followOperationRequest({
       did_pubkey: didPubkey,
       did_signature: signature,
       sign_content: signContent,
       userid,
       timestamp: followTimestamp,
-      address,
+      address: wallet_address,
       action,
-      did_type: didType,
-      target_userid: targetId,
+      did_type: wallet_type as BlockChainType,
+      target_userid: targetUserid,
     });
     if (this._client.listeners.events['contact.updateList']) {
       this._client.emit('contact.updateList', { type: 'contact.updateList' });
