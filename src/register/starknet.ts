@@ -2,7 +2,14 @@
 // import { testNet } from '../abi';
 // import {connect, StarknetWindowObject} from 'get-starknet';
 // import {WalletSignRes, WalletType} from '../types';
-type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
+type NetworkName = 'SN_MAIN' | 'SN_GOERLI' | 'SN_GOERLI2';
+
+// enum NetworkName {
+//   SN_MAIN = 'SN_MAIN',
+//   SN_GOERLI = 'SN_GOERLI',
+//   SN_GOERLI2 = 'SN_GOERLI2',
+// }
+
 //
 //
 // export const getStarkNetAccount = async () => {
@@ -13,24 +20,26 @@ type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 //   return res;
 // };
 //
-export const networkId = (baseUrl: string): {
-  chainId: string,
-  network: NetworkName
-}  =>  {
+export const networkId = (
+  baseUrl: string,
+): {
+  chainId: string;
+  network: NetworkName;
+} => {
   if (baseUrl.includes('alpha-mainnet.starknet.io')) {
     return {
       chainId: 'SN_MAIN',
-      network: 'mainnet-alpha',
+      network: 'SN_MAIN',
     };
   } else if (baseUrl.includes('alpha4-2.starknet.io')) {
     return {
       chainId: 'SN_GOERLI2',
-      network: 'goerli-alpha-2',
+      network: 'SN_GOERLI2',
     };
   } else {
     return {
       chainId: 'SN_GOERLI',
-      network: 'goerli-alpha',
+      network: 'SN_GOERLI',
     };
   }
 };

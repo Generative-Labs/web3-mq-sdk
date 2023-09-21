@@ -1,7 +1,7 @@
 import { StarknetWindowObject, connect } from 'get-starknet';
-import { Contract, hash, number, Provider, typedData } from 'starknet';
+import { Contract, hash, num, Provider, typedData, cairo } from 'starknet';
 import { networkId } from './starknet';
-import { ArgentAbi, BraavosAbi } from '../abi';
+import { ArgentAbi, ArgentXAbi2, BraavosAbi } from '../abi';
 import { WalletSignRes, WalletType } from '../types';
 
 export type WalletId = 'argentX' | 'braavos';
@@ -62,7 +62,9 @@ export class StarknetConnect {
       };
     }
     const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
-    const { chainId, network } = networkId(this.starknet.provider?.baseUrl || this.starknet.provider?.provider?.baseUrl || '');
+    const { chainId, network } = networkId(
+      this.starknet.provider?.baseUrl || this.starknet.provider?.provider?.baseUrl || '',
+    );
     const typedMessage = {
       domain: {
         name: 'Example DApp',
@@ -80,24 +82,36 @@ export class StarknetConnect {
       primaryType: 'Message',
       message: { message },
     };
+    console.log(this.starknet.account, 'this.starknet.account');
     const result = await this.starknet.account.signMessage(typedMessage);
+    console.log(this.starknet.account.signer);
     let messageText = typedData.getMessageHash(typedMessage, address);
     const contractProvider = new Provider({
+      //@ts-ignore
       sequencer: { network },
     });
     if (this.walletId === 'braavos') {
       const contact = new Contract(BraavosAbi, address, contractProvider);
       const { publicKey } = await contact.getPublicKey();
       return {
-        publicKey: number.toHex(publicKey),
-        sign: number.toFelt(messageText) + ',' + result.join(','),
+        publicKey: num.toHex(publicKey),
+        sign: cairo.felt(messageText) + ',' + result.join(','),
       };
     } else {
-      const contact = new Contract(ArgentAbi, address, contractProvider);
-      const [pubKey] = await contact.call('getSigner');
+      let pubkey2 = '';
+      try {
+        let contact = new Contract(ArgentXAbi2, address, contractProvider);
+        pubkey2 = await contact.get_owner();
+      } catch (e) {
+        let contact = new Contract(ArgentAbi, address, contractProvider);
+        console.log(contact, 'contact');
+        const signer = await contact.getSigner();
+        pubkey2 = signer.signer;
+        console.log(pubkey2, 'pubkey2');
+      }
       return {
-        publicKey: number.toHex(pubKey),
-        sign: number.toFelt(messageText) + ',' + result.join(','),
+        publicKey: num.toHex(pubkey2),
+        sign: cairo.felt(messageText) + ',' + result.join(','),
       };
     }
   }
