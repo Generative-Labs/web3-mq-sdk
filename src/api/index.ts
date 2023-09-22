@@ -25,7 +25,6 @@ import {
   PublishTopicMessageParams,
   GetTopicListParams,
   GetUserInfoParams,
-  RegisterParams,
   LoginApiParams,
   GetUserBindDidsParams,
   FollowOperationApiParams,
@@ -37,7 +36,12 @@ import {
   UpdateRoomListApiParams,
   UpdateUserPermissionsApiParams,
   UserBindDidApiParams,
-  RegisterApiResponse, CreateDappApiParams, QueryNotificationsApiParams, GetMyAuthInfoParams, GetMyAuthInfoResponse,
+  RegisterApiResponse,
+  CreateDappApiParams,
+  QueryNotificationsApiParams,
+  GetMyAuthInfoParams,
+  GetMyAuthInfoResponse,
+  RegisterApiParams,
 } from '../types';
 
 /**
@@ -136,11 +140,11 @@ export const getUserInfoRequest = async (payload: GetUserInfoParams) => {
   return await request.post('/api/get_user_info/', payload);
 };
 
-export const userRegisterRequest = async (payload: RegisterParams): Promise<RegisterApiResponse> => {
+export const userRegisterRequest = async (payload: RegisterApiParams): Promise<RegisterApiResponse> => {
   return await request.post('/api/user_register_v2/', payload);
 };
 
-export const resetPasswordRequest = async (payload: RegisterParams) => {
+export const resetPasswordRequest = async (payload: RegisterApiParams) => {
   return await request.post('/api/user_reset_password_v2/', payload);
 };
 
