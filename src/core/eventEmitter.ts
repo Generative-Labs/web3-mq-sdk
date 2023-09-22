@@ -7,7 +7,6 @@ class EventEmitter {
     this.events = {};
   }
 
-  // 订阅
   on(eventName: EventTypes, callback: any) {
     const valid = isValidEventType(eventName);
     if (!valid) {
@@ -22,7 +21,6 @@ class EventEmitter {
     }
   }
 
-  // 触发
   emit(eventName: EventTypes, ...args: any[]) {
     const callbacks = this.events[eventName] || [];
     if (callbacks.length === 0) {
@@ -31,7 +29,6 @@ class EventEmitter {
     callbacks.forEach((cb: any) => cb(...args));
   }
 
-  // 取消订阅，
   off(eventName: EventTypes, callback: any) {
     if (callback === undefined) {
       this.events[eventName] = [];

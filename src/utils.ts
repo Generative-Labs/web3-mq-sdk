@@ -3,10 +3,10 @@ import jssha256 from 'js-sha256';
 import axios from 'axios';
 
 import type { Client } from './client';
-import { DidType, EnvTypes, SendMsgLoadingMap} from './types';
+import { DidType, EnvTypes, SendMsgLoadingMap } from './types';
 import { PbTypeMessage, PbTypeMessageStatusResp } from './core/pbType';
 import { domainUrlList } from './core/config';
-import { getUserInfoRequest } from './api';
+import { getUserInfoRequest, getUserPublicProfileRequest } from './api';
 
 export {
   userLoginRequest,
@@ -160,39 +160,44 @@ export const getFastestUrl = async (env: EnvTypes = 'test') => {
 };
 
 export const renderMessagesList = async (msglist: any) => {
-  return msglist.map((msg: any, idx: number) => {
+  let messages = [];
+  for (let idx = 0; idx < msglist.length; idx++) {
+    let msg = msglist[idx];
     let content = '';
-    if (msg.cipher_suite == 'NONE') {
-      content = decodeURIComponent(escape(window.atob(msg.payload)));
+    if (msg.cipher_suite === 'NONE') {
+      content = window.atob(msg.payload);
+    } else {
+      throw new Error('This message decode error');
     }
-    // else if (msg.cipher_suite == 'RSA_OAEP') {
-    //   if (msg.payload) {
-    //     let byteContent = Uint8Array.from(atob(msg.payload), (c) => c.charCodeAt(0));
+    const date = new Date(msg.timestamp);
 
-    //     let decodeBytes = await getRsaDecryptData(RsaPrivateKeyStr ?? '', byteContent);
-    //     content = new TextDecoder().decode(decodeBytes);
-    //   } else {
-    //     content = '';
-    //   }
-    // }
-    else {
-      content = '不支持的加密类型 ' + msg.cipher_suite;
+    const timestampStr = `${date.getHours()}:${date.getMinutes()}`;
+
+    const dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+
+    const cacheUserInfo = localStorage.getItem(`user_info_${msg.from}`);
+    let userInfo;
+    if (cacheUserInfo) {
+      userInfo = JSON.parse(cacheUserInfo);
+    } else {
+      const { data } = await getUserPublicProfileRequest({
+        did_type: 'web3mq',
+        did_value: msg.from,
+        timestamp: Date.now(),
+        my_userid: '',
+      });
+      localStorage.setItem(`user_info_${msg.from}`, JSON.stringify(data));
+      userInfo = data;
     }
-    let date = new Date(msg.timestamp);
-
-    let timestampStr = date.getHours() + ':' + date.getMinutes();
-
-    let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    let message = {
+    const item = {
+      ...msg,
       _id: idx + 1,
       id: idx + 1,
       indexId: idx + 1,
       content: content,
       senderId: msg.from,
-      username: '',
-      avatar: 'assets/imgs/doe.png',
-      // date: "13 November",
-      // timestamp: "10:20",
+      username: userInfo?.nickname || '',
+      avatar: userInfo?.avatar_url || '',
       date: dateStr,
       timestamp: timestampStr,
       system: false,
@@ -201,8 +206,9 @@ export const renderMessagesList = async (msglist: any) => {
       seen: true,
       failure: false,
     };
-    return message;
-  });
+    messages.push(item);
+  }
+  return messages;
 };
 
 export const getGroupId = (msg: any, client: Client): string => {
@@ -245,14 +251,12 @@ export const renderMessage = (
     _id: messageId,
     id: messageId,
     indexId: messageId,
-    // 只有receive时为success
-    msgLoading: pbType === PbTypeMessage ? SendMsgLoadingMap['success'] : SendMsgLoadingMap['loading'],
+    msgLoading:
+      pbType === PbTypeMessage ? SendMsgLoadingMap['success'] : SendMsgLoadingMap['loading'],
     content,
     senderId,
     username: '',
     avatar: 'assets/imgs/doe.png',
-    // date: "13 November",
-    // timestamp: "10:20",
     date: dateStr,
     timestamp: timestampStr,
     system: false,
@@ -320,7 +324,7 @@ export function newDateFormat(time: number, format?: string) {
     i: minutes,
     s: seconds,
   };
-  // 是否补 0
+  // is need  0
   const isAddZero = (o: string) => {
     return /M|D|H|I|S/.test(o);
   };
