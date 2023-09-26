@@ -1,52 +1,52 @@
 export const EVENT_MAP = {
   'channel.created': true,
-  // 获取channel list
+  // query channel list
   'channel.getList': true,
-  // 改变active channel
+  // change active channel
   'channel.activeChange': true,
-  // 更新channel
+  // update channel
   'channel.updated': true,
-  // 改变contact
+  // update contact
   'contact.activeChange': true,
-  // 获取contact模块所有list
+  // get contacts list
   'contact.getList': true,
-  // 获取contactlist
+  // query contactlist
   'contact.getContactList': true,
-  // 获取followerList
+  // get followerList
   'contact.getFollowerList': true,
-  // 获取followingList
+  // get followingList
   'contact.getFollowingList': true,
-  // 我发送的好友申请列表
+  // List of my sent
   'contact.friendList': true,
-  // 收到的好友申请列表
+  // My recive friend list
   'contact.reviceList': true,
-  //更新contact模块所有list
+  //update contacts list
   'contact.updateList': true,
-  //更新contactlist
+  //update contactlist
   'contact.updateContactList': true,
-  //更新followerList
+  //update followerList
   'contact.updateFollowerList': true,
-  //更新followingList
+  //update followingList
   'contact.updateFollowingList': true,
-  // connect状态改变
+  // connect state changed
   'connect.changeReadyStatus': true,
-  // 消息发送
+  // sent message
   'message.send': true,
-  // 消息送达
+  // message sent
   'message.delivered': true,
-  // 消息已读
+  // read message
   'message.read': true,
-  // 发送更新消息
+  // send update message
   'message.updated': true,
-  // 获取message list
+  // get message list
   'message.getList': true,
-  // 获取message thread list
+  // get message thread list
   'message.getThreadList': true,
-  // 打开当前romm下的thread列表
+
   'message.openAllThread': true,
-  // 新通知
+  // new notification
   'notification.messageNew': true,
-  // 获取notification List
+  // get notification List
   'notification.getList': true,
   'notification.getMyTopicList': true,
   'notification.getMySubscribeList': true,

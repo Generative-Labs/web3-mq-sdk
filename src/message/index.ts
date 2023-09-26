@@ -1,5 +1,5 @@
 import { Client } from '../client';
-import { ClientKeyPaires, PageParams, MessageStatus, MessageListItem } from '../types';
+import {ClientKeyPaires, PageParams, MessageStatus, MessageListItem, DidType} from '../types';
 import {
   getDataSignature,
   renderMessagesList,
@@ -78,9 +78,9 @@ export class Message {
     }
   }
 
-  async sendMessage(msg: string, userId?: string) {
+  async sendMessage(msg: string, userId?: string, didType?: DidType) {
     const { keys, connect, channel } = this._client;
-    const topicId = userId ? await transformAddress(userId) : channel.activeChannel?.chatid;
+    const topicId = userId ? await transformAddress(userId, didType) : channel.activeChannel?.chatid;
 
     if (topicId) {
       this.msg_text = msg;
