@@ -49,9 +49,7 @@ export class Message {
       } else {
         this.messageList = list;
       }
-      if (this._client.listeners.events['message.getList']) {
-        this._client.emit('message.getList', { type: 'message.getList' });
-      }
+      this._client.emit('message.getList', { type: 'message.getList' });
       return list;
     }
   }
@@ -98,9 +96,7 @@ export class Message {
         this.messageList = [...this.messageList, { ...tempMessage }];
       }
 
-      if (this._client.listeners.events['message.send']) {
-        this._client.emit('message.send', { type: 'message.send' });
-      }
+      this._client.emit('message.send', { type: 'message.send' });
 
       connect.send(concatArray);
     }
@@ -120,10 +116,9 @@ export class Message {
         if (this.messageList) {
           this.messageList = [...this.messageList, msg];
         }
-        if (this._client.listeners.events['message.getList']) {
-          this._client.emit('message.getList', { type: 'message.getList', data: resp });
-        }
+        this._client.emit('message.getList', { type: 'message.getList', data: this.messageList });
       }
+      this._client.emit('message.received', { type: 'message.received', data: msg });
 
       // unread
       await this._client.channel.handleUnread(resp, msg);
@@ -137,9 +132,7 @@ export class Message {
         const msgList = updateMessageLoadStatus(this.messageList, msg);
         this.messageList = [...msgList];
       }
-      if (this._client.listeners.events['message.delivered']) {
-        this._client.emit('message.delivered', { type: 'message.delivered', data: resp });
-      }
+      this._client.emit('message.delivered', { type: 'message.delivered', data: msg });
     }
     if (pbType === PbTypeMessageChangeStatus) {
       const resp = Web3MQChangeMessageStatus.fromBinary(bytes);

@@ -38,9 +38,8 @@ export class Topic {
     } else {
       this.myTopicList = data;
     }
-    if (this._client.listeners.events['notification.getMyTopicList']) {
-      this._client.emit('notification.getMyTopicList', { type: 'notification.getMyTopicList' });
-    }
+    this._client.emit('notification.getMyTopicList', { type: 'notification.getMyTopicList' });
+    
     return data;
   }
 
@@ -56,12 +55,9 @@ export class Topic {
       ...options,
     });
     this.mySubscribeList = data;
-    if (this._client.listeners.events['notification.getMySubscribeList']) {
-      this._client.emit('notification.getMySubscribeList', {
-        type: 'notification.getMySubscribeList',
-      });
-
-    }
+    this._client.emit('notification.getMySubscribeList', {
+      type: 'notification.getMySubscribeList',
+    });
     return data;
   }
 

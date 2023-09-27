@@ -48,9 +48,7 @@ export class Channel {
       }
     });
 
-    if (this._client.listeners.events['channel.updated']) {
-      this._client.emit('channel.updated', { type: 'channel.updated' });
-    }
+    this._client.emit('channel.updated', { type: 'channel.updated' });
   }
 
   private async syncNewMessages(): Promise<Record<string, any>> {
@@ -113,9 +111,7 @@ export class Channel {
         await this._client.storage.setData(channel?.chatid as string, data);
       }
     }
-    if (this._client.listeners.events['channel.activeChange']) {
-      this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
-    }
+    this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
     return this.activeChannel;
     // if (data && data.unread !== 0) {
     //   data.unread = 0;
@@ -174,9 +170,7 @@ export class Channel {
     } else {
       this.channelList = list;
     }
-    if (this._client.listeners.events['channel.getList']) {
-      this._client.emit('channel.getList', { type: 'channel.getList' });
-    }
+    this._client.emit('channel.getList', { type: 'channel.getList' });
     return list;
   }
 
@@ -228,9 +222,7 @@ export class Channel {
       ...this.channelList,
     ];
 
-    if (this._client.listeners.events['channel.getList']) {
-      this._client.emit('channel.getList', { type: 'channel.getList' });
-    }
+    this._client.emit('channel.getList', { type: 'channel.getList' });
     return data;
   }
 
@@ -250,8 +242,8 @@ export class Channel {
   //   return data;
   // }
 
-  async getGroupMemberList(option: PageParams, chantId?: string) {
-    const groupid = chantId || this.activeChannel?.chatid;
+  async getGroupMemberList(option: PageParams, chatId?: string) {
+    const groupid = chatId || this.activeChannel?.chatid;
     if (groupid) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -314,9 +306,7 @@ export class Channel {
         },
         ...this.channelList,
       ];
-      if (this._client.listeners.events['channel.getList']) {
-        this._client.emit('channel.getList', { type: 'channel.getList' });
-      }
+      this._client.emit('channel.getList', { type: 'channel.getList' });
     }
     return data;
   }

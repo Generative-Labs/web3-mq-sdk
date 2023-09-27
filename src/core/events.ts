@@ -6,6 +6,7 @@ export const EVENT_MAP = {
   'channel.activeChange': true,
   // update channel
   'channel.updated': true,
+  'channel.invited': true,
   // update contact
   'contact.activeChange': true,
   // get contacts list
@@ -19,7 +20,7 @@ export const EVENT_MAP = {
   // List of my sent
   'contact.friendList': true,
   // My recive friend list
-  'contact.reviceList': true,
+  'contact.receiveList': true,
   //update contacts list
   'contact.updateList': true,
   //update contactlist
@@ -36,13 +37,13 @@ export const EVENT_MAP = {
   'message.delivered': true,
   // read message
   'message.read': true,
+  'message.received': true,
   // send update message
   'message.updated': true,
   // get message list
   'message.getList': true,
   // get message thread list
   'message.getThreadList': true,
-
   'message.openAllThread': true,
   // new notification
   'notification.messageNew': true,
@@ -50,6 +51,7 @@ export const EVENT_MAP = {
   'notification.getList': true,
   'notification.getMyTopicList': true,
   'notification.getMySubscribeList': true,
+  'notification.received': true,
 };
 
 const IS_VALID_EVENT_MAP_TYPE = { ...EVENT_MAP, all: true };
