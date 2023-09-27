@@ -65,6 +65,6 @@ export class Notify {
     if (this._client.listeners.events['notification.getList']) {
       this._client.emit('notification.getList', { type: 'notification.getList' });
     }
-    // return data;
+    return list;
   }
 }

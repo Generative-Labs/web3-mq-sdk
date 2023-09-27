@@ -47,7 +47,10 @@ export class Channel {
         item.unread = msg.unread || 0;
       }
     });
-    this._client.emit('channel.updated', { type: 'channel.updated' });
+
+    if (this._client.listeners.events['channel.updated']) {
+      this._client.emit('channel.updated', { type: 'channel.updated' });
+    }
   }
 
   private async syncNewMessages(): Promise<Record<string, any>> {
@@ -97,7 +100,7 @@ export class Channel {
 
     await storage.setData(comeFrom, indexeddbData);
 
-    this.handleUpdateChannel(indexeddbData, comeFrom);
+    return this.handleUpdateChannel(indexeddbData, comeFrom);
   }
 
   async setActiveChannel(channel: ChannelItemType | null) {
@@ -110,7 +113,10 @@ export class Channel {
         await this._client.storage.setData(channel?.chatid as string, data);
       }
     }
-    this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
+    if (this._client.listeners.events['channel.activeChange']) {
+      this._client.emit('channel.activeChange', { type: 'channel.activeChange' });
+    }
+    return this.activeChannel;
     // if (data && data.unread !== 0) {
     //   data.unread = 0;
     //   await this._client.storage.setData(channel?.chatid as string, data);
@@ -168,8 +174,10 @@ export class Channel {
     } else {
       this.channelList = list;
     }
-
-    this._client.emit('channel.getList', { type: 'channel.getList' });
+    if (this._client.listeners.events['channel.getList']) {
+      this._client.emit('channel.getList', { type: 'channel.getList' });
+    }
+    return list;
   }
 
   async updateChannels(params: UpdateRoomListParams): Promise<ServiceResponse> {
@@ -219,7 +227,11 @@ export class Channel {
       },
       ...this.channelList,
     ];
-    this._client.emit('channel.getList', { type: 'channel.getList' });
+
+    if (this._client.listeners.events['channel.getList']) {
+      this._client.emit('channel.getList', { type: 'channel.getList' });
+    }
+    return data;
   }
 
   // async updateRoom(topic: string, topic_type: string) {
@@ -238,8 +250,8 @@ export class Channel {
   //   return data;
   // }
 
-  async getGroupMemberList(option: PageParams) {
-    const groupid = this.activeChannel?.chatid;
+  async getGroupMemberList(option: PageParams, chantId?: string) {
+    const groupid = chantId || this.activeChannel?.chatid;
     if (groupid) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -257,8 +269,8 @@ export class Channel {
     }
   }
 
-  async inviteGroupMember(members: string[]) {
-    const groupid = this.activeChannel?.chatid;
+  async inviteGroupMember(members: string[], chatId?: string) {
+    const groupid = chatId || this.activeChannel?.chatid;
     if (groupid) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -302,8 +314,11 @@ export class Channel {
         },
         ...this.channelList,
       ];
-      this._client.emit('channel.getList', { type: 'channel.getList' });
+      if (this._client.listeners.events['channel.getList']) {
+        this._client.emit('channel.getList', { type: 'channel.getList' });
+      }
     }
+    return data;
   }
 
   async getGroupPermissions(groupid: string) {

@@ -32,8 +32,8 @@ export class Message {
     this.messageList = null;
   }
 
-  async getMessageList(option: PageParams, userId?: string) {
-    const topic = userId || this._client.channel.activeChannel?.chatid;
+  async getMessageList(option: PageParams, chatId?: string) {
+    const topic = chatId || this._client.channel.activeChannel?.chatid;
     if (topic) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -49,8 +49,10 @@ export class Message {
       } else {
         this.messageList = list;
       }
-      this._client.emit('message.getList', { type: 'message.getList' });
-      // return data;
+      if (this._client.listeners.events['message.getList']) {
+        this._client.emit('message.getList', { type: 'message.getList' });
+      }
+      return list;
     }
   }
 
@@ -118,8 +120,9 @@ export class Message {
         if (this.messageList) {
           this.messageList = [...this.messageList, msg];
         }
-        // channel.handleLastMessage(resp.comeFrom, msg);
-        this._client.emit('message.getList', { type: 'message.getList', data: resp });
+        if (this._client.listeners.events['message.getList']) {
+          this._client.emit('message.getList', { type: 'message.getList', data: resp });
+        }
       }
 
       // unread
@@ -134,7 +137,9 @@ export class Message {
         const msgList = updateMessageLoadStatus(this.messageList, msg);
         this.messageList = [...msgList];
       }
-      this._client.emit('message.delivered', { type: 'message.delivered', data: resp });
+      if (this._client.listeners.events['message.delivered']) {
+        this._client.emit('message.delivered', { type: 'message.delivered', data: resp });
+      }
     }
     if (pbType === PbTypeMessageChangeStatus) {
       const resp = Web3MQChangeMessageStatus.fromBinary(bytes);

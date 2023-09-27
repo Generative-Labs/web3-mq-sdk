@@ -85,7 +85,10 @@ export class Contact {
     } else {
       this.contactList = newContacts;
     }
-    emit('contact.getContactList', { type: 'contact.getContactList' });
+
+    if (this._client.listeners.events['contact.getContactList']) {
+      emit('contact.getContactList', { type: 'contact.getContactList' });
+    }
     return newContacts;
   }
 
@@ -278,8 +281,10 @@ export class Contact {
       ...option,
     });
     this.myFriendRequestList = data.result;
-    emit('contact.friendList', { type: 'contact.friendList' });
-    // return data;
+    if (this._client.listeners.events['contact.friendList']) {
+      emit('contact.friendList', { type: 'contact.friendList' });
+    }
+    return data?.result || [];
   }
 
   /**
@@ -300,8 +305,10 @@ export class Contact {
       ...option,
     });
     this.receiveFriendRequestList = data.result;
-    emit('contact.reviceList', { type: 'contact.reviceList' });
-    // return data;
+    if (this._client.listeners.events['contact.reviceList']) {
+      emit('contact.reviceList', { type: 'contact.reviceList' });
+    }
+    return data;
   }
 
   /**
@@ -321,8 +328,9 @@ export class Contact {
       target_userid,
       action,
     });
-
-    emit('contact.getList', { type: 'contact.getList' });
+    if (this._client.listeners.events['contact.getList']) {
+      emit('contact.getList', { type: 'contact.getList' });
+    }
     return data;
   }
 }
