@@ -51,6 +51,18 @@ export type RegisterBySignParams = {
   avatar_url?: string;
   avatar_base64?: string;
 };
+export type RegisterBySignatureParams = {
+  userid: string;
+  didValue: string;
+  mainPublicKey: string;
+  signature: string;
+  did_pubkey?: string;
+  didType?: BlockChainType;
+  signContentURI?: string;
+  nickname?: string;
+  avatar_url?: string;
+  avatar_base64?: string;
+};
 
 export type LoginByKeysParams = {
   mainPrivateKey: string;
@@ -115,6 +127,12 @@ export type GetMainKeypairParams = {
   password: string;
   did_type: WalletType;
   did_value: string;
+};
+
+export type GenerateMainKeypair = {
+  password: string;
+  walletType: WalletType;
+  address: string;
 };
 
 export interface SignConnectOptions extends SendTempConnectOptions {
@@ -493,12 +511,20 @@ export type WalletSignRes = {
 
 export type GetSignContentResponse = {
   signContent: string;
+  registerTime?: number
 };
 
 export type GetRegisterSignContentParams = {
   userid: string;
   mainPublicKey: string;
   didType: WalletType;
+  didValue: string;
+  signContentURI?: string;
+};
+export type GetSignContentForRegisterParams = {
+  userid: string;
+  mainPublicKey: string;
+  didType: BlockChainType;
   didValue: string;
   signContentURI?: string;
 };
