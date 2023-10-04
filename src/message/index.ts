@@ -58,8 +58,8 @@ export class Message {
    * if message from group chat: topic = group id
    * if message from one chat: topic = userid
    */
-  async changeMessageStatus(messages: string[], status: MessageStatus = 'delivered') {
-    const topic = this._client.channel.activeChannel?.chatid;
+  async changeMessageStatus(messages: string[], status: MessageStatus = 'delivered', chatId: string) {
+    const topic = chatId || this._client.channel.activeChannel?.chatid;
     if (topic) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
