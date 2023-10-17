@@ -202,12 +202,21 @@ export type GroupPermissions = {
   };
 };
 
+type nftPermissionType = {
+  chain_type: 'evm' | 'starknet';
+  chain_id: string;
+  contract: string; // nft 合约地址
+};
+
 export interface CreateRoomApiParams extends BaseParams {
   group_name?: string;
   groupid?: string;
   avatar_url?: string;
   avatar_base64?: string;
   permissions?: GroupPermissions;
+  version?: number;
+  nfts?: nftPermissionType[];
+  payload_hash?: string  // required when version is 2
 }
 
 export interface CreateRoomParams {
@@ -216,6 +225,7 @@ export interface CreateRoomParams {
   avatarUrl?: string;
   avatarBase64?: string;
   permissions?: GroupPermissions;
+  nfts?: nftPermissionType[];
 }
 
 export interface CommonGetListParams extends BaseParams, PageParams {}
@@ -581,30 +591,30 @@ export interface CreateDappListResponse {
 }
 
 export interface QueryNotificationsApiParams extends BaseParams {
-    topic?: string;
-    notice_type?: string;
-    size: number;
-    page: number;
+  topic?: string;
+  notice_type?: string;
+  size: number;
+  page: number;
 }
 
 export type QueryNotificationsParams = {
-    topic?: string;
-    notice_type?: string;
-    size: number;
-    page: number;
+  topic?: string;
+  notice_type?: string;
+  size: number;
+  page: number;
 };
 
 export type GetMyAuthInfoParams = {
-    userid: string;
-    dapp_id: string;
-    timestamp: number;
-    web3mq_user_signature: string;
+  userid: string;
+  dapp_id: string;
+  timestamp: number;
+  web3mq_user_signature: string;
 };
 
 export type GetMyAuthInfoResponse = {
-    auth_status: number;
-    create_at: number;
-    dapp_id: string;
-    scopes: any;
-    userid: string;
+  auth_status: number;
+  create_at: number;
+  dapp_id: string;
+  scopes: any;
+  userid: string;
 };

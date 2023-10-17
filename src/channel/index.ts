@@ -10,7 +10,13 @@ import {
   updateGroupPermissionsRequest,
   syncNewMessagesRequest,
 } from '../api';
-import { getDataSignature, getGroupId, getMessageUpdateDate } from '../utils';
+import {
+  ByteArrayToHexString,
+  getDataSignature,
+  getGroupId,
+  getMessageUpdateDate,
+  sha256,
+} from '../utils';
 import {
   PageParams,
   ChannelItemType,
@@ -20,6 +26,7 @@ import {
   UpdateRoomListParams,
   UpdateGroupPermissionsParams,
   Web3MQDBValue,
+  CreateRoomApiParams,
 } from '../types';
 import { Web3MQMessageStatusResp, Web3MQRequestMessage } from '../pb';
 
@@ -191,13 +198,24 @@ export class Channel {
   }
 
   async createRoom(params: CreateRoomParams) {
-    const { avatarUrl, avatarBase64, groupid = '', groupName } = params;
+    const { avatarUrl, avatarBase64, groupid = '', groupName, nfts, permissions } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
-    const signContent = userid + groupid + timestamp;
-    const web3mq_signature = await getDataSignature(PrivateKey, signContent);
-    const { data = { groupid: '', group_name: '', avatar_base64: '', avatar_url: '' } } =
-      await createRoomRequest({
+    let payload: CreateRoomApiParams;
+    if (nfts && nfts.length > 0) {
+      let permission = permissions || {
+        'group:join': {
+          type: 'enum',
+          value: 'nft_validation',
+        },
+      };
+      const payload_hash = sha256(
+        userid + groupid + JSON.stringify(permission) + JSON.stringify(nfts) + timestamp,
+      );
+      const payloadSting = ByteArrayToHexString(payload_hash);
+      const web3mq_signature = await getDataSignature(PrivateKey, payloadSting);
+      payload = {
+        version: 2,
         web3mq_signature,
         userid,
         timestamp,
@@ -205,7 +223,25 @@ export class Channel {
         avatar_url: avatarUrl,
         group_name: groupName,
         ...params,
-      });
+        payload_hash: payloadSting,
+        permissions: permission,
+      };
+    } else {
+      const signContent = userid + groupid + timestamp;
+      const web3mq_signature = await getDataSignature(PrivateKey, signContent);
+      payload = {
+        web3mq_signature,
+        userid,
+        timestamp,
+        avatar_base64: avatarBase64,
+        avatar_url: avatarUrl,
+        group_name: groupName,
+        ...params,
+      };
+    }
+    const { data = { groupid: '', group_name: '', avatar_base64: '', avatar_url: '' } } =
+      await createRoomRequest(payload);
+
     if (!this.channelList) {
       return;
     }
