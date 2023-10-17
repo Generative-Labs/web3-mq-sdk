@@ -40,7 +40,7 @@ import {
   ResetPasswordParams,
   AccountType,
   BlockChainMap,
-  BlockChainType,
+  BlockChainType, GetSignContentForRegisterParams, RegisterBySignatureParams,
 } from '../types';
 import { StarknetConnect, WalletId } from './StarknetConnect';
 
@@ -168,7 +168,7 @@ export class Register {
       // @ts-ignore
       request.defaults.headers['web3mq-request-pubkey'] = PublicKey;
       // @ts-ignore
-      request.defaults.headers['didkey'] = `${didType}:${didValue}`;
+      request.defaults.headers['didkey'] = `${BlockChainMap[didType]}:${didValue}`;
       return {
         tempPrivateKey: PrivateKey,
         tempPublicKey: PublicKey,
@@ -276,6 +276,29 @@ Nonce: ${magicString}`;
 
     return { signContent };
   };
+  getSignContentForMainKeys = async (options: {
+    password: string;
+    didValue: string;
+    didType: BlockChainType;
+  }): Promise<GetSignContentResponse> => {
+    const { password, didType, didValue } = options;
+    const keyIndex = 1;
+    const keyMSG = `${didType}:${didValue}${keyIndex}${password}`;
+
+    const magicString = Uint8ToBase64String(
+      new TextEncoder().encode(sha3_224(`$web3mq${keyMSG}web3mq$`)),
+    );
+
+    const signContent = `Signing this message will allow this app to decrypt messages in the Web3MQ protocol for the following address: ${didValue}. This won’t cost you anything.
+
+If your Web3MQ wallet-associated password and this signature is exposed to any malicious app, this would result in exposure of Web3MQ account access and encryption keys, and the attacker would be able to read your messages.
+
+In the event of such an incident, don’t panic. You can call Web3MQ’s key revoke API and service to revoke access to the exposed encryption key and generate a new one!
+
+Nonce: ${magicString}`;
+
+    return { signContent };
+  };
 
   getMainKeypairBySignature = async (
     signature: string,
@@ -333,4 +356,75 @@ Issued At: ${getCurrentDate()}`;
     this.registerTime = timestamp;
     return { signContent };
   };
+  getSignContentForRegister = async (
+    options: GetSignContentForRegisterParams,
+  ): Promise<GetSignContentResponse> => {
+    const {
+      mainPublicKey,
+      didType,
+      didValue,
+      userid,
+      signContentURI = window.location.origin,
+    } = options;
+
+    const pubkey_type = this.pubicKeyType;
+    const timestamp = Date.now();
+    const NonceContent = sha3_224(
+      userid + pubkey_type + mainPublicKey + didType + didValue + timestamp,
+    );
+
+    const signContent = `Web3MQ wants you to sign in with your ${didType} account:
+${didValue}
+For Web3MQ register
+URI: ${signContentURI}
+Version: 1
+
+Nonce: ${NonceContent}
+Issued At: ${getCurrentDate()}`;
+
+    this.registerSignContent = signContent;
+    this.registerTime = timestamp;
+    return { signContent, registerTime: timestamp };
+  };
+
+
+  registerBySign = async (options: RegisterBySignatureParams) => {
+    const {
+      userid,
+      didValue,
+      mainPublicKey,
+      signature,
+      did_pubkey = '',
+      didType = 'eth',
+      nickname = '',
+      avatar_url = '',
+      avatar_base64 = '',
+    } = options;
+    if (!this.registerTime || !this.registerSignContent) {
+      throw new Error('Please create register sign content first!');
+    }
+
+    const payload: RegisterApiParams = {
+      userid,
+      did_type: didType,
+      did_value: didValue,
+      did_pubkey,
+      did_signature: signature,
+      signature_content: this.registerSignContent,
+      pubkey_type: this.pubicKeyType,
+      pubkey_value: mainPublicKey,
+      nickname,
+      avatar_url,
+      avatar_base64,
+      timestamp: this.registerTime,
+      testnet_access_key: this.appKey,
+    };
+
+    try {
+      return await userRegisterRequest(payload);
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
+
 }
