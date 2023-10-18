@@ -73,6 +73,15 @@ export type LoginByKeysParams = {
   password: string;
   pubkeyExpiredTimestamp?: number;
 };
+export type LoginByWalletKeysParams = {
+  mainPrivateKey: string;
+  mainPublicKey: string;
+  didType: BlockChainType;
+  didValue: string;
+  userid: string;
+  password: string;
+  pubkeyExpiredTimestamp?: number;
+};
 
 export type InitOptions = {
   connectUrl?: string | null;

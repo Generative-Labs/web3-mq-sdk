@@ -40,7 +40,10 @@ import {
   ResetPasswordParams,
   AccountType,
   BlockChainMap,
-  BlockChainType, GetSignContentForRegisterParams, RegisterBySignatureParams,
+  BlockChainType,
+  GetSignContentForRegisterParams,
+  RegisterBySignatureParams,
+  LoginByWalletKeysParams,
 } from '../types';
 import { StarknetConnect, WalletId } from './StarknetConnect';
 
@@ -155,6 +158,56 @@ export class Register {
       const payload: LoginApiParams = {
         userid,
         did_type: BlockChainMap[didType],
+        did_value: didValue,
+        login_signature,
+        signature_content: signContent,
+        main_pubkey: mainPublicKey,
+        pubkey_value: PublicKey,
+        pubkey_type: 'ed25519',
+        timestamp,
+        pubkey_expired_timestamp: pubkeyExpiredTimestamp,
+      };
+      await userLoginRequest(payload);
+      // @ts-ignore
+      request.defaults.headers['web3mq-request-pubkey'] = PublicKey;
+      // @ts-ignore
+      request.defaults.headers['didkey'] = `${BlockChainMap[didType]}:${didValue}`;
+      return {
+        tempPrivateKey: PrivateKey,
+        tempPublicKey: PublicKey,
+        mainPrivateKey,
+        mainPublicKey,
+        pubkeyExpiredTimestamp,
+      };
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
+  loginByWallet = async (options: LoginByWalletKeysParams): Promise<LoginResponse> => {
+    const {
+      password,
+      userid,
+      didValue,
+      didType,
+      mainPrivateKey,
+      mainPublicKey,
+      pubkeyExpiredTimestamp = Date.now() + 86400 * 1000,
+    } = options;
+    try {
+      const timestamp = Date.now();
+
+      const { PublicKey, PrivateKey } = await GenerateEd25519KeyPair();
+
+      const signContent = sha3_224(userid + PublicKey + pubkeyExpiredTimestamp + timestamp);
+      const AesKey = await GetAESBase64Key(password);
+      const AesIv = AesKey.slice(0, 16);
+      const decode_data = await aesGCMDecrypt(AesKey, AesIv, Base64StringToUint8(mainPrivateKey));
+      const decode_dataStr = new TextDecoder().decode(new Uint8Array(decode_data));
+      const login_signature = await getDataSignature(decode_dataStr, signContent);
+
+      const payload: LoginApiParams = {
+        userid,
+        did_type: didType,
         did_value: didValue,
         login_signature,
         signature_content: signContent,
@@ -387,7 +440,6 @@ Issued At: ${getCurrentDate()}`;
     return { signContent, registerTime: timestamp };
   };
 
-
   registerBySign = async (options: RegisterBySignatureParams) => {
     const {
       userid,
@@ -426,5 +478,4 @@ Issued At: ${getCurrentDate()}`;
       throw new Error(error.message);
     }
   };
-
 }
