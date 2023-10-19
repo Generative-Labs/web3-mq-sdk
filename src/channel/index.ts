@@ -27,6 +27,7 @@ import {
   UpdateGroupPermissionsParams,
   Web3MQDBValue,
   CreateRoomApiParams,
+  UpdateGroupPermissionsApiParams,
 } from '../types';
 import { Web3MQMessageStatusResp, Web3MQRequestMessage } from '../pb';
 
@@ -357,17 +358,43 @@ export class Channel {
   }
 
   async updateGroupPermissions(params: UpdateGroupPermissionsParams) {
-    const { groupid } = params;
+    const { groupid, permissions, nfts } = params;
     const { userid, PrivateKey } = this._keys;
     const timestamp = Date.now();
-    const signContent = userid + groupid + timestamp;
-    const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
-    const data = await updateGroupPermissionsRequest({
-      web3mq_user_signature,
-      userid,
-      timestamp,
-      ...params,
-    });
+    let payload: UpdateGroupPermissionsApiParams;
+    if (nfts && nfts.length > 0) {
+      let permission = permissions || {
+        'group:join': {
+          type: 'enum',
+          value: 'nft_validation',
+        },
+      };
+      const payload_hash = sha256(
+        userid + groupid + JSON.stringify(permission) + JSON.stringify(nfts) + timestamp,
+      );
+      const payloadSting = ByteArrayToHexString(payload_hash);
+      const web3mq_user_signature = await getDataSignature(PrivateKey, payloadSting);
+      payload = {
+        version: 2,
+        web3mq_user_signature,
+        userid,
+        groupid,
+        timestamp,
+        payload_hash: payloadSting,
+        permissions: permission,
+        nfts,
+      };
+    } else {
+      const signContent = userid + groupid + timestamp;
+      const web3mq_user_signature = await getDataSignature(PrivateKey, signContent);
+      payload = {
+        web3mq_user_signature,
+        userid,
+        timestamp,
+        ...params,
+      };
+    }
+    const data = await updateGroupPermissionsRequest(payload);
     return data;
   }
 }

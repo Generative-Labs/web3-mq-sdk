@@ -195,10 +195,12 @@ export type WalletBaseParams = {
   timestamp: number;
 };
 
+export type GroupPermissionValueType = 'ceator_invite_friends' | 'public' | 'nft_validation';
+
 export type GroupPermissions = {
   [key: string]: {
     type: string;
-    value: 'ceator_invite_friends' | 'public' | 'nft_validation';
+    value: GroupPermissionValueType;
   };
 };
 
@@ -216,7 +218,7 @@ export interface CreateRoomApiParams extends BaseParams {
   permissions?: GroupPermissions;
   version?: number;
   nfts?: nftPermissionType[];
-  payload_hash?: string  // required when version is 2
+  payload_hash?: string; // required when version is 2
 }
 
 export interface CreateRoomParams {
@@ -276,13 +278,18 @@ export interface JoinGroupParams extends NewBaseParams {
   groupid: string;
 }
 
-export interface UpdateGroupPermissionsApiParams
-  extends NewBaseParams,
-    UpdateGroupPermissionsParams {}
+export interface UpdateGroupPermissionsApiParams extends NewBaseParams {
+  groupid: string;
+  version?: number;
+  nfts?: nftPermissionType[];
+  payload_hash?: string; // required when version is 2
+  permissions: GroupPermissions;
+}
 
 export interface UpdateGroupPermissionsParams {
   groupid: string;
   permissions: GroupPermissions;
+  nfts?: nftPermissionType[];
 }
 
 export interface GetGroupPermissionsParams extends NewBaseParams {
