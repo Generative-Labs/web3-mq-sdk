@@ -195,7 +195,7 @@ export type WalletBaseParams = {
   timestamp: number;
 };
 
-export type GroupPermissionValueType = 'ceator_invite_friends' | 'public' | 'nft_validation';
+export type GroupPermissionValueType = 'creator_invite_friends' | 'public' | 'nft_validation';
 
 export type GroupPermissions = {
   [key: string]: {
@@ -235,7 +235,7 @@ export interface CommonGetListParams extends BaseParams, PageParams {}
 export interface NewCommonGetListParams extends NewBaseParams, PageParams {}
 
 export type ChannelItemType = {
-  avatar_base64: string;
+  avatar_base64?: string;
   avatar_url: string;
   chat_name: string;
   chat_type: string;

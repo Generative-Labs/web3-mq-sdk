@@ -275,8 +275,8 @@ export class Channel {
   //   return data;
   // }
 
-  async getGroupMemberList(option: PageParams) {
-    const groupid = this.activeChannel?.chatid;
+  async getGroupMemberList(option: PageParams, chatId?: string) {
+    const groupid = chatId || this.activeChannel?.chatid;
     if (groupid) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
@@ -294,8 +294,8 @@ export class Channel {
     }
   }
 
-  async inviteGroupMember(members: string[]) {
-    const groupid = this.activeChannel?.chatid;
+  async inviteGroupMember(members: string[], chatId?: string) {
+    const groupid = chatId || this.activeChannel?.chatid;
     if (groupid) {
       const { userid, PrivateKey } = this._keys;
       const timestamp = Date.now();
