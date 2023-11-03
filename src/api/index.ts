@@ -41,7 +41,7 @@ import {
   QueryNotificationsApiParams,
   GetMyAuthInfoParams,
   GetMyAuthInfoResponse,
-  RegisterApiParams,
+  RegisterApiParams, SearchUsersByHandleParams, getActivePubUsersDetailParams,
 } from '../types';
 
 /**
@@ -114,7 +114,6 @@ export const changeMessageStatusRequest = async (payload: ChangeMessageStatusPar
 export const syncNewMessagesRequest = async (payload: SyncNewMessagesParams) => {
   return await request.post('/api/get_new_messages/', payload);
 };
-
 /**
  * @API User
  */
@@ -122,6 +121,14 @@ export const searchUsersRequest = async (payload: SearchParams) => {
   return await request.get('/api/users/search/', {
     params: payload,
   });
+};
+export const searchUsersByHandleRequest = async (payload: SearchUsersByHandleParams) => {
+  return await request.get('/api/fediverse/users/search/', {
+    params: payload,
+  });
+};
+export const getActivePubProfileRequest = async (payload: getActivePubUsersDetailParams) => {
+  return await request.post('/api/fediverse/userinfo/', payload);
 };
 
 export const getMyProfileRequest = async (payload: BaseParams) => {

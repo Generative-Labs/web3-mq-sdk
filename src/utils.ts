@@ -14,6 +14,7 @@ export {
   getUserPublicProfileRequest,
   getPublicFollowerListRequest,
   getPublicFollowingListRequest,
+  getActivePubProfileRequest,
 } from './api';
 
 export const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<unknown>) => {

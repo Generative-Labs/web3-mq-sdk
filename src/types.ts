@@ -314,6 +314,19 @@ export interface SearchParams extends BaseParams {
   keyword: string;
 }
 
+
+export type ProtocolType = 'ActivityPub' | 'Nostr'
+export interface SearchUsersByHandleParams extends NewBaseParams {
+  protocol:ProtocolType
+  target_userid: string,
+  payload_hash: string
+}
+export interface getActivePubUsersDetailParams extends NewBaseParams {
+  protocol:ProtocolType
+  target_userid: string,
+  payload_hash: string
+}
+
 export interface ProfileParams extends BaseParams {
   nickname: string;
   avatar_url: string;
