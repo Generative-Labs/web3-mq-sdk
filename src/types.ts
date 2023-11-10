@@ -621,3 +621,76 @@ export type GetMyAuthInfoResponse = {
     scopes: any;
     userid: string;
 };
+
+export type ActivityPubPostItemObjectType = {
+  id: string,
+  type: string,
+  atomUri: string // jump detail url
+  published: string
+  content: string
+  attributedTo: string // jump profile url
+}
+export type ActivityPubPostItemType =  {
+  id: string,
+  type: string,
+  object: ActivityPubPostItemObjectType
+}
+
+export interface getMyFollowingFeedsParams extends NewBaseParams {
+  protocol: ProtocolType;
+  payload_hash: string;
+  page: number;
+  size: number;
+}
+
+
+export interface followActivePubUserParams {
+  protocol: ProtocolType;
+  userid: string;
+  target_userid: string;
+  timestamp: number;
+  action: 'follow' | 'unfollow';
+  did_type: 'starknet' | 'eth';
+  did_signature: string;
+  sign_content: string;
+  fediverse_signature: string;
+  fediverse_body: any;
+  fediverse_date: string;
+  fediverse_body_digest: string;
+}
+
+
+export interface UploadUserKeypairParams extends NewBaseParams {
+  protocol: ProtocolType;
+  payload_hash: string;
+  pubkey: string;
+  keyType: 'RSA';
+}
+
+export interface GetUserKeypairParams extends NewBaseParams {
+  protocol: ProtocolType;
+  payload_hash: string;
+}
+
+export interface getFollowActivePubUserParams {
+  protocol: ProtocolType;
+  userid: string;
+  timestamp: number;
+  web3mq_user_signature: string;
+  payload_hash: string;
+  page: number;
+  size: number;
+}
+
+export type activityPubUserType = {
+  id: string;
+  type: string;
+  url: string;
+  name: string;
+  icon?: {
+    url: string;
+  };
+  image?: {
+    url: string;
+  };
+};

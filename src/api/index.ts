@@ -1,4 +1,4 @@
-import {request} from '../core/request';
+import { request } from '../core/request';
 
 import {
   CreateRoomApiParams,
@@ -41,7 +41,15 @@ import {
   QueryNotificationsApiParams,
   GetMyAuthInfoParams,
   GetMyAuthInfoResponse,
-  RegisterApiParams, SearchUsersByHandleParams, getActivePubUsersDetailParams,
+  RegisterApiParams,
+  SearchUsersByHandleParams,
+  getActivePubUsersDetailParams,
+  ProtocolType,
+  ActivityPubPostItemType,
+  getMyFollowingFeedsParams,
+  followActivePubUserParams,
+  GetUserKeypairParams,
+  UploadUserKeypairParams, getFollowActivePubUserParams, activityPubUserType,
 } from '../types';
 
 /**
@@ -127,9 +135,6 @@ export const searchUsersByHandleRequest = async (payload: SearchUsersByHandlePar
     params: payload,
   });
 };
-export const getActivePubProfileRequest = async (payload: getActivePubUsersDetailParams) => {
-  return await request.post('/api/fediverse/userinfo/', payload);
-};
 
 export const getMyProfileRequest = async (payload: BaseParams) => {
   return await request.get('/api/my_profile/', {
@@ -147,7 +152,9 @@ export const getUserInfoRequest = async (payload: GetUserInfoParams) => {
   return await request.post('/api/get_user_info/', payload);
 };
 
-export const userRegisterRequest = async (payload: RegisterApiParams): Promise<RegisterApiResponse> => {
+export const userRegisterRequest = async (
+  payload: RegisterApiParams,
+): Promise<RegisterApiResponse> => {
   return await request.post('/api/user_register_v2/', payload);
 };
 
@@ -241,7 +248,7 @@ export const sendFriendRequest = async (payload: SendFriendParams) => {
 };
 
 export const getMyAuthInfoRequest = async (
-  payload: GetMyAuthInfoParams
+  payload: GetMyAuthInfoParams,
 ): Promise<GetMyAuthInfoResponse> => {
   return await request.post('/api/dapp/user_auth_info/', payload);
 };
@@ -287,16 +294,16 @@ export const publishTopicMessageRequest = async (payload: PublishTopicMessagePar
 };
 
 export const myCreateTopicListRequest = async (payload: GetTopicListParams) => {
-  return await request.get('/api/my_create_topic_list/', {params: payload});
+  return await request.get('/api/my_create_topic_list/', { params: payload });
 };
 
 export const mySubscribeTopicListRequest = async (payload: GetTopicListParams) => {
-  return await request.get('/api/my_subscribe_topic_list/', {params: payload});
+  return await request.get('/api/my_subscribe_topic_list/', { params: payload });
 };
 
 export const getMyCreateDappListRequest = async (payload: GetMyCreateDappListApiParmas) => {
   return await request.get('/api/my_create_dapps/', {
-    params: payload
+    params: payload,
   });
 };
 
@@ -306,4 +313,58 @@ export const createDappRequest = async (payload: CreateDappApiParams) => {
 
 export const updateDappRequest = async (payload: CreateDappApiParams) => {
   return await request.post('/api/update_dapp/', payload);
+};
+
+export const getActivePubProfileRequest = async (
+  payload: getActivePubUsersDetailParams,
+): Promise<activityPubUserType> => {
+  return await request.post('/api/fediverse/userinfo/', payload);
+};
+export const getActivePubPostRequest = async (payload: getActivePubUsersDetailParams) => {
+  return await request.post('/api/fediverse/user/outbox/', payload);
+};
+export const getMyFollowActivePubUserRequest = async (
+  payload: getFollowActivePubUserParams,
+): Promise<{
+  data_list: {
+    userid: string;
+    protocol: ProtocolType;
+  }[];
+}> => {
+  return await request.post('/api/fediverse/my_following/', payload);
+};
+export const checkIsMyFollowRequest = async (payload: getActivePubUsersDetailParams) => {
+  return await request.post('/api/fediverse/isfollowing/', payload);
+};
+
+
+export const uploadUserKeypairRequest = async (payload: UploadUserKeypairParams) => {
+  return await request.post('/api/fediverse/keypair/', payload);
+};
+
+export const getUserKeypairRequest = async (
+  payload: GetUserKeypairParams,
+): Promise<{
+  key_type: string;
+  protocol: ProtocolType;
+  pubkey: string;
+  timestamp: number;
+}> => {
+  return await request.get('/api/fediverse/keypair/', { params: payload });
+};
+
+export const followActivePubUserRequest = async (payload: followActivePubUserParams) => {
+  return await request.post('/api/fediverse/follow/', payload);
+};
+
+
+
+export const getMyFollowingFeeds = async (
+  payload: getMyFollowingFeedsParams,
+): Promise<
+  {
+    orderedItems: ActivityPubPostItemType[];
+  }[]
+> => {
+  return await request.post('/api/fediverse/user/timelines/home/', payload);
 };
