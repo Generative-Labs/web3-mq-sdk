@@ -168,7 +168,7 @@ export class Register {
       // @ts-ignore
       request.defaults.headers['web3mq-request-pubkey'] = PublicKey;
       // @ts-ignore
-      request.defaults.headers['didkey'] = `${didType}:${didValue}`;
+      request.defaults.headers['didkey'] = `${BlockChainMap[didType]}:${didValue}`;
       return {
         tempPrivateKey: PrivateKey,
         tempPublicKey: PublicKey,

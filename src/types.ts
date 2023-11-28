@@ -195,11 +195,19 @@ export type WalletBaseParams = {
   timestamp: number;
 };
 
+export type GroupPermissionValueType = 'creator_invite_friends' | 'public' | 'nft_validation';
+
 export type GroupPermissions = {
   [key: string]: {
     type: string;
-    value: 'ceator_invite_friends' | 'public' | 'nft_validation';
+    value: GroupPermissionValueType;
   };
+};
+
+type nftPermissionType = {
+  chain_type: 'evm' | 'starknet';
+  chain_id: string;
+  contract: string; // nft 合约地址
 };
 
 export interface CreateRoomApiParams extends BaseParams {
@@ -208,6 +216,9 @@ export interface CreateRoomApiParams extends BaseParams {
   avatar_url?: string;
   avatar_base64?: string;
   permissions?: GroupPermissions;
+  version?: number;
+  nfts?: nftPermissionType[];
+  payload_hash?: string; // required when version is 2
 }
 
 export interface CreateRoomParams {
@@ -216,6 +227,7 @@ export interface CreateRoomParams {
   avatarUrl?: string;
   avatarBase64?: string;
   permissions?: GroupPermissions;
+  nfts?: nftPermissionType[];
 }
 
 export interface CommonGetListParams extends BaseParams, PageParams {}
@@ -223,7 +235,7 @@ export interface CommonGetListParams extends BaseParams, PageParams {}
 export interface NewCommonGetListParams extends NewBaseParams, PageParams {}
 
 export type ChannelItemType = {
-  avatar_base64: string;
+  avatar_base64?: string;
   avatar_url: string;
   chat_name: string;
   chat_type: string;
@@ -266,13 +278,18 @@ export interface JoinGroupParams extends NewBaseParams {
   groupid: string;
 }
 
-export interface UpdateGroupPermissionsApiParams
-  extends NewBaseParams,
-    UpdateGroupPermissionsParams {}
+export interface UpdateGroupPermissionsApiParams extends NewBaseParams {
+  groupid: string;
+  version?: number;
+  nfts?: nftPermissionType[];
+  payload_hash?: string; // required when version is 2
+  permissions: GroupPermissions;
+}
 
 export interface UpdateGroupPermissionsParams {
   groupid: string;
   permissions: GroupPermissions;
+  nfts?: nftPermissionType[];
 }
 
 export interface GetGroupPermissionsParams extends NewBaseParams {
@@ -581,30 +598,30 @@ export interface CreateDappListResponse {
 }
 
 export interface QueryNotificationsApiParams extends BaseParams {
-    topic?: string;
-    notice_type?: string;
-    size: number;
-    page: number;
+  topic?: string;
+  notice_type?: string;
+  size: number;
+  page: number;
 }
 
 export type QueryNotificationsParams = {
-    topic?: string;
-    notice_type?: string;
-    size: number;
-    page: number;
+  topic?: string;
+  notice_type?: string;
+  size: number;
+  page: number;
 };
 
 export type GetMyAuthInfoParams = {
-    userid: string;
-    dapp_id: string;
-    timestamp: number;
-    web3mq_user_signature: string;
+  userid: string;
+  dapp_id: string;
+  timestamp: number;
+  web3mq_user_signature: string;
 };
 
 export type GetMyAuthInfoResponse = {
-    auth_status: number;
-    create_at: number;
-    dapp_id: string;
-    scopes: any;
-    userid: string;
+  auth_status: number;
+  create_at: number;
+  dapp_id: string;
+  scopes: any;
+  userid: string;
 };

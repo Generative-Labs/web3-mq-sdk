@@ -97,6 +97,11 @@ export const getCurrentDate = () => {
   );
 };
 
+const base64ToString = (str: string) => {
+  const u = Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(u);
+};
+
 export const selectUrl = (url: string, type: string = 'http') => {
   if (type === 'ws') {
     let Domain: string = url.split('://')[1];
@@ -165,7 +170,7 @@ export const renderMessagesList = async (msglist: any) => {
     let msg = msglist[idx];
     let content = '';
     if (msg.cipher_suite === 'NONE') {
-      content = window.atob(msg.payload);
+      content = base64ToString(msg.payload);
     } else {
       throw new Error('This message decode error');
     }
