@@ -195,7 +195,7 @@ export type WalletBaseParams = {
   timestamp: number;
 };
 
-export type GroupPermissionValueType = 'creator_invite_friends' | 'public' | 'nft_validation';
+export type GroupPermissionValueType = 'creator_invite_friends' | 'public' | 'nft_validation' | 'validate_by_creator';
 
 export type GroupPermissions = {
   [key: string]: {

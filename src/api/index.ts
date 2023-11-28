@@ -300,3 +300,9 @@ export const createDappRequest = async (payload: CreateDappApiParams) => {
 export const updateDappRequest = async (payload: CreateDappApiParams) => {
   return await request.post('/api/update_dapp/', payload);
 };
+export const getGroupsRequest = async (payload: {
+  groupid_list: string[],
+  timestamp: number
+}): Promise<any> => {
+  return await request.post('/api/groups/info/', payload);
+};

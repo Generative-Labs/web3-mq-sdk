@@ -9,6 +9,7 @@ import {
   updateRoomListRequest,
   updateGroupPermissionsRequest,
   syncNewMessagesRequest,
+  getGroupsRequest,
 } from '../api';
 import {
   ByteArrayToHexString,
@@ -396,5 +397,14 @@ export class Channel {
     }
     const data = await updateGroupPermissionsRequest(payload);
     return data;
+  }
+
+  async queryGroups(ids: string[]) {
+    const res = await getGroupsRequest({
+      groupid_list: ids,
+      timestamp: Date.now(),
+    });
+    console.log(res);
+    return res;
   }
 }
