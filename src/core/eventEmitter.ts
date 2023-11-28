@@ -23,10 +23,9 @@ class EventEmitter {
 
   emit(eventName: EventTypes, ...args: any[]) {
     const callbacks = this.events[eventName] || [];
-    if (callbacks.length === 0) {
-      throw new Error(`The ${eventName} event was not registered`);
+    if (callbacks.length > 0) {
+      callbacks.forEach((cb: any) => cb(...args));
     }
-    callbacks.forEach((cb: any) => cb(...args));
   }
 
   off(eventName: EventTypes, callback: any) {

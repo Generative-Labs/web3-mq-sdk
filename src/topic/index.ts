@@ -39,6 +39,7 @@ export class Topic {
       this.myTopicList = data;
     }
     this._client.emit('notification.getMyTopicList', { type: 'notification.getMyTopicList' });
+    
     return data;
   }
 

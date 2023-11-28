@@ -34,14 +34,22 @@ export class Notify {
 
   receiveNotify = (pbType: number, bytes: Uint8Array) => {
     const { data } = Web3MQMessageListResponse.fromBinary(bytes);
+    console.log(data, 'data');
     const list = data.map((item) => JSON.parse(new TextDecoder().decode(item.payload)));
+    console.log(list, 'list new receive notify');
     if (!this.notificationList) {
       this.notificationList = list;
     } else {
       this.notificationList = [...list, ...this.notificationList];
     }
-    if (this._client.listeners.events['notification.getList']) {
-      this._client.emit('notification.getList', { type: 'notification.getList' });
+    this._client.emit('notification.received', { type: 'notification.received', data: list });
+    this._client.emit('notification.getList', { type: 'notification.getList', data: list });
+    if (list.length > 0) {
+      list.forEach(item => {
+        if (item.type === 'system.group_invitation') {
+          this._client.emit('channel.invited', { type: 'channel.invited'});
+        }
+      });
     }
   };
 
@@ -62,9 +70,7 @@ export class Notify {
     } else {
       this.notificationList = list;
     }
-    if (this._client.listeners.events['notification.getList']) {
-      this._client.emit('notification.getList', { type: 'notification.getList' });
-    }
-    // return data;
+    this._client.emit('notification.getList', { type: 'notification.getList' });
+    return list;
   }
 }

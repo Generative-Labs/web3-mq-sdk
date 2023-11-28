@@ -85,6 +85,7 @@ export class Contact {
     } else {
       this.contactList = newContacts;
     }
+
     emit('contact.getContactList', { type: 'contact.getContactList' });
     return newContacts;
   }
@@ -105,9 +106,7 @@ export class Contact {
     } else {
       this.followerList = data.user_list;
     }
-    if (this._client.listeners.events['contact.getFollowerList']) {
-      this._client.emit('contact.getFollowerList', { type: 'contact.getFollowerList' });
-    }
+    this._client.emit('contact.getFollowerList', { type: 'contact.getFollowerList' });
     return data.user_list;
   }
 
@@ -127,9 +126,7 @@ export class Contact {
     } else {
       this.followingList = data.user_list;
     }
-    if (this._client.listeners.events['contact.getFollowingList']) {
-      this._client.emit('contact.getFollowingList', { type: 'contact.getFollowingList' });
-    }
+    this._client.emit('contact.getFollowingList', { type: 'contact.getFollowingList' });
     return data.user_list;
   }
 
@@ -183,9 +180,7 @@ export class Contact {
       did_type: didType,
       target_userid: targetUserid,
     });
-    if (this._client.listeners.events['contact.updateList']) {
-      this._client.emit('contact.updateList', { type: 'contact.updateList' });
-    }
+    this._client.emit('contact.updateList', { type: 'contact.updateList' });
     return data as any;
   }
 
@@ -238,9 +233,7 @@ export class Contact {
       did_type: wallet_type as BlockChainType,
       target_userid: targetUserid,
     });
-    if (this._client.listeners.events['contact.updateList']) {
-      this._client.emit('contact.updateList', { type: 'contact.updateList' });
-    }
+    this._client.emit('contact.updateList', { type: 'contact.updateList' });
     return data as any;
   }
 
@@ -279,7 +272,7 @@ export class Contact {
     });
     this.myFriendRequestList = data.result;
     emit('contact.friendList', { type: 'contact.friendList' });
-    // return data;
+    return data?.result || [];
   }
 
   /**
@@ -300,8 +293,8 @@ export class Contact {
       ...option,
     });
     this.receiveFriendRequestList = data.result;
-    emit('contact.reviceList', { type: 'contact.reviceList' });
-    // return data;
+    emit('contact.receiveList', { type: 'contact.receiveList' });
+    return data;
   }
 
   /**
@@ -321,7 +314,6 @@ export class Contact {
       target_userid,
       action,
     });
-
     emit('contact.getList', { type: 'contact.getList' });
     return data;
   }
