@@ -2,6 +2,7 @@ export const EVENT_MAP = {
   'channel.created': true,
   // query channel list
   'channel.getList': true,
+  'channel.joined': true,
   // change active channel
   'channel.activeChange': true,
   // update channel

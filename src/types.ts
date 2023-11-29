@@ -195,7 +195,11 @@ export type WalletBaseParams = {
   timestamp: number;
 };
 
-export type GroupPermissionValueType = 'creator_invite_friends' | 'public' | 'nft_validation' | 'validate_by_creator';
+export type GroupPermissionValueType =
+  | 'creator_invite_friends'
+  | 'public'
+  | 'nft_validation'
+  | 'validate_by_creator';
 
 export type GroupPermissions = {
   [key: string]: {
@@ -624,4 +628,37 @@ export type GetMyAuthInfoResponse = {
   dapp_id: string;
   scopes: any;
   userid: string;
+};
+
+export enum ApproveJoinGroupStatusEnum {
+  // eslint-disable-next-line no-unused-vars
+  APPROVE,
+  // eslint-disable-next-line no-unused-vars
+  REJECTTED,
+}
+
+export type approveJoinGroupRequestParams = {
+  userid: string;
+  did_type: BlockChainType;
+  did_signature: string;
+  sign_content: string;
+  timestamp: number;
+  groupid: string;
+  request_userid?: string;
+  wallet_address: string;
+  status: ApproveJoinGroupStatusEnum;
+  reason?: string;
+  did_pubkey?: string;
+};
+
+export type requestJoinGroupRequestParams = {
+  did_type: BlockChainType;
+  did_signature: string;
+  sign_content: string;
+  groupid: string;
+  request_reason?: string;
+  did_pubkey?: string;
+  wallet_address: string;
+  userid: string;
+  timestamp: number;
 };
