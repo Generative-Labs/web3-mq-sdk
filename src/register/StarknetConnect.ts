@@ -82,9 +82,7 @@ export class StarknetConnect {
       primaryType: 'Message',
       message: { message },
     };
-    console.log(this.starknet.account, 'this.starknet.account');
     const result = await this.starknet.account.signMessage(typedMessage);
-    console.log(this.starknet.account.signer);
     let messageText = typedData.getMessageHash(typedMessage, address);
     const contractProvider = new Provider({
       //@ts-ignore
@@ -104,10 +102,8 @@ export class StarknetConnect {
         pubkey2 = await contact.get_owner();
       } catch (e) {
         let contact = new Contract(ArgentAbi, address, contractProvider);
-        console.log(contact, 'contact');
         const signer = await contact.getSigner();
         pubkey2 = signer.signer;
-        console.log(pubkey2, 'pubkey2');
       }
       return {
         publicKey: num.toHex(pubkey2),

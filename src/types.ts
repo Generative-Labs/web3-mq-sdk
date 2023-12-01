@@ -632,9 +632,9 @@ export type GetMyAuthInfoResponse = {
 
 export enum ApproveJoinGroupStatusEnum {
   // eslint-disable-next-line no-unused-vars
-  APPROVE,
-  // eslint-disable-next-line no-unused-vars
   REJECTTED,
+  // eslint-disable-next-line no-unused-vars
+  APPROVE,
 }
 
 export type approveJoinGroupRequestParams = {

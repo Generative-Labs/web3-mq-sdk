@@ -583,7 +583,7 @@ export class Channel {
     signContent: string;
     requestTime: number;
   }> {
-    const { groupid, requestUserid, reason, isApprove, didType, walletAddress } = params;
+    const { groupid, requestUserid, reason = '', isApprove, didType, walletAddress } = params;
     let status = isApprove
       ? ApproveJoinGroupStatusEnum.APPROVE
       : ApproveJoinGroupStatusEnum.REJECTTED;
@@ -662,7 +662,6 @@ Issued At: ${newDateFormat(timestamp, 'Y/m/d h:i')}`;
       reason: requestReason,
       did_pubkey: didPubkey,
     });
-    // this._client.emit('contact.updateList', { type: 'contact.updateList' });
     return data as any;
   }
 }
