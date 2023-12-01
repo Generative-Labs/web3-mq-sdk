@@ -1,6 +1,5 @@
 import { StarknetWindowObject, connect } from 'get-starknet';
-import { Contract, hash, num, Provider, typedData, cairo } from 'starknet';
-import { networkId } from './starknet';
+import { Contract, hash, num, RpcProvider, typedData, cairo } from 'starknet';
 import { ArgentAbi, ArgentXAbi2, BraavosAbi } from '../abi';
 import { WalletSignRes, WalletType } from '../types';
 
@@ -62,13 +61,10 @@ export class StarknetConnect {
       };
     }
     const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
-    const { chainId, network } = networkId(
-      this.starknet.provider?.baseUrl || this.starknet.provider?.provider?.baseUrl || '',
-    );
     const typedMessage = {
       domain: {
         name: 'Example DApp',
-        chainId,
+        chainId: this.starknet.chainId,
         version: '0.0.1',
       },
       types: {
@@ -84,9 +80,8 @@ export class StarknetConnect {
     };
     const result = await this.starknet.account.signMessage(typedMessage);
     let messageText = typedData.getMessageHash(typedMessage, address);
-    const contractProvider = new Provider({
-      //@ts-ignore
-      sequencer: { network },
+    const contractProvider = new RpcProvider({
+      nodeUrl: this.starknet.chainId,
     });
     if (this.walletId === 'braavos') {
       const contact = new Contract(BraavosAbi, address, contractProvider);
