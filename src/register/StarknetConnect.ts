@@ -81,7 +81,10 @@ export class StarknetConnect {
     const result = await this.starknet.account.signMessage(typedMessage);
     let messageText = typedData.getMessageHash(typedMessage, address);
     const contractProvider = new RpcProvider({
-      nodeUrl: this.starknet.chainId,
+      nodeUrl:
+        this.starknet.chainId === 'SN_MAIN'
+          ? 'https://starknet-mainnet.public.blastapi.io'
+          : 'https://starknet-testnet.public.blastapi.io',
     });
     if (this.walletId === 'braavos') {
       const contact = new Contract(BraavosAbi, address, contractProvider);
