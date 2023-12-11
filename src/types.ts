@@ -613,6 +613,7 @@ export type QueryNotificationsParams = {
   notice_type?: string;
   size: number;
   page: number;
+  read_status?: string
 };
 
 export type GetMyAuthInfoParams = {
