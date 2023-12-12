@@ -1,4 +1,4 @@
-import {request} from '../core/request';
+import { request } from '../core/request';
 
 import {
   CreateRoomApiParams,
@@ -42,6 +42,7 @@ import {
   GetMyAuthInfoParams,
   GetMyAuthInfoResponse,
   RegisterApiParams,
+  approveJoinGroupRequestParams, requestJoinGroupRequestParams,
 } from '../types';
 
 /**
@@ -140,7 +141,9 @@ export const getUserInfoRequest = async (payload: GetUserInfoParams) => {
   return await request.post('/api/get_user_info/', payload);
 };
 
-export const userRegisterRequest = async (payload: RegisterApiParams): Promise<RegisterApiResponse> => {
+export const userRegisterRequest = async (
+  payload: RegisterApiParams,
+): Promise<RegisterApiResponse> => {
   return await request.post('/api/user_register_v2/', payload);
 };
 
@@ -234,7 +237,7 @@ export const sendFriendRequest = async (payload: SendFriendParams) => {
 };
 
 export const getMyAuthInfoRequest = async (
-  payload: GetMyAuthInfoParams
+  payload: GetMyAuthInfoParams,
 ): Promise<GetMyAuthInfoResponse> => {
   return await request.post('/api/dapp/user_auth_info/', payload);
 };
@@ -280,16 +283,16 @@ export const publishTopicMessageRequest = async (payload: PublishTopicMessagePar
 };
 
 export const myCreateTopicListRequest = async (payload: GetTopicListParams) => {
-  return await request.get('/api/my_create_topic_list/', {params: payload});
+  return await request.get('/api/my_create_topic_list/', { params: payload });
 };
 
 export const mySubscribeTopicListRequest = async (payload: GetTopicListParams) => {
-  return await request.get('/api/my_subscribe_topic_list/', {params: payload});
+  return await request.get('/api/my_subscribe_topic_list/', { params: payload });
 };
 
 export const getMyCreateDappListRequest = async (payload: GetMyCreateDappListApiParmas) => {
   return await request.get('/api/my_create_dapps/', {
-    params: payload
+    params: payload,
   });
 };
 
@@ -299,4 +302,24 @@ export const createDappRequest = async (payload: CreateDappApiParams) => {
 
 export const updateDappRequest = async (payload: CreateDappApiParams) => {
   return await request.post('/api/update_dapp/', payload);
+};
+export const getGroupsRequest = async (payload: {
+  groupid_list: string[];
+  timestamp: number;
+  userid?: string
+  web3mq_user_signature?: string
+}): Promise<any> => {
+  return await request.post('/api/groups/info/', payload);
+};
+
+
+export const requestJoinGroupRequest = async (
+  payload: requestJoinGroupRequestParams,
+): Promise<any> => {
+  return await request.post('/api/group/user_join_request/', payload);
+};
+export const approveJoinGroupRequest = async (
+  payload: approveJoinGroupRequestParams,
+): Promise<any> => {
+  return await request.post('/api/group/approve_join_request/', payload);
 };

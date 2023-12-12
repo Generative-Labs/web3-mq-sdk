@@ -1,6 +1,5 @@
 import { StarknetWindowObject, connect } from 'get-starknet';
-import { Contract, hash, num, Provider, typedData, cairo } from 'starknet';
-import { networkId } from './starknet';
+import { Contract, hash, num, RpcProvider, typedData, cairo } from 'starknet';
 import { ArgentAbi, ArgentXAbi2, BraavosAbi } from '../abi';
 import { WalletSignRes, WalletType } from '../types';
 
@@ -62,13 +61,10 @@ export class StarknetConnect {
       };
     }
     const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
-    const { chainId, network } = networkId(
-      this.starknet.provider?.baseUrl || this.starknet.provider?.provider?.baseUrl || '',
-    );
     const typedMessage = {
       domain: {
         name: 'Example DApp',
-        chainId,
+        chainId: this.starknet.chainId,
         version: '0.0.1',
       },
       types: {
@@ -82,13 +78,13 @@ export class StarknetConnect {
       primaryType: 'Message',
       message: { message },
     };
-    console.log(this.starknet.account, 'this.starknet.account');
     const result = await this.starknet.account.signMessage(typedMessage);
-    console.log(this.starknet.account.signer);
     let messageText = typedData.getMessageHash(typedMessage, address);
-    const contractProvider = new Provider({
-      //@ts-ignore
-      sequencer: { network },
+    const contractProvider = new RpcProvider({
+      nodeUrl:
+        this.starknet.chainId === 'SN_MAIN'
+          ? 'https://starknet-mainnet.public.blastapi.io'
+          : 'https://starknet-testnet.public.blastapi.io',
     });
     if (this.walletId === 'braavos') {
       const contact = new Contract(BraavosAbi, address, contractProvider);
@@ -104,10 +100,8 @@ export class StarknetConnect {
         pubkey2 = await contact.get_owner();
       } catch (e) {
         let contact = new Contract(ArgentAbi, address, contractProvider);
-        console.log(contact, 'contact');
         const signer = await contact.getSigner();
         pubkey2 = signer.signer;
-        console.log(pubkey2, 'pubkey2');
       }
       return {
         publicKey: num.toHex(pubkey2),

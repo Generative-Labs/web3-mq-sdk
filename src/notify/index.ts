@@ -33,15 +33,41 @@ export class Notify {
   }
 
   receiveNotify = (pbType: number, bytes: Uint8Array) => {
+    const { channel } = this._client;
     const { data } = Web3MQMessageListResponse.fromBinary(bytes);
-    const list = data.map((item) => JSON.parse(new TextDecoder().decode(item.payload)));
+    const list = data.map((item) => {
+      const payload = JSON.parse(new TextDecoder().decode(item.payload));
+      if (
+        payload &&
+        payload.type === 'system.group.agree_join_request' &&
+        payload?.metadata?.groupid
+      ) {
+        channel.updateChannels({
+          chatid: payload.metadata.groupid,
+          chatType: 'group',
+          topic: payload.metadata.groupid,
+          topicType: 'group',
+        });
+      }
+      return {
+        ...payload,
+        messageId: item.messageId,
+        read: item.read,
+      };
+    });
     if (!this.notificationList) {
       this.notificationList = list;
     } else {
       this.notificationList = [...list, ...this.notificationList];
     }
-    if (this._client.listeners.events['notification.getList']) {
-      this._client.emit('notification.getList', { type: 'notification.getList' });
+    this._client.emit('notification.received', { type: 'notification.received', data: list });
+    this._client.emit('notification.getList', { type: 'notification.getList', data: list });
+    if (list.length > 0) {
+      list.forEach((item) => {
+        if (item.type === 'system.group_invitation') {
+          this._client.emit('channel.invited', { type: 'channel.invited' });
+        }
+      });
     }
   };
 
@@ -55,16 +81,18 @@ export class Notify {
       data: { result = [] },
     } = await queryNotificationsRequest({ userid, timestamp, web3mq_signature, ...option });
     const list = result.map((item: any) => {
-      return item.payload;
+      return {
+        ...item.payload,
+        messageId: item.messageid,
+        read: item.read,
+      };
     });
     if (this.notificationList && option.page !== 1) {
       this.notificationList = [...list, ...this.notificationList];
     } else {
       this.notificationList = list;
     }
-    if (this._client.listeners.events['notification.getList']) {
-      this._client.emit('notification.getList', { type: 'notification.getList' });
-    }
-    // return data;
+    this._client.emit('notification.getList', { type: 'notification.getList' });
+    return list;
   }
 }
