@@ -663,3 +663,28 @@ export type requestJoinGroupRequestParams = {
   userid: string;
   timestamp: number;
 };
+
+
+export type UserPublicInfoType = {
+  avatar_url: string
+  is_my_following: boolean
+  nickname: string
+  timestamp: string
+  userid: string
+  wallet_address: string
+  wallet_type: BlockChainType
+}
+
+export type MessageItemType = {
+  senderId: string  // sender user id,
+  topic: string  /// topic   userid or groupid
+  chatId: string  /// topic   userid or groupid
+  content: string  // content
+  contentType: string// text
+  timestamp: number
+  messageId: string
+  senderInfo?: UserPublicInfoType,
+  date: string
+  time: string
+  msgLoading: string
+}

@@ -3,10 +3,10 @@ import jssha256 from 'js-sha256';
 import axios from 'axios';
 
 import type { Client } from './client';
-import { DidType, EnvTypes, SendMsgLoadingMap } from './types';
-import { PbTypeMessage, PbTypeMessageStatusResp } from './core/pbType';
+import { DidType, EnvTypes, MessageItemType, SendMsgLoadingMap } from './types';
 import { domainUrlList } from './core/config';
 import { getUserInfoRequest, getUserPublicProfileRequest } from './api';
+import { Web3MQMessageStatusResp, Web3MQRequestMessage } from './pb';
 
 export {
   userLoginRequest,
@@ -164,52 +164,31 @@ export const getFastestUrl = async (env: EnvTypes = 'test') => {
   return list.sort(handleSort('time'))[0].url;
 };
 
-export const renderMessagesList = async (msglist: any) => {
+export const newRenderMessagesList = (msglist: any) => {
   let messages = [];
   for (let idx = 0; idx < msglist.length; idx++) {
     let msg = msglist[idx];
     let content = '';
+    let contentType: 'text';
     if (msg.cipher_suite === 'NONE') {
       content = base64ToString(msg.payload);
+      contentType = 'text';
     } else {
       throw new Error('This message decode error');
     }
-    const date = new Date(msg.timestamp);
-
-    const timestampStr = `${date.getHours()}:${date.getMinutes()}`;
-
-    const dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-
-    const cacheUserInfo = localStorage.getItem(`user_info_${msg.from}`);
-    let userInfo;
-    if (cacheUserInfo) {
-      userInfo = JSON.parse(cacheUserInfo);
-    } else {
-      const { data } = await getUserPublicProfileRequest({
-        did_type: 'web3mq',
-        did_value: msg.from,
-        timestamp: Date.now(),
-        my_userid: '',
-      });
-      localStorage.setItem(`user_info_${msg.from}`, JSON.stringify(data));
-      userInfo = data;
-    }
-    const item = {
-      ...msg,
-      _id: idx + 1,
-      id: idx + 1,
-      indexId: idx + 1,
-      content: content,
+    const { dateStr, timeStr } = getDateTimes(Number(msg.timestamp));
+    // const userInfo = await getUserPublicInfo(msg.from);
+    const item: MessageItemType = {
       senderId: msg.from,
-      username: userInfo?.nickname || '',
-      avatar: userInfo?.avatar_url || '',
+      topic: msg.topic,
+      chatId: msg.topic,
+      content,
+      contentType,
+      messageId: msg.messageid,
       date: dateStr,
-      timestamp: timestampStr,
-      system: false,
-      saved: false,
-      distributed: true,
-      seen: true,
-      failure: false,
+      time: timeStr,
+      timestamp: msg.timestamp,
+      msgLoading: SendMsgLoadingMap['success'],
     };
     messages.push(item);
   }
@@ -225,52 +204,24 @@ export const getGroupId = (msg: any, client: Client): string => {
   return contentTopic;
 };
 
-export const renderMessage = (
-  pbType: number,
-  msg: { messageId: string; timestamp: bigint; payload?: any },
-  client: Client,
-) => {
-  const { messageId, timestamp, payload } = msg;
-
-  let content = '';
-  let senderId = '';
-  if (pbType === PbTypeMessage) {
-    // received message
-    content = new TextDecoder().decode(payload);
-    senderId = getGroupId(msg, client);
-  }
-  if (pbType === PbTypeMessageStatusResp) {
-    // send message
-    content = client.message.msg_text;
-    senderId = client.keys.userid;
-  }
-
-  let date =
-    pbType === PbTypeMessage ? new Date(Number(timestamp)) : new Date(Number(timestamp) * 1000);
-
-  let timestampStr = date.getHours() + ':' + date.getMinutes();
-
-  let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-
-  let message: any = {
-    _id: messageId,
-    id: messageId,
-    indexId: messageId,
-    msgLoading:
-      pbType === PbTypeMessage ? SendMsgLoadingMap['success'] : SendMsgLoadingMap['loading'],
+export const renderReceiveMessage = (msg: Web3MQRequestMessage): MessageItemType => {
+  const { messageId, timestamp, payload, contentTopic, comeFrom } = msg;
+  let content = new TextDecoder().decode(payload);
+  const { dateStr, timeStr } = getDateTimes(Number(timestamp));
+  // const userInfo = await getUserPublicInfo(comeFrom);
+  const item: MessageItemType = {
+    senderId: comeFrom,
+    topic: contentTopic,
+    chatId: contentTopic,
     content,
-    senderId,
-    username: '',
-    avatar: 'assets/imgs/doe.png',
+    contentType: 'text',
+    messageId,
     date: dateStr,
-    timestamp: timestampStr,
-    system: false,
-    saved: false,
-    distributed: true,
-    seen: true,
-    failure: false,
+    time: timeStr,
+    timestamp: Number(timestamp),
+    msgLoading: SendMsgLoadingMap['success'],
   };
-  return message;
+  return item;
 };
 
 export const transformAddress = async (walletAddress: string, didType: DidType = 'eth') => {
@@ -300,11 +251,11 @@ export const getMessageUpdateDate = () => {
 };
 
 export const updateMessageLoadStatus = (
-  msgList: Array<any>,
-  msg: any,
+  msgList: MessageItemType[],
+  msg: Web3MQMessageStatusResp,
   status = SendMsgLoadingMap['success'],
 ) => {
-  const message = msgList.find((item: any) => item.id === msg.id);
+  const message = msgList.find((item: any) => item.messageId === msg.messageId);
   if (message) {
     (message as any).msgLoading = status;
   }
@@ -340,3 +291,32 @@ export function newDateFormat(time: number, format?: string) {
     return rt >= 10 || isAddZero(o) ? rt : `0${rt}`;
   });
 }
+
+export const getUserPublicInfo = async (userid: string) => {
+  const cacheUserInfo = localStorage.getItem(`user_info_${userid}`);
+  let userInfo;
+  if (cacheUserInfo) {
+    userInfo = JSON.parse(cacheUserInfo);
+  } else {
+    const { data } = await getUserPublicProfileRequest({
+      did_type: 'web3mq',
+      did_value: userid,
+      timestamp: Date.now(),
+      my_userid: '',
+    });
+    localStorage.setItem(`user_info_${userid}`, JSON.stringify(data));
+    userInfo = data;
+  }
+  return userInfo;
+};
+
+export const getDateTimes = (timestamp: number) => {
+  let date = new Date(timestamp);
+  let timeStr = date.getHours() + ':' + date.getMinutes();
+  let dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  return {
+    timeStr,
+    timestamp,
+    dateStr,
+  };
+};
