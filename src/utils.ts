@@ -21,18 +21,15 @@ export const ByteArrayToHexString = (byteArray: Iterable<unknown> | ArrayLike<un
     '',
   );
 };
-
 const Uint8ToBase64String = (u8a: any) => {
   return btoa(String.fromCharCode.apply(null, u8a));
 };
-
 export const GetContactBytes = (command: any, bytes: Uint8Array) => {
   // client category type
   const categoryType = 10;
   const concatArray = new Uint8Array([categoryType, command, ...bytes]);
   return concatArray;
 };
-
 export const GenerateEd25519KeyPair = async () => {
   let privateObj = ed.utils.randomPrivateKey();
   let pubkeyObj = await ed.getPublicKey(privateObj);
@@ -43,19 +40,9 @@ export const GenerateEd25519KeyPair = async () => {
     PublicKey,
   };
 };
-
-// export const GenerateQrCode = async (text: string) => {
-//   try {
-//     return await QRCode.toDataURL(text);
-//   } catch (err: any) {
-//     throw new Error(err.message);
-//   }
-// };
-
 export const sha256 = (data: string | Uint8Array): Uint8Array => {
   return new Uint8Array(jssha256.sha256.digest(data));
 };
-
 export const DownloadKeyPair = (text: string, filename: string = 'KeyPairs') => {
   const aTag = document.createElement('a');
   aTag.download = filename;
@@ -65,7 +52,6 @@ export const DownloadKeyPair = (text: string, filename: string = 'KeyPairs') => 
   document.body.appendChild(aTag);
   aTag.click();
 };
-
 export const GenerateRandomSixCode = () => {
   let code = '';
   for (let i = 0; i < 6; i++) {
@@ -73,7 +59,6 @@ export const GenerateRandomSixCode = () => {
   }
   return code;
 };
-
 export const getDataSignature = async (PrivateKey: string, signContent: string) => {
   if (!PrivateKey) {
     throw new Error('Ed25519PrivateKey not found');
@@ -81,7 +66,6 @@ export const getDataSignature = async (PrivateKey: string, signContent: string) 
   const signature = await ed.sign(new TextEncoder().encode(signContent), PrivateKey);
   return Uint8ToBase64String(signature);
 };
-
 export const getCurrentDate = () => {
   const d = new Date();
   return (
@@ -96,12 +80,10 @@ export const getCurrentDate = () => {
     ('0' + d.getMinutes()).slice(-2)
   );
 };
-
 const base64ToString = (str: string) => {
   const u = Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
   return new TextDecoder().decode(u);
 };
-
 export const selectUrl = (url: string, type: string = 'http') => {
   if (type === 'ws') {
     let Domain: string = url.split('://')[1];
@@ -109,7 +91,6 @@ export const selectUrl = (url: string, type: string = 'http') => {
   }
   return url;
 };
-
 // eslint-disable-next-line no-unused-vars
 const getServerList = async (arr: any[]) => {
   let serverList = [];
@@ -125,7 +106,6 @@ const getServerList = async (arr: any[]) => {
   }
   return serverList;
 };
-
 export const getAllDomainList = async (env: EnvTypes) => {
   const list = await getServerList(domainUrlList[env]);
 

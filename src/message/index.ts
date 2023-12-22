@@ -70,7 +70,7 @@ export class Message {
   async changeMessageStatus(
     messages: string[],
     status: MessageStatus = 'delivered',
-    chatId: string,
+    chatId?: string,
   ) {
     const topic = chatId || this._client.channel.activeChannel?.chatid;
     if (topic) {
@@ -122,7 +122,7 @@ export class Message {
         this.messageList = [...this.messageList, { ...tempMessageData }];
       }
 
-      this._client.emit('message.send', { type: 'message.send' });
+      this._client.emit('message.send', { type: 'message.send', data: tempMessageData});
 
       connect.send(concatArray);
     }

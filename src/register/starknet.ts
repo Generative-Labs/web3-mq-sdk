@@ -1,96 +1,109 @@
-// import {Contract, hash, number, Provider, typedData} from 'starknet';
-// import { testNet } from '../abi';
-// import {connect, StarknetWindowObject} from 'get-starknet';
-// import {WalletSignRes, WalletType} from '../types';
-type NetworkName = 'SN_MAIN' | 'SN_GOERLI' | 'SN_GOERLI2';
+import { StarknetWindowObject, connect } from 'get-starknet';
+import { WalletId } from './StarknetConnect';
+import { cairo, Contract, hash, num, RpcProvider, typedData } from 'starknet';
+import { ArgentAbi, ArgentXAbi2, BraavosAbi } from '../abi';
 
-// enum NetworkName {
-//   SN_MAIN = 'SN_MAIN',
-//   SN_GOERLI = 'SN_GOERLI',
-//   SN_GOERLI2 = 'SN_GOERLI2',
-// }
-
-//
-//
-// export const getStarkNetAccount = async () => {
-//   let res: any = {
-//     address: '',
-//   };
-//   res.address = await ((await getStarknetAccount()) as any).address;
-//   return res;
-// };
-//
-export const networkId = (
-  baseUrl: string,
-): {
-  chainId: string;
-  network: NetworkName;
-} => {
-  if (baseUrl.includes('alpha-mainnet.starknet.io')) {
+export const signWithStarkNet = async (
+  signContent: string,
+  address: string,
+  walletId: WalletId,
+): Promise<{
+  sign: string;
+  publicKey: string;
+}> => {
+  let starknet: StarknetWindowObject | null = window.starknet || null;
+  if (!starknet) {
+    starknet = await connect({
+      include: [walletId],
+      modalMode: 'neverAsk',
+    });
+  }
+  if (!starknet) {
+    starknet = await connect({
+      include: [walletId],
+      modalMode: 'canAsk',
+    });
+  }
+  if (!starknet || !starknet.isConnected) {
     return {
-      chainId: 'SN_MAIN',
-      network: 'SN_MAIN',
+      publicKey: '',
+      sign: '',
     };
-  } else if (baseUrl.includes('alpha4-2.starknet.io')) {
+  }
+  const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
+  const typedMessage = {
+    domain: {
+      name: 'Example DApp',
+      chainId: starknet.chainId,
+      version: '0.0.1',
+    },
+    types: {
+      StarkNetDomain: [
+        { name: 'name', type: 'felt' },
+        { name: 'chainId', type: 'felt' },
+        { name: 'version', type: 'felt' },
+      ],
+      Message: [{ name: 'message', type: 'felt' }],
+    },
+    primaryType: 'Message',
+    message: { message },
+  };
+  const result = await starknet.account.signMessage(typedMessage);
+  let messageText = typedData.getMessageHash(typedMessage, address);
+  const contractProvider = new RpcProvider({
+    nodeUrl:
+      starknet.chainId === 'SN_MAIN'
+        ? 'https://starknet-mainnet.public.blastapi.io'
+        : 'https://starknet-testnet.public.blastapi.io',
+  });
+  if (walletId === 'braavos') {
+    const contact = new Contract(BraavosAbi, address, contractProvider);
+    const { publicKey } = await contact.getPublicKey();
     return {
-      chainId: 'SN_GOERLI2',
-      network: 'SN_GOERLI2',
+      publicKey: num.toHex(publicKey),
+      sign: cairo.felt(messageText) + ',' + result.join(','),
     };
   } else {
+    let pubkey2 = '';
+    try {
+      let contact = new Contract(ArgentXAbi2, address, contractProvider);
+      pubkey2 = await contact.get_owner();
+    } catch (e) {
+      let contact = new Contract(ArgentAbi, address, contractProvider);
+      const signer = await contact.getSigner();
+      pubkey2 = signer.signer;
+    }
     return {
-      chainId: 'SN_GOERLI',
-      network: 'SN_GOERLI',
+      publicKey: num.toHex(pubkey2),
+      sign: cairo.felt(messageText) + ',' + result.join(','),
     };
   }
 };
-
-// export const signWithStarkNet = async (
-//   signContent: string,
-//   address: string,
-// ): Promise<WalletSignRes> => {
-//   const provider = await ((await getStarknetAccount()) as any)?.provider;
-//   const message = hash.starknetKeccak(signContent).toString(16).substring(0, 31);
-//   const { chainId, network } = networkId(provider.provider.baseUrl);
-//   const typedMessage = {
-//     domain: {
-//       name: 'Example DApp',
-//       chainId,
-//       version: '0.0.1',
-//     },
-//     types: {
-//       StarkNetDomain: [
-//         { name: 'name', type: 'felt' },
-//         { name: 'chainId', type: 'felt' },
-//         { name: 'version', type: 'felt' },
-//       ],
-//       Message: [{ name: 'message', type: 'felt' }],
-//     },
-//     primaryType: 'Message',
-//     message: {
-//       message,
-//     },
-//   };
-//   const result = await provider.account.signMessage(typedMessage);
-//   let messageText = typedData.getMessageHash(typedMessage, address);
-//   const contractProvider = new Provider({
-//     sequencer: { network },
-//   });
-//   const contact = new Contract(testNet, address, contractProvider);
-//   const { publicKey } = await contact.getPublicKey();
-//   return {
-//     publicKey: number.toHex(publicKey),
-//     sign: number.toFelt(messageText) + ',' + result.join(','),
-//   };
-// };
 //
-// const getStarknetAccount = async () => {
-//   const starknet = await connect();
-//   if (!starknet) {
-//     return;
-//   }
-//   const [add] = await starknet.enable();
-//   return {
-//     address: add,
-//     provider: starknet,
-//   };
-// };
+export const getStarknetAccount = async (walletId: WalletId) => {
+  const cacheStarknet = window.starknet;
+  if (cacheStarknet && cacheStarknet.isConnected) {
+    return {
+      address: cacheStarknet.selectedAddress,
+    };
+  }
+  let starknet = await connect({
+    include: [walletId],
+    modalMode: 'neverAsk',
+  });
+  if (!starknet) {
+    starknet = await connect({
+      include: [walletId],
+      modalMode: 'canAsk',
+    });
+  }
+  if (starknet) {
+    const [add] = await starknet.enable();
+    return {
+      address: add,
+    };
+  }
+  return {
+    address: '',
+  };
+};

@@ -45,17 +45,16 @@ export type RegisterBySignParams = {
   mainPublicKey: string;
   signature: string;
   did_pubkey?: string;
-  didType?: WalletType;
+  didType?: BlockChainType;
   signContentURI?: string;
   nickname?: string;
   avatar_url?: string;
-  avatar_base64?: string;
 };
 
 export type LoginByKeysParams = {
   mainPrivateKey: string;
   mainPublicKey: string;
-  didType: WalletType;
+  didType: BlockChainType;
   didValue: string;
   userid: string;
   password: string;
@@ -113,7 +112,7 @@ export type GetUserInfoResponse = { userid: string; userExist: boolean };
 
 export type GetMainKeypairParams = {
   password: string;
-  did_type: WalletType;
+  did_type: BlockChainType;
   did_value: string;
 };
 
@@ -476,8 +475,11 @@ export interface ChangeNotificationStatusParams extends BaseParams {
 
 export type NotifyResponse = {
   come_from?: string;
-  title: string;
   content: string;
+  messageId: string;
+  metadata: any;
+  read: boolean;
+  title: string;
   type: string;
   version: number;
   timestamp: number;
@@ -519,7 +521,7 @@ export type GetSignContentResponse = {
 export type GetRegisterSignContentParams = {
   userid: string;
   mainPublicKey: string;
-  didType: WalletType;
+  didType: BlockChainType;
   didValue: string;
   signContentURI?: string;
 };
@@ -535,7 +537,7 @@ export type ResetPasswordParams = {
   mainPublicKey: string;
   signature: string;
   did_pubkey?: string;
-  didType?: WalletType;
+  didType?: BlockChainType;
   signContentURI?: string;
   nickname?: string;
   avatar_url?: string;
@@ -613,7 +615,7 @@ export type QueryNotificationsParams = {
   notice_type?: string;
   size: number;
   page: number;
-  read_status?: string
+  read_status?: string;
 };
 
 export type GetMyAuthInfoParams = {
@@ -664,27 +666,25 @@ export type requestJoinGroupRequestParams = {
   timestamp: number;
 };
 
-
 export type UserPublicInfoType = {
-  avatar_url: string
-  is_my_following: boolean
-  nickname: string
-  timestamp: string
-  userid: string
-  wallet_address: string
-  wallet_type: BlockChainType
-}
+  avatar_url: string;
+  is_my_following: boolean;
+  nickname: string;
+  timestamp: string;
+  userid: string;
+  wallet_address: string;
+  wallet_type: BlockChainType;
+};
 
 export type MessageItemType = {
-  senderId: string  // sender user id,
-  topic: string  /// topic   userid or groupid
-  chatId: string  /// topic   userid or groupid
-  content: string  // content
-  contentType: string// text
-  timestamp: number
-  messageId: string
-  senderInfo?: UserPublicInfoType,
-  date: string
-  time: string
-  msgLoading: string
-}
+  senderId: string; // sender user id,
+  topic: string; /// topic   userid or groupid
+  chatId: string; /// topic   userid or groupid
+  content: string; // content
+  contentType: string; // text
+  timestamp: number; // message send time
+  messageId: string;
+  date: string;
+  time: string;
+  msgLoading: string;
+};
