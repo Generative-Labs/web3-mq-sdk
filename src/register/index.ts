@@ -29,7 +29,6 @@ import {
   LoginApiParams,
   RegisterBySignParams,
   RegisterApiParams,
-  WalletNameMap,
   WalletSignRes,
   WalletType,
   LoginResponse,
@@ -43,6 +42,7 @@ import {
   BlockChainType,
 } from '../types';
 import { StarknetConnect, WalletId } from './StarknetConnect';
+import { walletTypes } from '../helpers';
 
 export class Register {
   appKey: string;
@@ -81,7 +81,9 @@ export class Register {
       userExist,
     };
   };
-
+  /**
+   * @deprecated Use helpers.generateMainKeypair() instead.
+   */
   getMainKeypair = async (
     options: GetMainKeypairParams,
   ): Promise<{ publicKey: string; secretKey: string }> => {
@@ -98,18 +100,24 @@ export class Register {
       mainPublicKey,
       signature,
       did_pubkey = '',
-      didType = 'metamask',
+      didType = 'eth',
       nickname = '',
       avatar_url = '',
-      avatar_base64 = '',
     } = options;
     if (!this.registerTime || !this.registerSignContent) {
       throw new Error('Please create register sign content first!');
     }
+    let did_type = didType;
+    // TODO: Beta version For compatibility with the developer's history calling method, will be removed after the official version is released.
+    // @ts-ignore
+    if (walletTypes.includes(did_type)) {
+      // @ts-ignore
+      did_type = BlockChainMap[did_type];
+    }
 
     const payload: RegisterApiParams = {
       userid,
-      did_type: BlockChainMap[didType],
+      did_type,
       did_value: didValue,
       did_pubkey,
       did_signature: signature,
@@ -118,7 +126,6 @@ export class Register {
       pubkey_value: mainPublicKey,
       nickname,
       avatar_url,
-      avatar_base64,
       timestamp: this.registerTime,
       testnet_access_key: this.appKey,
     };
@@ -135,7 +142,7 @@ export class Register {
       password,
       userid,
       didValue,
-      didType = 'metamask',
+      didType = 'eth',
       mainPrivateKey,
       mainPublicKey,
       pubkeyExpiredTimestamp = Date.now() + 86400 * 1000,
@@ -151,10 +158,17 @@ export class Register {
       const decode_data = await aesGCMDecrypt(AesKey, AesIv, Base64StringToUint8(mainPrivateKey));
       const decode_dataStr = new TextDecoder().decode(new Uint8Array(decode_data));
       const login_signature = await getDataSignature(decode_dataStr, signContent);
+      let did_type = didType;
+      // TODO: Beta version For compatibility with the developer's history calling method, will be removed after the official version is released.
+      // @ts-ignore
+      if (walletTypes.includes(did_type)) {
+        // @ts-ignore
+        did_type = BlockChainMap[did_type];
+      }
 
       const payload: LoginApiParams = {
         userid,
-        did_type: BlockChainMap[didType],
+        did_type,
         did_value: didValue,
         login_signature,
         signature_content: signContent,
@@ -188,7 +202,7 @@ export class Register {
       mainPublicKey,
       signature,
       did_pubkey = '',
-      didType = 'metamask',
+      didType = 'eth',
       nickname = '',
       avatar_url = '',
     } = options;
@@ -196,9 +210,16 @@ export class Register {
     if (!this.registerTime || !this.registerSignContent) {
       throw new Error('Please create register sign content first!');
     }
+    let did_type = didType;
+    // TODO: Beta version For compatibility with the developer's history calling method, will be removed after the official version is released.
+    // @ts-ignore
+    if (walletTypes.includes(did_type)) {
+      // @ts-ignore
+      did_type = BlockChainMap[did_type];
+    }
     const payload: RegisterApiParams = {
       userid,
-      did_type: BlockChainMap[didType],
+      did_type,
       did_value: didValue,
       did_pubkey,
       did_signature: signature,
@@ -217,7 +238,12 @@ export class Register {
       throw new Error(error.message);
     }
   };
-
+  /**
+   * @deprecated Use helpers.signMessage() instead.
+   * @param signContent
+   * @param address
+   * @param walletType
+   */
   sign = async (
     signContent: string,
     address: string,
@@ -234,17 +260,11 @@ export class Register {
     }
   };
 
+  /**
+   * @deprecated Use helpers.connectWallet() instead.
+   * @param walletType
+   */
   getAccount = async (walletType: WalletType): Promise<AccountType> => {
-    switch (walletType) {
-      case 'argentX':
-      case 'braavos':
-        return await this.starknetConnect.connect(walletType as WalletId);
-      default:
-        return await getEthAccount();
-    }
-  };
-
-  connectWallet = async (walletType: WalletType): Promise<AccountType> => {
     switch (walletType) {
       case 'argentX':
       case 'braavos':
@@ -258,7 +278,13 @@ export class Register {
     options: GetMainKeypairParams,
   ): Promise<GetSignContentResponse> => {
     const { password, did_value, did_type } = options;
-    const didType = BlockChainMap[did_type];
+    let didType = did_type;
+    // TODO: Beta version For compatibility with the developer's history calling method, will be removed after the official version is released.
+    // @ts-ignore
+    if (walletTypes.includes(did_type)) {
+      // @ts-ignore
+      didType = BlockChainMap[did_type];
+    }
     const keyIndex = 1;
     const keyMSG = `${didType}:${did_value}${keyIndex}${password}`;
 
@@ -313,14 +339,20 @@ Nonce: ${magicString}`;
       userid,
       signContentURI = window.location.origin,
     } = options;
-
+    let did_type = didType;
+    // TODO: Beta version For compatibility with the developer's history calling method, will be removed after the official version is released.
+    // @ts-ignore
+    if (walletTypes.includes(didType)) {
+      // @ts-ignore
+      did_type = BlockChainMap[didType];
+    }
     const pubkey_type = this.pubicKeyType;
     const timestamp = Date.now();
     const NonceContent = sha3_224(
-      userid + pubkey_type + mainPublicKey + BlockChainMap[didType] + didValue + timestamp,
+      userid + pubkey_type + mainPublicKey + did_type + didValue + timestamp,
     );
 
-    const signContent = `Web3MQ wants you to sign in with your ${WalletNameMap[didType]} account:
+    const signContent = `Web3MQ wants you to sign in with your ${did_type} account:
 ${didValue}
 For Web3MQ register
 URI: ${signContentURI}

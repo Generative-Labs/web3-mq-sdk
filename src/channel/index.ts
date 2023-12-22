@@ -17,7 +17,6 @@ import {
 import {
   ByteArrayToHexString,
   getDataSignature,
-  getGroupId,
   getMessageUpdateDate,
   newDateFormat,
   sha256,
@@ -30,6 +29,7 @@ import {
   CreateRoomApiParams,
   CreateRoomParams,
   GroupPermissions,
+  MessageItemType,
   PageParams,
   ServiceResponse,
   UpdateGroupPermissionsApiParams,
@@ -37,7 +37,6 @@ import {
   UpdateRoomListParams,
   Web3MQDBValue,
 } from '../types';
-import { Web3MQMessageStatusResp, Web3MQRequestMessage } from '../pb';
 
 export class Channel {
   private readonly _client: Client;
@@ -85,13 +84,14 @@ export class Channel {
     return data;
   }
 
-  async handleUnread(resp: Web3MQRequestMessage | Web3MQMessageStatusResp, msg: any) {
+  async handleUnread(msg: MessageItemType) {
     if (!this.activeChannel) {
       return;
     }
     const { storage } = this._client;
+    const { messageId, topic, senderId, timestamp, content, date } = msg;
     let count = 0;
-    const comeFrom = getGroupId(resp, this._client) || this.activeChannel.chatid;
+    const comeFrom = topic || this.activeChannel.chatid;
     const data = await storage.getData(comeFrom);
     const msglist = !data ? [msg] : [...data.payload.messageList, msg];
 
@@ -100,13 +100,13 @@ export class Channel {
     }
 
     const indexeddbData: Web3MQDBValue = {
-      messageId: resp.messageId,
-      from: comeFrom,
-      contentTopic: resp.contentTopic,
-      timestamp: Number(resp.timestamp),
+      messageId,
+      from: senderId,
+      contentTopic: messageId,
+      timestamp,
       unread: count,
-      lastMessage: msg.content,
-      updatedAt: msg.date,
+      lastMessage: content,
+      updatedAt: date,
       payload: {
         messageList: msglist,
       },
@@ -349,7 +349,12 @@ export class Channel {
     });
     if (this.channelList !== null) {
       if (!this.channelList.find((item) => item.chatid !== groupid)) {
-        const { groupid: group_id = '', group_name = '', avatar_base64 = '', avatar_url = '' } = data;
+        const {
+          groupid: group_id = '',
+          group_name = '',
+          avatar_base64 = '',
+          avatar_url = '',
+        } = data;
         this.channelList = [
           {
             chatid: group_id,
